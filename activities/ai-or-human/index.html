@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI or Human? // Detection Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #050508;
+            --bg-dark: #0a0a12;
+            --bg-panel: #12121a;
+            --bg-elevated: #1a1a25;
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff00aa;
+            --neon-green: #00ff6a;
+            --neon-red: #ff2a2a;
+            --neon-yellow: #ffea00;
+            --text-bright: #ffffff;
+            --text-dim: #8888aa;
+            --text-muted: #555566;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+            96% { opacity: 0.9; }
+            97% { opacity: 1; }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 20px var(--neon-cyan)); }
+            50% { filter: drop-shadow(0 0 40px var(--neon-cyan)); }
+        }
+
+        @keyframes count-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes streak-fire {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes reveal-slide {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-void);
+            color: var(--text-bright);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Noise texture overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0 3rem;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            animation: flicker 4s infinite;
+        }
+
+        .logo .ai {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+        }
+
+        .logo .or {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.7em;
+            margin: 0 0.3em;
+        }
+
+        .logo .human {
+            color: var(--neon-magenta);
+            text-shadow: 0 0 20px var(--neon-magenta), 0 0 40px var(--neon-magenta);
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--text-muted);
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .home-link:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--bg-elevated);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .stat-value.score { color: var(--neon-green); }
+        .stat-value.streak { color: var(--neon-yellow); }
+        .stat-value.timer { color: var(--neon-magenta); }
+
+        .stat-value.streak.on-fire {
+            background: linear-gradient(90deg, var(--neon-yellow), var(--neon-red), var(--neon-yellow));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: streak-fire 1s linear infinite;
+        }
+
+        /* Game Area */
+        .game-area {
+            background: var(--bg-dark);
+            border: 1px solid var(--bg-elevated);
+            min-height: 500px;
+            position: relative;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-void);
+            border: 1px solid var(--neon-cyan);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--neon-cyan);
+            z-index: 10;
+        }
+
+        .question-counter {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 10;
+        }
+
+        .content-display {
+            padding: 4rem 2rem 2rem;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-bright);
+            max-width: 700px;
+            text-align: left;
+            padding: 2rem;
+            background: var(--bg-panel);
+            border-left: 3px solid var(--neon-cyan);
+            position: relative;
+        }
+
+        .content-text.code-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            border-color: var(--neon-green);
+        }
+
+        .content-text::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            font-size: 4rem;
+            color: var(--bg-elevated);
+            font-family: Georgia, serif;
+        }
+
+        .content-image {
+            max-width: 100%;
+            max-height: 300px;
+            border: 2px solid var(--bg-elevated);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-social {
+            background: var(--bg-panel);
+            border: 1px solid var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .social-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--bg-elevated);
+        }
+
+        .social-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+        }
+
+        .social-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .social-handle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .social-body {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .social-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Choice Buttons */
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1.5rem 2rem 2rem;
+        }
+
+        .choice-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            padding: 1.5rem 2rem;
+            border: 2px solid;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .choice-btn:hover::before {
+            left: 100%;
+        }
+
+        .choice-btn.ai {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .choice-btn.ai:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3), inset 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .choice-btn.human {
+            border-color: var(--neon-magenta);
+            color: var(--neon-magenta);
+        }
+
+        .choice-btn.human:hover {
+            background: rgba(255, 0, 170, 0.1);
+            box-shadow: 0 0 30px rgba(255, 0, 170, 0.3), inset 0 0 30px rgba(255, 0, 170, 0.1);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .choice-btn.correct {
+            border-color: var(--neon-green) !important;
+            color: var(--neon-green) !important;
+            background: rgba(0, 255, 106, 0.2) !important;
+            box-shadow: 0 0 40px rgba(0, 255, 106, 0.5) !important;
+        }
+
+        .choice-btn.wrong {
+            border-color: var(--neon-red) !important;
+            color: var(--neon-red) !important;
+            background: rgba(255, 42, 42, 0.2) !important;
+            animation: glitch 0.3s ease;
+        }
+
+        /* Result Reveal */
+        .result-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.95);
+            z-index: 20;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .result-overlay.show {
+            display: flex;
+            animation: reveal-slide 0.4s ease;
+        }
+
+        .result-verdict {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        .result-verdict.correct {
+            color: var(--neon-green);
+            text-shadow: 0 0 30px var(--neon-green);
+        }
+
+        .result-verdict.wrong {
+            color: var(--neon-red);
+            text-shadow: 0 0 30px var(--neon-red);
+        }
+
+        .result-answer {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+        }
+
+        .result-answer span {
+            font-weight: 700;
+        }
+
+        .result-answer span.ai { color: var(--neon-cyan); }
+        .result-answer span.human { color: var(--neon-magenta); }
+
+        .result-explanation {
+            max-width: 600px;
+            padding: 1.5rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--bg-elevated);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .result-explanation strong {
+            color: var(--neon-yellow);
+        }
+
+        .points-earned {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            margin-bottom: 1.5rem;
+        }
+
+        .next-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            padding: 1rem 3rem;
+            background: var(--neon-cyan);
+            border: none;
+            color: var(--bg-void);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            box-shadow: 0 0 30px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .start-screen h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--neon-cyan);
+        }
+
+        .start-screen p {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        .difficulty-select {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover, .difficulty-btn.active {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .name-input {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .name-input input {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            padding: 0.8rem 1.2rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--bg-elevated);
+            color: var(--text-bright);
+            width: 200px;
+            text-align: center;
+        }
+
+        .name-input input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        .start-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            padding: 1.2rem 4rem;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+            border: none;
+            color: var(--bg-void);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .final-score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .accuracy-stat {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .accuracy-stat span {
+            color: var(--neon-green);
+            font-weight: 700;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--bg-panel);
+            border: 2px solid var(--neon-yellow);
+            color: var(--neon-yellow);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--bg-elevated);
+        }
+
+        .leaderboard h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            margin-bottom: 1.5rem;
+        }
+
+        .leaderboard-list {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--bg-panel);
+            margin-bottom: 0.5rem;
+            border-left: 3px solid transparent;
+        }
+
+        .leaderboard-entry:nth-child(1) { border-color: var(--neon-yellow); }
+        .leaderboard-entry:nth-child(2) { border-color: var(--text-dim); }
+        .leaderboard-entry:nth-child(3) { border-color: #cd7f32; }
+
+        .leaderboard-rank {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 30px;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .play-again-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            padding: 1rem 3rem;
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .play-again-btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+
+        /* Timer Warning */
+        .stat-value.timer.warning {
+            color: var(--neon-red);
+            animation: count-pulse 0.5s ease infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .stat-box { padding: 0.8rem 0.5rem; }
+            .stat-value { font-size: 1.2rem; }
+            .choices { grid-template-columns: 1fr; }
+            .content-display { padding: 3rem 1rem 1rem; }
+            .content-text { padding: 1.5rem; font-size: 1rem; }
+            .home-link { top: 0.5rem; left: 0.5rem; padding: 0.4rem 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">[ BACK TO COURSE ]</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="ai">AI</span>
+                <span class="or">or</span>
+                <span class="human">HUMAN</span>
+                <span class="or">?</span>
+            </h1>
+            <p class="tagline">Can you spot the machine?</p>
+        </header>
+
+        <div class="stats-bar" id="statsBar" style="display: none;">
+            <div class="stat-box">
+                <div class="stat-label">Score</div>
+                <div class="stat-value score" id="scoreDisplay">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Streak</div>
+                <div class="stat-value streak" id="streakDisplay">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Accuracy</div>
+                <div class="stat-value" id="accuracyDisplay">-%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Time</div>
+                <div class="stat-value timer" id="timerDisplay">15</div>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <!-- Start Screen -->
+            <div class="start-screen" id="startScreen">
+                <h2>DETECTION PROTOCOL</h2>
+                <p>You'll see 15 examples of content - some created by AI, some by humans. Can you tell the difference? Fast answers earn bonus points. Build streaks for multipliers.</p>
+
+                <div class="name-input">
+                    <input type="text" id="playerName" placeholder="Enter your alias" maxlength="15">
+                </div>
+
+                <div class="difficulty-select">
+                    <button class="difficulty-btn active" data-time="20">EASY (20s)</button>
+                    <button class="difficulty-btn" data-time="15">NORMAL (15s)</button>
+                    <button class="difficulty-btn" data-time="10">HARD (10s)</button>
+                </div>
+
+                <button class="start-btn" onclick="startGame()">INITIATE SCAN</button>
+            </div>
+
+            <!-- Game Screen -->
+            <div id="gameScreen" style="display: none;">
+                <div class="category-badge" id="categoryBadge">WRITING</div>
+                <div class="question-counter" id="questionCounter">01/15</div>
+
+                <div class="content-display" id="contentDisplay"></div>
+
+                <div class="choices">
+                    <button class="choice-btn ai" id="aiBtn" onclick="makeChoice('ai')">AI GENERATED</button>
+                    <button class="choice-btn human" id="humanBtn" onclick="makeChoice('human')">HUMAN MADE</button>
+                </div>
+
+                <div class="result-overlay" id="resultOverlay">
+                    <div class="result-verdict" id="resultVerdict">CORRECT</div>
+                    <div class="result-answer" id="resultAnswer">This was created by <span class="ai">AI</span></div>
+                    <div class="result-explanation" id="resultExplanation"></div>
+                    <div class="points-earned" id="pointsEarned">+100 POINTS</div>
+                    <button class="next-btn" onclick="nextQuestion()">CONTINUE</button>
+                </div>
+            </div>
+
+            <!-- End Screen -->
+            <div class="end-screen" id="endScreen" style="display: none;">
+                <div class="final-score" id="finalScore">0</div>
+                <div class="score-label">FINAL SCORE</div>
+                <div class="accuracy-stat" id="finalAccuracy">You correctly identified <span>0/15</span> samples</div>
+                <div class="rank-badge" id="rankBadge">NOVICE DETECTOR</div>
+
+                <button class="play-again-btn" onclick="resetGame()">SCAN AGAIN</button>
+
+                <div class="leaderboard">
+                    <h3>TOP DETECTORS</h3>
+                    <div class="leaderboard-list" id="leaderboardList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Questions - Mix of tricky AI and human content
+        const questions = [
+            {
+                category: "WRITING",
+                type: "text",
+                content: `The morning light hit different today. Not in that Instagram filter way everyone's always banging on about, but genuinely different - like the clouds had given up trying to look aesthetic and just existed. Made me think about my nan's kitchen, weirdly enough. The way dust would float in the sunbeams while she burnt toast for the fifth time that week.`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. The casual Australian voice ('banging on about'), specific imperfect memory (nan burning toast), and the natural flow of thought are hard for AI to replicate authentically. AI tends to be more polished and less specific with personal details."
+            },
+            {
+                category: "WRITING",
+                type: "text",
+                content: `The integration of renewable energy sources into Australia's national grid represents a pivotal moment in our nation's environmental journey. As we transition away from fossil fuels, we must consider the multifaceted implications of this shift, including economic impacts, technological requirements, and the need for comprehensive policy frameworks that balance progress with practicality.`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong> (ChatGPT-style). The giveaways: overly formal tone, generic 'multifaceted implications', perfectly structured but says nothing specific. Real experts would cite actual data, policies, or regions. This is classic AI 'sounds smart but is vague' writing."
+            },
+            {
+                category: "CODE",
+                type: "code",
+                content: `// TODO: fix this later, it works but idk why
+function calcTotal(items) {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        // sarah said to add GST here??
+        total += items[i].price * 1.1;
+    }
+    return total.toFixed(2); // might break for negative
+}`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. The messy comments ('fix this later', 'idk why', 'sarah said'), uncertainty, and acknowledging potential bugs are very human. AI code is usually cleaner, with proper documentation, and wouldn't admit confusion or reference colleagues."
+            },
+            {
+                category: "CODE",
+                type: "code",
+                content: `/**
+ * Calculates the total price of items including GST
+ * @param {Array} items - Array of item objects with price property
+ * @returns {string} Total price formatted to 2 decimal places
+ */
+function calculateTotal(items) {
+    const GST_RATE = 1.1;
+    const total = items.reduce((sum, item) => sum + (item.price * GST_RATE), 0);
+    return total.toFixed(2);
+}`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong> (Claude-style). Perfect JSDoc comments, meaningful variable names (GST_RATE), modern JavaScript (reduce instead of for loop), and immaculate formatting. Too clean and educational to be typical human code written under deadline pressure."
+            },
+            {
+                category: "SOCIAL MEDIA",
+                type: "social",
+                platform: "twitter",
+                username: "Sarah Mitchell",
+                handle: "@sarahm_perth",
+                content: `just saw a huntsman the size of my hand in the bathroom and now I live in the lounge room I guess. this is my life now. the spider can have the mortgage.`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. The dry Australian humour, relatable exaggeration, and specific regional reference (huntsman spiders) feel authentic. AI struggles with this kind of casual, culturally-specific comedy that doesn't try too hard."
+            },
+            {
+                category: "SOCIAL MEDIA",
+                type: "social",
+                platform: "linkedin",
+                username: "James Richardson",
+                handle: "Leadership Coach",
+                content: `Excited to share that I've just completed a transformative journey in understanding the power of authentic leadership. After 6 months of deep reflection, I've discovered that true success comes from empowering others. Three key takeaways: 1) Listen more than you speak 2) Embrace vulnerability 3) Lead with empathy. What leadership lessons have shaped your journey? Let's connect and share insights!`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong>. Classic LinkedIn AI cringe: 'transformative journey', 'deep reflection', numbered takeaways that are generic platitudes, and the desperate engagement bait at the end. Real professionals share specific stories, not vague inspiration."
+            },
+            {
+                category: "SOCIAL MEDIA",
+                type: "social",
+                platform: "instagram",
+                username: "coastal.eats.wa",
+                handle: "@coastal.eats.wa",
+                content: `freo markets never miss. grabbed the laksa from that stall near the back (you know the one) and nearly cried. $14 for what felt like a spiritual experience. the aunty remembered my order from last month?? legends only. if you're coming down hit me up for the actual good spots, not the tourist trap ones`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. Specific local knowledge (Freo markets, 'the stall near the back'), real pricing, personal connection ('aunty remembered'), and casual invitation to DM. AI would name the stall directly and be more polished."
+            },
+            {
+                category: "WRITING",
+                type: "text",
+                content: `Climate change poses unprecedented challenges to our planet's ecosystems. Rising temperatures, extreme weather events, and shifting precipitation patterns threaten biodiversity and human societies alike. To address this global crisis, we must embrace sustainable practices, invest in renewable energy, and foster international cooperation. Together, we can create a more resilient and sustainable future for generations to come.`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong>. The red flags: every sentence is a platitude, no specific data or locations, 'unprecedented challenges', 'together we can'. It's the AI equivalent of a motivational poster - sounds important, says nothing actionable."
+            },
+            {
+                category: "WRITING",
+                type: "text",
+                content: `I've read all the threads about whether to take the gap year or go straight to uni and honestly? Everyone's missing the point. It's not about 'finding yourself' or whatever. I worked at Bunnings for 8 months and all I found was that I really hate being asked where the mulch is. Learned more about what I DON'T want to do which is apparently valuable or something.`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. The casual dismissal of cliches, specific Australian reference (Bunnings), self-deprecating humour about a mundane job, and the authentic uncertainty ('or something') are distinctly human. AI would give balanced, serious gap year advice."
+            },
+            {
+                category: "SOCIAL MEDIA",
+                type: "social",
+                platform: "twitter",
+                username: "TechInsider",
+                handle: "@techinsider_au",
+                content: `The future of artificial intelligence is incredibly exciting! We're witnessing unprecedented advances in machine learning that will revolutionize healthcare, education, and entertainment. As we embrace these innovations, we must also consider the ethical implications. What are your thoughts on AI? Share below!`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong>. Buzzword bingo: 'unprecedented advances', 'revolutionize', 'ethical implications'. No specific innovations mentioned, no actual insights, just vague tech optimism ending with engagement bait. Real tech accounts would share specific news or opinions."
+            },
+            {
+                category: "CODE",
+                type: "code",
+                content: `def get_weather(city):
+    # i know theres a better way to do this lol
+    if city == "perth":
+        return "hot af"
+    elif city == "melbourne":
+        return "all 4 seasons today mate"
+    elif city == "sydney":
+        return "humid but pretending its not"
+    else:
+        return "dunno check bom.gov.au"`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. The informal comments, Australian slang ('hot af', 'mate'), culturally accurate jokes about Melbourne weather, and lazy else case ('dunno check bom') are authentically human. AI would write a proper API call or at least be more professional."
+            },
+            {
+                category: "WRITING",
+                type: "text",
+                content: `The café was the kind of place that tried too hard to look like it wasn't trying. Exposed brick, mismatched chairs, a barista with a moustache you could set your watch to. I ordered something with oat milk because that's what you do now, apparently. Three years ago I thought oats were for horses. Now I'm paying $6.50 to drink them and pretending I can taste the difference.`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. The self-aware observation about hipster cafés, specific details (barista's moustache, $6.50 price), and wry commentary on changing habits are distinctly human. AI would describe the café more positively or give a balanced review."
+            },
+            {
+                category: "SOCIAL MEDIA",
+                type: "social",
+                platform: "linkedin",
+                username: "Dr. Amanda Chen",
+                handle: "AI Research Lead @ CSIRO",
+                content: `Our latest paper on using ML for bushfire prediction is finally out. 3 years of work, 47 rejected models, and one very patient PhD student later. Accuracy improved 23% over existing methods but honestly the real win was getting the model to work on rural areas with patchy satellite coverage. Link in comments if anyone wants the technical details.`,
+                answer: "human",
+                explanation: "This is <strong>human-written</strong>. Real researcher voice: specific numbers (3 years, 47 models, 23%), acknowledging failures and team members, technical honesty about the actual challenge (patchy coverage), and casual tone. AI would oversell the achievement and be less specific about the struggles."
+            },
+            {
+                category: "WRITING",
+                type: "text",
+                content: `In the realm of modern education, digital literacy has emerged as a fundamental skill for success. As technology continues to evolve at an unprecedented pace, students must develop the ability to critically evaluate online information, navigate digital platforms safely, and leverage technology for learning. Educational institutions play a crucial role in fostering these essential competencies.`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong>. Empty phrases: 'realm of modern education', 'unprecedented pace', 'essential competencies'. It reads like a school mission statement written by committee. No specific examples, tools, or actionable advice - just impressive-sounding nothing."
+            },
+            {
+                category: "CODE",
+                type: "code",
+                content: `async function fetchUserData(userId) {
+    try {
+        const response = await fetch(\`/api/users/\${userId}\`);
+        if (!response.ok) {
+            throw new Error(\`HTTP error! status: \${response.status}\`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        throw error;
+    }
+}`,
+                answer: "ai",
+                explanation: "This is <strong>AI-generated</strong>. Textbook-perfect async/await, proper error handling, template literals done correctly, educational error messages. It's the exact code you'd find in a tutorial - too clean and complete for typical developer code where error handling is often an afterthought."
+            }
+        ];
+
+        // Game State
+        let currentQuestion = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let correct = 0;
+        let timeLeft = 15;
+        let baseTime = 15;
+        let timer = null;
+        let playerName = "ANONYMOUS";
+        let shuffledQuestions = [];
+
+        // Initialize difficulty buttons
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                baseTime = parseInt(this.dataset.time);
+            });
+        });
+
+        // Shuffle array
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Start Game
+        function startGame() {
+            playerName = document.getElementById('playerName').value.trim() || 'ANONYMOUS';
+            shuffledQuestions = shuffle(questions);
+            currentQuestion = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            correct = 0;
+
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('statsBar').style.display = 'grid';
+            document.getElementById('endScreen').style.display = 'none';
+
+            loadQuestion();
+        }
+
+        // Load Question
+        function loadQuestion() {
+            if (currentQuestion >= shuffledQuestions.length) {
+                endGame();
+                return;
+            }
+
+            const q = shuffledQuestions[currentQuestion];
+            document.getElementById('categoryBadge').textContent = q.category;
+            document.getElementById('questionCounter').textContent =
+                `${String(currentQuestion + 1).padStart(2, '0')}/${shuffledQuestions.length}`;
+
+            const display = document.getElementById('contentDisplay');
+
+            if (q.type === 'text') {
+                display.innerHTML = `<div class="content-text">${q.content}</div>`;
+            } else if (q.type === 'code') {
+                display.innerHTML = `<div class="content-text code-content">${q.content}</div>`;
+            } else if (q.type === 'social') {
+                display.innerHTML = `
+                    <div class="content-social">
+                        <div class="social-header">
+                            <div class="social-avatar"></div>
+                            <div>
+                                <div class="social-name">${q.username}</div>
+                                <div class="social-handle">${q.handle}</div>
+                            </div>
+                        </div>
+                        <div class="social-body">${q.content}</div>
+                        <div class="social-meta">${q.platform.toUpperCase()} POST</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('resultOverlay').classList.remove('show');
+            document.getElementById('aiBtn').disabled = false;
+            document.getElementById('humanBtn').disabled = false;
+            document.getElementById('aiBtn').classList.remove('correct', 'wrong');
+            document.getElementById('humanBtn').classList.remove('correct', 'wrong');
+
+            // Start timer
+            timeLeft = baseTime;
+            updateTimer();
+            if (timer) clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    makeChoice(null); // Time ran out
+                }
+            }, 1000);
+        }
+
+        // Update Timer Display
+        function updateTimer() {
+            const timerEl = document.getElementById('timerDisplay');
+            timerEl.textContent = timeLeft;
+            if (timeLeft <= 5) {
+                timerEl.classList.add('warning');
+            } else {
+                timerEl.classList.remove('warning');
+            }
+        }
+
+        // Make Choice
+        function makeChoice(choice) {
+            clearInterval(timer);
+
+            const q = shuffledQuestions[currentQuestion];
+            const isCorrect = choice === q.answer;
+
+            document.getElementById('aiBtn').disabled = true;
+            document.getElementById('humanBtn').disabled = true;
+
+            // Show which button was correct
+            if (q.answer === 'ai') {
+                document.getElementById('aiBtn').classList.add('correct');
+                if (choice === 'human') document.getElementById('humanBtn').classList.add('wrong');
+            } else {
+                document.getElementById('humanBtn').classList.add('correct');
+                if (choice === 'ai') document.getElementById('aiBtn').classList.add('wrong');
+            }
+
+            // Calculate points
+            let points = 0;
+            if (isCorrect) {
+                correct++;
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+
+                // Base points + time bonus + streak bonus
+                const timeBonus = Math.floor(timeLeft * 5);
+                const streakMultiplier = Math.min(streak, 5);
+                points = (100 + timeBonus) * streakMultiplier;
+                score += points;
+            } else {
+                streak = 0;
+            }
+
+            // Update displays
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('streakDisplay').textContent = streak;
+            if (streak >= 3) {
+                document.getElementById('streakDisplay').classList.add('on-fire');
+            } else {
+                document.getElementById('streakDisplay').classList.remove('on-fire');
+            }
+
+            const accuracy = currentQuestion > 0 ? Math.round((correct / (currentQuestion + 1)) * 100) : 0;
+            document.getElementById('accuracyDisplay').textContent = accuracy + '%';
+
+            // Show result overlay
+            setTimeout(() => {
+                const overlay = document.getElementById('resultOverlay');
+                const verdict = document.getElementById('resultVerdict');
+                const answer = document.getElementById('resultAnswer');
+
+                if (choice === null) {
+                    verdict.textContent = "TIME'S UP";
+                    verdict.className = 'result-verdict wrong';
+                } else if (isCorrect) {
+                    verdict.textContent = 'CORRECT';
+                    verdict.className = 'result-verdict correct';
+                } else {
+                    verdict.textContent = 'WRONG';
+                    verdict.className = 'result-verdict wrong';
+                }
+
+                answer.innerHTML = `This was created by <span class="${q.answer}">${q.answer.toUpperCase()}</span>`;
+                document.getElementById('resultExplanation').innerHTML = q.explanation;
+                document.getElementById('pointsEarned').textContent = isCorrect ? `+${points} POINTS` : '+0 POINTS';
+                document.getElementById('pointsEarned').style.color = isCorrect ? 'var(--neon-green)' : 'var(--neon-red)';
+
+                overlay.classList.add('show');
+            }, 500);
+        }
+
+        // Next Question
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // End Game
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('endScreen').style.display = 'block';
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalAccuracy').innerHTML =
+                `You correctly identified <span>${correct}/${shuffledQuestions.length}</span> samples`;
+
+            // Determine rank
+            const accuracy = correct / shuffledQuestions.length;
+            let rank;
+            if (accuracy >= 0.93) rank = "MASTER DETECTOR";
+            else if (accuracy >= 0.8) rank = "EXPERT ANALYST";
+            else if (accuracy >= 0.67) rank = "SKILLED SCANNER";
+            else if (accuracy >= 0.53) rank = "LEARNING AGENT";
+            else rank = "NOVICE DETECTOR";
+
+            document.getElementById('rankBadge').textContent = rank;
+
+            // Save to leaderboard
+            saveScore(playerName, score);
+            displayLeaderboard();
+        }
+
+        // Save Score to localStorage
+        function saveScore(name, score) {
+            let leaderboard = JSON.parse(localStorage.getItem('aiOrHuman_leaderboard') || '[]');
+            leaderboard.push({ name, score, date: new Date().toISOString() });
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 10); // Keep top 10
+            localStorage.setItem('aiOrHuman_leaderboard', JSON.stringify(leaderboard));
+        }
+
+        // Display Leaderboard
+        function displayLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('aiOrHuman_leaderboard') || '[]');
+            const list = document.getElementById('leaderboardList');
+
+            if (leaderboard.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No scores yet</p>';
+                return;
+            }
+
+            list.innerHTML = leaderboard.map((entry, i) => `
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">${i + 1}</div>
+                    <div class="leaderboard-name">${entry.name}</div>
+                    <div class="leaderboard-score">${entry.score}</div>
+                </div>
+            `).join('');
+        }
+
+        // Reset Game
+        function resetGame() {
+            document.getElementById('endScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+            document.getElementById('statsBar').style.display = 'none';
+        }
+
+        // Initialize
+        displayLeaderboard();
+    </script>
+</body>
+</html>

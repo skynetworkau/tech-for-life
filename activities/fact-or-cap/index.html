@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fact or Cap? // AI Hallucination Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-elevated: #252525;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-yellow: #facc15;
+            --accent-blue: #3b82f6;
+            --text-white: #fafafa;
+            --text-gray: #9ca3af;
+            --text-muted: #6b7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Gradient mesh background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(239, 68, 68, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-elevated);
+            border-radius: 6px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .home-link:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 10vw, 5rem);
+            letter-spacing: 0.05em;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo .fact { color: var(--accent-green); }
+        .logo .or { color: var(--text-muted); font-size: 0.6em; }
+        .logo .cap { color: var(--accent-red); }
+
+        .tagline {
+            font-size: 1rem;
+            color: var(--text-gray);
+            font-weight: 400;
+        }
+
+        .tagline strong {
+            color: var(--accent-yellow);
+        }
+
+        /* Game Stats */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .stat-value.score { color: var(--accent-yellow); }
+        .stat-value.correct { color: var(--accent-green); }
+        .stat-value.wrong { color: var(--accent-red); }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-elevated);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Statement Card */
+        .statement-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--bg-elevated);
+            position: relative;
+        }
+
+        .ai-badge {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            padding: 0.4rem 1rem;
+            background: var(--bg-deep);
+            border: 1px solid var(--bg-elevated);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .statement-text {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            color: var(--text-white);
+            font-weight: 400;
+        }
+
+        .statement-source {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--bg-elevated);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .statement-source strong {
+            color: var(--text-gray);
+        }
+
+        /* Choice Buttons */
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .choice-btn {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.05em;
+            padding: 1.5rem 2rem;
+            border: 3px solid;
+            border-radius: 12px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .choice-btn span {
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        .choice-btn.fact {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .choice-btn.fact:hover:not(:disabled) {
+            background: rgba(34, 197, 94, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.2);
+        }
+
+        .choice-btn.cap {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .choice-btn.cap:hover:not(:disabled) {
+            background: rgba(239, 68, 68, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .choice-btn.selected.correct {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .choice-btn.selected.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Result Panel */
+        .result-panel {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-panel.show { display: block; }
+        .result-panel.correct { border-color: var(--accent-green); }
+        .result-panel.incorrect { border-color: var(--accent-red); }
+
+        .result-header {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-header.correct { color: var(--accent-green); }
+        .result-header.incorrect { color: var(--accent-red); }
+
+        .result-explanation {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            line-height: 1.7;
+        }
+
+        .result-explanation a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .result-explanation a:hover {
+            text-decoration: underline;
+        }
+
+        .next-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            background: var(--bg-elevated);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-white);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .next-btn:hover {
+            background: var(--accent-blue);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .start-screen p {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        .warning-box {
+            background: rgba(250, 204, 21, 0.1);
+            border: 1px solid var(--accent-yellow);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--accent-yellow);
+        }
+
+        .start-btn {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            padding: 1rem 4rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-deep);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .final-score {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 6rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .final-label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+        }
+
+        .final-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 8px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            color: var(--accent-yellow);
+            margin-bottom: 2rem;
+        }
+
+        .tips-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .tips-section h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .tips-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-section li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        .tips-section li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+        }
+
+        .play-again-btn {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 0.1em;
+            padding: 1rem 3rem;
+            background: transparent;
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .play-again-btn:hover {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .statement-card { padding: 2rem 1.5rem; }
+            .statement-text { font-size: 1.1rem; }
+            .choices { grid-template-columns: 1fr; }
+            .choice-btn { font-size: 1.5rem; padding: 1.2rem; }
+            .stats-row { gap: 1rem; }
+            .home-link { top: 0.5rem; left: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">← Back to Course</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="fact">FACT</span>
+                <span class="or"> or </span>
+                <span class="cap">CAP?</span>
+            </h1>
+            <p class="tagline">AI says a lot of things. Some of it is <strong>completely made up.</strong></p>
+        </header>
+
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <div class="start-screen">
+                <p>AI chatbots sometimes "hallucinate" - they confidently make up facts, statistics, quotes, and events that never happened. Can you spot the lies?</p>
+
+                <div class="warning-box">
+                    ⚠️ All statements in this game are presented as if generated by AI. Your job is to identify which are real facts and which are AI hallucinations.
+                </div>
+
+                <button class="start-btn" onclick="startGame()">START DETECTING</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" style="display: none;">
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-value score" id="scoreDisplay">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value correct" id="correctDisplay">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value wrong" id="wrongDisplay">0</div>
+                    <div class="stat-label">Wrong</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="questionNum">Question 1</span>
+                    <span id="questionTotal">of 12</span>
+                </div>
+            </div>
+
+            <div class="statement-card">
+                <div class="ai-badge">AI Generated Statement</div>
+                <p class="statement-text" id="statementText"></p>
+                <div class="statement-source" id="statementSource"></div>
+            </div>
+
+            <div class="choices">
+                <button class="choice-btn fact" id="factBtn" onclick="makeChoice('fact')">
+                    FACT
+                    <span>This is true</span>
+                </button>
+                <button class="choice-btn cap" id="capBtn" onclick="makeChoice('cap')">
+                    CAP
+                    <span>This is made up</span>
+                </button>
+            </div>
+
+            <div class="result-panel" id="resultPanel">
+                <div class="result-header" id="resultHeader"></div>
+                <div class="result-explanation" id="resultExplanation"></div>
+                <button class="next-btn" onclick="nextQuestion()">Next Question →</button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" style="display: none;">
+            <div class="end-screen">
+                <div class="final-score" id="finalScore">0</div>
+                <div class="final-label">Points</div>
+
+                <div class="final-stats">
+                    <div class="stat">
+                        <div class="stat-value correct" id="finalCorrect">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value wrong" id="finalWrong">0</div>
+                        <div class="stat-label">Wrong</div>
+                    </div>
+                </div>
+
+                <div class="rank-badge" id="rankBadge">HALLUCINATION HUNTER</div>
+
+                <div class="tips-section">
+                    <h3>How to Spot AI Hallucinations</h3>
+                    <ul>
+                        <li>Be suspicious of very specific numbers, dates, or statistics - AI loves to make these up</li>
+                        <li>Fake quotes are common - AI invents quotes from real people</li>
+                        <li>Cross-reference anything important with reliable sources</li>
+                        <li>If it sounds too perfect or too interesting, it might be fabricated</li>
+                        <li>AI often mixes real facts with made-up details</li>
+                        <li>Recent events (after training cutoff) are often hallucinated</li>
+                    </ul>
+                </div>
+
+                <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Questions - Mix of real facts and AI hallucinations
+        const questions = [
+            {
+                statement: "The Sydney Opera House was designed by Danish architect Jørn Utzon, who won an international design competition in 1957. Construction took 16 years and cost $102 million, roughly 14 times the original budget.",
+                source: "Commonly cited fact about Australian architecture",
+                answer: "fact",
+                explanation: "This is <strong>TRUE</strong>. Jørn Utzon did win the 1957 competition, and the Opera House did take 16 years to build (1959-1973). The original budget was $7 million, and it ended up costing around $102 million - about 14 times over budget."
+            },
+            {
+                statement: "In 2019, the Australian government passed the 'Digital Identity Act' which requires all citizens to have a verified digital ID by 2025, with penalties of up to $5,000 for non-compliance.",
+                source: "Statement about Australian digital policy",
+                answer: "cap",
+                explanation: "This is <strong>CAP</strong> (hallucination). While Australia has been developing digital identity systems, there is no 'Digital Identity Act' requiring all citizens to have verified digital IDs with penalties for non-compliance. AI often invents specific legislation with believable details."
+            },
+            {
+                statement: "Quokkas, the small marsupials found on Rottnest Island in Western Australia, are known to throw their babies at predators as a defence mechanism to escape danger.",
+                source: "Popular claim about Australian wildlife",
+                answer: "fact",
+                explanation: "This is <strong>TRUE</strong> (sort of). While 'throwing' is an exaggeration, quokka mothers can eject joeys from their pouches when threatened. The joey's movement distracts predators, allowing the mother to escape. This behaviour has been observed in several marsupial species."
+            },
+            {
+                statement: "ChatGPT was created by a team of researchers at Google Brain in 2021, led by chief scientist Dr. Ilya Sutskever, before being acquired by Microsoft in early 2022.",
+                source: "Statement about AI history",
+                answer: "cap",
+                explanation: "This is <strong>CAP</strong> (hallucination). ChatGPT was created by OpenAI (not Google Brain) and released in November 2022. Ilya Sutskever was at OpenAI, not Google. Microsoft invested in OpenAI but didn't acquire it. AI often mixes up tech companies and their products."
+            },
+            {
+                statement: "Australia has the world's longest fence, the Dingo Fence (or Dog Fence), stretching over 5,600 kilometres - longer than the Great Wall of China.",
+                source: "Geographic fact about Australia",
+                answer: "fact",
+                explanation: "This is <strong>TRUE</strong>. The Dingo Fence runs 5,614 km through Queensland, New South Wales, and South Australia. It was built to keep dingoes away from fertile land in the southeast. The Great Wall of China is about 5,500 km, making the Dingo Fence longer."
+            },
+            {
+                statement: "According to a 2023 study by Melbourne University, 73% of Australian teenagers spend more than 6 hours daily on social media, with TikTok being the primary platform for 89% of users.",
+                source: "Research statistic about teen social media use",
+                answer: "cap",
+                explanation: "This is <strong>CAP</strong> (hallucination). AI frequently invents specific statistics and attributes them to real institutions. While teen social media use is high, these specific percentages and the cited study don't exist. Always verify statistics by finding the original source."
+            },
+            {
+                statement: "The platypus is one of only five species of mammals that lay eggs (monotremes), and males have venomous spurs on their hind legs that can cause severe pain in humans.",
+                source: "Biology fact",
+                answer: "fact",
+                explanation: "This is <strong>TRUE</strong>. Platypuses are monotremes (egg-laying mammals) along with four species of echidnas. Male platypuses do have venomous spurs that produce pain severe enough to incapacitate a human and isn't relieved by morphine."
+            },
+            {
+                statement: "In 2022, Elon Musk famously said in an interview: 'Australia will be the world leader in renewable energy by 2030. I'm considering moving Tesla's headquarters to Perth.'",
+                source: "Quote attribution",
+                answer: "cap",
+                explanation: "This is <strong>CAP</strong> (hallucination). Elon Musk never made this statement. AI commonly fabricates quotes from famous people - they sound plausible but are completely invented. Always search for the original interview or source when you see a specific quote."
+            },
+            {
+                statement: "Bunnings Warehouse, the Australian hardware chain, sells approximately 50,000 sausages every Saturday through their community fundraising sausage sizzles.",
+                source: "Business fact about Australian retail",
+                answer: "cap",
+                explanation: "This is <strong>CAP</strong> (hallucination). While Bunnings sausage sizzles are iconic and extremely popular, this specific statistic is made up. Bunnings doesn't publish official numbers on sausages sold. AI loves to invent plausible-sounding statistics for well-known things."
+            },
+            {
+                statement: "Lake Hillier in Western Australia is naturally bright pink year-round. Scientists believe the colour comes from a combination of algae, bacteria, and high salt concentration.",
+                source: "Geographic fact about WA",
+                answer: "fact",
+                explanation: "This is <strong>TRUE</strong>. Lake Hillier on Middle Island in WA is indeed bright pink year-round. The exact cause is still being studied, but scientists believe it's due to the presence of Dunaliella salina algae, Halobacteria, and the lake's high salinity."
+            },
+            {
+                statement: "The Australian government's 'Youth Digital Skills Initiative' announced in March 2024 provides every Year 12 student with free access to Adobe Creative Cloud and Microsoft 365 until age 25.",
+                source: "Government policy statement",
+                answer: "cap",
+                explanation: "This is <strong>CAP</strong> (hallucination). There is no such initiative. AI often creates fake government programs with specific, believable details. If you see claims about new policies or initiatives, always check official government websites."
+            },
+            {
+                statement: "The Great Barrier Reef is so large it can be seen from space, and it's the only living structure on Earth visible from orbit.",
+                source: "Common claim about the Great Barrier Reef",
+                answer: "cap",
+                explanation: "This is <strong>PARTIALLY CAP</strong>. While the Great Barrier Reef can technically be seen from low Earth orbit with the right conditions, it's NOT the only living structure visible from space - many forests and algal blooms are also visible. The claim that it's 'the only one' is false."
+            }
+        ];
+
+        // Game State
+        let currentQuestion = 0;
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let shuffledQuestions = [];
+
+        // Shuffle array
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Start Game
+        function startGame() {
+            shuffledQuestions = shuffle(questions);
+            currentQuestion = 0;
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('endScreen').style.display = 'none';
+
+            loadQuestion();
+        }
+
+        // Load Question
+        function loadQuestion() {
+            const q = shuffledQuestions[currentQuestion];
+
+            document.getElementById('statementText').textContent = q.statement;
+            document.getElementById('statementSource').innerHTML = `<strong>Context:</strong> ${q.source}`;
+
+            document.getElementById('questionNum').textContent = `Question ${currentQuestion + 1}`;
+            document.getElementById('questionTotal').textContent = `of ${shuffledQuestions.length}`;
+            document.getElementById('progressFill').style.width = `${((currentQuestion) / shuffledQuestions.length) * 100}%`;
+
+            document.getElementById('factBtn').disabled = false;
+            document.getElementById('capBtn').disabled = false;
+            document.getElementById('factBtn').className = 'choice-btn fact';
+            document.getElementById('capBtn').className = 'choice-btn cap';
+
+            document.getElementById('resultPanel').classList.remove('show', 'correct', 'incorrect');
+        }
+
+        // Make Choice
+        function makeChoice(choice) {
+            const q = shuffledQuestions[currentQuestion];
+            const isCorrect = choice === q.answer;
+
+            document.getElementById('factBtn').disabled = true;
+            document.getElementById('capBtn').disabled = true;
+
+            const selectedBtn = choice === 'fact' ? 'factBtn' : 'capBtn';
+            const otherBtn = choice === 'fact' ? 'capBtn' : 'factBtn';
+
+            if (isCorrect) {
+                correctCount++;
+                score += 100;
+                document.getElementById(selectedBtn).classList.add('selected', 'correct');
+            } else {
+                wrongCount++;
+                document.getElementById(selectedBtn).classList.add('selected', 'incorrect');
+                // Show correct answer
+                document.getElementById(q.answer === 'fact' ? 'factBtn' : 'capBtn').classList.add('selected', 'correct');
+            }
+
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('correctDisplay').textContent = correctCount;
+            document.getElementById('wrongDisplay').textContent = wrongCount;
+
+            // Show result panel
+            const resultPanel = document.getElementById('resultPanel');
+            const resultHeader = document.getElementById('resultHeader');
+
+            resultPanel.classList.add('show');
+            resultPanel.classList.add(isCorrect ? 'correct' : 'incorrect');
+            resultHeader.className = 'result-header ' + (isCorrect ? 'correct' : 'incorrect');
+            resultHeader.textContent = isCorrect ? '✓ CORRECT!' : '✗ WRONG!';
+
+            document.getElementById('resultExplanation').innerHTML = q.explanation;
+        }
+
+        // Next Question
+        function nextQuestion() {
+            currentQuestion++;
+
+            if (currentQuestion >= shuffledQuestions.length) {
+                endGame();
+                return;
+            }
+
+            loadQuestion();
+        }
+
+        // End Game
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('endScreen').style.display = 'block';
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalCorrect').textContent = correctCount;
+            document.getElementById('finalWrong').textContent = wrongCount;
+
+            // Determine rank
+            const accuracy = correctCount / shuffledQuestions.length;
+            let rank;
+            if (accuracy >= 0.9) rank = "HALLUCINATION HUNTER";
+            else if (accuracy >= 0.75) rank = "TRUTH SEEKER";
+            else if (accuracy >= 0.6) rank = "SKEPTICAL STUDENT";
+            else if (accuracy >= 0.4) rank = "LEARNING DETECTOR";
+            else rank = "EASILY FOOLED";
+
+            document.getElementById('rankBadge').textContent = rank;
+        }
+
+        // Reset Game
+        function resetGame() {
+            document.getElementById('endScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

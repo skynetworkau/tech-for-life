@@ -982,8 +982,8 @@
         function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
             else if (e.key === 'f' || e.key === 'F') {
                 document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
             }

@@ -941,38 +941,32 @@
 
         <!-- Slide 13: Hands-On Activity -->
         <div class="slide">
-            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Let's <em>Explore</em> AI</h2>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Let's <em>Play</em></h2>
             <div class="activity-section">
-                <h3>Hands-On Exploration Activities</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Choose one and spend 10 minutes exploring:</p>
+                <h3>Choose Your Challenge</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Pick a game and see how you stack up against your classmates:</p>
                 <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-number">1</div>
+                    <div class="activity-item" style="cursor: pointer;" onclick="window.open('../../activities/ai-or-human/index.html', '_blank')">
+                        <div class="activity-number">🤖</div>
                         <div class="activity-text">
-                            <strong>Chat with AI:</strong> Ask ChatGPT or Claude to explain something you're curious about. Try asking the same question in different ways.
+                            <strong>AI or Human?</strong> Can you spot machine-made content? 15 tricky examples, leaderboard, streak bonuses. Who's got the best detection skills?
                         </div>
                     </div>
-                    <div class="activity-item">
-                        <div class="activity-number">2</div>
+                    <div class="activity-item" style="cursor: pointer;" onclick="window.open('../../activities/fact-or-cap/index.html', '_blank')">
+                        <div class="activity-number">🧢</div>
                         <div class="activity-text">
-                            <strong>Image Generation:</strong> Try Microsoft Designer or Bing Image Creator. Generate an image of "Perth skyline at sunset in cyberpunk style"
+                            <strong>Fact or Cap?</strong> AI makes stuff up. A lot. Can you spot the hallucinations? Learn to never trust AI blindly again.
                         </div>
                     </div>
-                    <div class="activity-item">
-                        <div class="activity-number">3</div>
+                    <div class="activity-item" style="cursor: pointer;" onclick="window.open('../../activities/prompt-fixer/index.html', '_blank')">
+                        <div class="activity-number">🔧</div>
                         <div class="activity-text">
-                            <strong>Compare AI Tools:</strong> Ask the same question to ChatGPT, Claude, and Gemini. How do the responses differ?
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-number">4</div>
-                        <div class="activity-text">
-                            <strong>Test Limits:</strong> Try to find something AI can't do well. Ask it for very recent news, personal opinions, or complex maths.
+                            <strong>Prompt Fixer:</strong> Bad prompts = bad results. Fix broken prompts and level up your prompt engineering skills.
                         </div>
                     </div>
                 </div>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
-                    Be ready to share: What surprised you? What worked well? What didn't?
+                    Click any card to open the game • Compare your scores at the end • Top scorers get bragging rights
                 </p>
             </div>
         </div>
@@ -1053,8 +1047,8 @@
         function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
             else if (e.key === 'f' || e.key === 'F') {
                 document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
             }

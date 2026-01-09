@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Fixer // Learn Prompt Engineering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-dark: #141414;
+            --bg-card: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            --accent-orange: #ff6b35;
+            --accent-purple: #a855f7;
+            --accent-blue: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-pink: #f472b6;
+            --text-white: #ffffff;
+            --text-light: #e5e5e5;
+            --text-gray: #a3a3a3;
+            --text-muted: #737373;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg-black);
+            color: var(--text-white);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-hover);
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .home-link:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0 2.5rem;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo .prompt { color: var(--accent-orange); }
+        .logo .fixer { color: var(--text-white); }
+
+        .tagline {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* Progress */
+        .progress-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--bg-card);
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--bg-hover);
+            transition: all 0.3s ease;
+        }
+
+        .dot.completed {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .dot.current {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 10px var(--accent-orange);
+        }
+
+        .dot.wrong {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .score-display {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .score-display span {
+            color: var(--accent-orange);
+        }
+
+        /* Bad Prompt Display */
+        .prompt-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-label .icon {
+            font-size: 1rem;
+        }
+
+        .bad-prompt-card {
+            background: var(--bg-card);
+            border: 2px solid #ef4444;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .bad-prompt-card::before {
+            content: 'BAD PROMPT';
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            padding: 0.2rem 0.6rem;
+            background: #ef4444;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: white;
+        }
+
+        .prompt-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .prompt-context {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--bg-hover);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .prompt-context strong {
+            color: var(--text-gray);
+        }
+
+        /* Question */
+        .question-box {
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-purple);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .question-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        /* Answer Options */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid var(--bg-hover);
+            color: var(--text-light);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-orange);
+            background: var(--bg-hover);
+            transform: translateX(4px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            border-color: var(--accent-green) !important;
+            background: rgba(74, 222, 128, 0.1) !important;
+        }
+
+        .option-btn.correct::after {
+            content: '✓ BEST FIX';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            letter-spacing: 0.1em;
+        }
+
+        .option-btn.wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+            opacity: 0.7;
+        }
+
+        .option-btn.selected {
+            border-width: 3px;
+        }
+
+        .option-letter {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background: var(--bg-hover);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 1rem;
+            color: var(--accent-orange);
+        }
+
+        /* Explanation Panel */
+        .explanation-panel {
+            display: none;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-blue);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .explanation-panel.show { display: block; }
+
+        .explanation-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            line-height: 1.8;
+        }
+
+        .explanation-text strong {
+            color: var(--accent-orange);
+        }
+
+        .better-prompt {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .better-prompt-label {
+            font-size: 0.7rem;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .better-prompt-text {
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .next-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--accent-orange);
+            border: none;
+            color: var(--bg-black);
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .next-btn:hover {
+            background: #ff8c5a;
+            transform: translateY(-2px);
+        }
+
+        /* Tip Badge */
+        .tip-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--accent-purple);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            margin-right: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .start-screen p {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .skills-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .skill-item {
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-hover);
+            text-align: center;
+        }
+
+        .skill-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-name {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .start-btn {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 1rem 4rem;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink));
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .final-score {
+            font-family: 'Syne', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .final-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-orange);
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            margin-bottom: 2rem;
+        }
+
+        .principles-learned {
+            background: var(--bg-card);
+            padding: 2rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .principles-learned h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .principles-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .principle-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .principle-item::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        .play-again-btn {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 1rem 3rem;
+            background: transparent;
+            border: 2px solid var(--accent-orange);
+            color: var(--accent-orange);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .play-again-btn:hover {
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .prompt-text { font-size: 1rem; }
+            .option-btn { padding: 1rem; font-size: 0.85rem; }
+            .progress-dots { gap: 0.3rem; }
+            .dot { width: 10px; height: 10px; }
+            .home-link { top: 0.5rem; left: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">← COURSE HOME</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="prompt">PROMPT</span>
+                <span class="fixer">FIXER</span>
+            </h1>
+            <p class="tagline">Learn to write prompts that actually work</p>
+        </header>
+
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <div class="start-screen">
+                <p>Bad prompts = bad outputs. Master the art of prompt engineering by fixing broken prompts and learning what makes AI actually understand you.</p>
+
+                <div class="skills-preview">
+                    <div class="skill-item">
+                        <div class="skill-icon">🎯</div>
+                        <div class="skill-name">Be Specific</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">📋</div>
+                        <div class="skill-name">Give Context</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">🎨</div>
+                        <div class="skill-name">Set Format</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">🔄</div>
+                        <div class="skill-name">Iterate</div>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="startGame()">FIX SOME PROMPTS</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" style="display: none;">
+            <div class="progress-row">
+                <div class="progress-dots" id="progressDots"></div>
+                <div class="score-display">Score: <span id="scoreDisplay">0</span></div>
+            </div>
+
+            <div class="prompt-section">
+                <div class="section-label">
+                    <span class="icon">⚠️</span> THIS PROMPT NEEDS FIXING
+                </div>
+                <div class="bad-prompt-card">
+                    <p class="prompt-text" id="badPromptText"></p>
+                    <div class="prompt-context" id="promptContext"></div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question-text" id="questionText"></p>
+            </div>
+
+            <div class="options-grid" id="optionsGrid"></div>
+
+            <div class="explanation-panel" id="explanationPanel">
+                <div class="explanation-header">
+                    <span>💡</span> WHY THIS MATTERS
+                </div>
+                <div class="explanation-text" id="explanationText"></div>
+                <div class="better-prompt" id="betterPromptBox">
+                    <div class="better-prompt-label">Better Version</div>
+                    <p class="better-prompt-text" id="betterPromptText"></p>
+                </div>
+                <button class="next-btn" onclick="nextQuestion()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" style="display: none;">
+            <div class="end-screen">
+                <div class="final-score" id="finalScore">0</div>
+                <div class="final-label">Points Earned</div>
+
+                <div class="rank-badge" id="rankBadge">PROMPT APPRENTICE</div>
+
+                <div class="principles-learned">
+                    <h3>Prompt Engineering Principles You Learned</h3>
+                    <div class="principles-list">
+                        <div class="principle-item">Be specific, not vague</div>
+                        <div class="principle-item">Provide context and background</div>
+                        <div class="principle-item">Specify the format you want</div>
+                        <div class="principle-item">Include examples when helpful</div>
+                        <div class="principle-item">Break complex tasks into steps</div>
+                        <div class="principle-item">Set constraints and limits</div>
+                        <div class="principle-item">Define your role/audience</div>
+                        <div class="principle-item">Ask for reasoning, not just answers</div>
+                    </div>
+                </div>
+
+                <button class="play-again-btn" onclick="resetGame()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                badPrompt: "Write something about climate change",
+                context: "A student wants to write an essay for their Year 12 Environmental Science class",
+                question: "What's the main problem with this prompt?",
+                options: [
+                    { text: "It's too short", correct: false },
+                    { text: "It's too vague - no format, length, angle, or audience specified", correct: true },
+                    { text: "Climate change is too controversial", correct: false },
+                    { text: "AI can't write about science topics", correct: false }
+                ],
+                explanation: "This prompt gives AI zero direction. It doesn't specify: What format (essay, dot points, report)? How long? What aspect of climate change? What's the audience? Academic or casual tone? Without these, AI will guess - and probably guess wrong.",
+                betterPrompt: "Write a 500-word persuasive essay for Year 12 Environmental Science arguing that Australia should increase renewable energy investment. Include 3 specific examples and cite recent statistics. Use formal academic tone.",
+                principle: "Be Specific"
+            },
+            {
+                badPrompt: "Make my resume better",
+                context: "A Year 12 student applying for their first part-time job at a local café",
+                question: "What key information is missing from this prompt?",
+                options: [
+                    { text: "The AI needs to see the current resume and know the job they're applying for", correct: true },
+                    { text: "The student's age", correct: false },
+                    { text: "The café's menu", correct: false },
+                    { text: "Nothing - this prompt is fine", correct: false }
+                ],
+                explanation: "AI can't 'make something better' without seeing what exists. This prompt is like asking a mechanic to 'fix my car' without showing them the car or saying what's wrong. AI needs: the current resume, the specific job, and what 'better' means to you.",
+                betterPrompt: "I'm applying for a barista position at a café in Denmark, WA. Here's my current resume: [paste resume]. Please improve it by: highlighting customer service experience, adding a skills section relevant to hospitality, and making it one page. I have no formal work experience but I've done school canteen volunteering.",
+                principle: "Give Context"
+            },
+            {
+                badPrompt: "Explain photosynthesis",
+                context: "A student is studying for their Year 12 Biology exam",
+                question: "How could this prompt be improved for exam prep?",
+                options: [
+                    { text: "Add 'please' to make it polite", correct: false },
+                    { text: "Make it shorter", correct: false },
+                    { text: "Specify the level of detail, format, and what aspects to focus on", correct: true },
+                    { text: "Ask for it in a different language", correct: false }
+                ],
+                explanation: "For exam prep, you need targeted information. A generic explanation might be too basic or cover the wrong content. Specifying 'Year 12 level', 'WACE curriculum', specific processes, and format (diagrams? dot points? practice questions?) gets you useful study material.",
+                betterPrompt: "Explain photosynthesis for Year 12 WACE Biology exam prep. Cover: light-dependent reactions, Calvin cycle, and factors affecting rate. Format as dot points I can use for revision. Include 3 potential exam questions with model answers.",
+                principle: "Match Your Purpose"
+            },
+            {
+                badPrompt: "Write code to sort a list",
+                context: "A student learning Python in their Digital Technologies class",
+                question: "What would make this prompt more useful for learning?",
+                options: [
+                    { text: "Specify the programming language, what kind of list, and ask for explanations", correct: true },
+                    { text: "Just ask for 'good code'", correct: false },
+                    { text: "Don't specify - let AI choose", correct: false },
+                    { text: "Add more exclamation marks", correct: false }
+                ],
+                explanation: "Different languages have different syntax. Different sorting needs require different algorithms. For learning, you want explanations, not just code. A good coding prompt specifies: language, input/output examples, whether you want comments, and your skill level.",
+                betterPrompt: "Write a Python function to sort a list of student names alphabetically. I'm a beginner, so please: add comments explaining each line, show an example of calling the function, and briefly explain why this approach works. Use only basic Python (no imported libraries).",
+                principle: "Specify Requirements"
+            },
+            {
+                badPrompt: "Tell me about AI",
+                context: "Writing an introduction for a Digital Technologies assignment about AI in healthcare",
+                question: "Why would this prompt give you unusable results?",
+                options: [
+                    { text: "AI is a boring topic", correct: false },
+                    { text: "AI doesn't exist yet", correct: false },
+                    { text: "It's way too broad - could return anything from AI history to Terminator movie reviews", correct: true },
+                    { text: "The prompt is too long", correct: false }
+                ],
+                explanation: "'AI' is a massive topic. This prompt could return: AI history, types of AI, AI in movies, ethical debates, technical explanations, company profiles... You'd waste time filtering through irrelevant info. Narrow it down to exactly what you need.",
+                betterPrompt: "Write a 150-word introduction paragraph for a Year 12 assignment about AI in Australian healthcare. Mention 2 specific current applications (like diagnostic imaging or patient triage). Keep it formal but engaging. This will be the opening of a 1500-word report.",
+                principle: "Narrow Your Scope"
+            },
+            {
+                badPrompt: "Generate a picture of a dog",
+                context: "Creating artwork for a school poster about pet adoption",
+                question: "What's missing for image generation prompts?",
+                options: [
+                    { text: "You can't generate images with AI", correct: false },
+                    { text: "Style, mood, composition, specific dog breed, and purpose details", correct: true },
+                    { text: "The dog's name", correct: false },
+                    { text: "This prompt is perfect", correct: false }
+                ],
+                explanation: "Image AI prompts need: style (photorealistic? cartoon? watercolour?), subject details (breed, age, pose), mood/lighting, composition, and context. 'A dog' could give you anything from a chihuahua photo to an abstract dog painting.",
+                betterPrompt: "Create a heartwarming illustration of a golden retriever puppy looking hopefully at the viewer, in a warm cartoon style suitable for a school pet adoption poster. Soft lighting, pastel background, friendly and inviting mood. Include space at the top for text.",
+                principle: "Visual Prompts Need Style"
+            },
+            {
+                badPrompt: "Summarise this article [no article provided]",
+                context: "A student trying to get AI to summarise something they've read",
+                question: "What's the obvious problem here?",
+                options: [
+                    { text: "Summaries are illegal", correct: false },
+                    { text: "AI can read minds and knows which article you mean", correct: false },
+                    { text: "You need to actually include the content you want summarised", correct: true },
+                    { text: "Articles can't be summarised", correct: false }
+                ],
+                explanation: "Seems obvious, but people do this constantly. AI can't access your browser, your mind, or 'that article you read yesterday'. You need to paste the text, provide a link (if the AI can access URLs), or describe the content in detail.",
+                betterPrompt: "Summarise this article in 5 bullet points, focusing on the main argument and key evidence: [paste full article text here]. I need this for notes on media representation of climate change for my Year 12 Media Studies class.",
+                principle: "Provide the Content"
+            },
+            {
+                badPrompt: "Help me cheat on my exam",
+                context: "A student facing a difficult test",
+                question: "Besides being ethically wrong, why won't this work?",
+                options: [
+                    { text: "AI doesn't understand exams", correct: false },
+                    { text: "AI will refuse, and even if it didn't, you'd learn nothing and still fail future assessments", correct: true },
+                    { text: "This prompt is fine actually", correct: false },
+                    { text: "AI always helps with cheating", correct: false }
+                ],
+                explanation: "Most AI tools refuse cheating requests. But even if one helped, you'd: learn nothing, get caught by plagiarism detection, fail when tested on the same content later, and face serious academic consequences. Instead, ask AI to help you UNDERSTAND the content.",
+                betterPrompt: "I'm struggling with quadratic equations for my maths exam tomorrow. Can you explain the quadratic formula step-by-step, then give me 5 practice problems with solutions so I can check my working? Start with easier examples.",
+                principle: "Use AI Ethically"
+            },
+            {
+                badPrompt: "Write me a 2000-word essay on the causes of World War 1",
+                context: "An assignment due tomorrow that the student hasn't started",
+                question: "What's problematic about asking AI to write your entire assignment?",
+                options: [
+                    { text: "2000 words is too long for AI", correct: false },
+                    { text: "It's academic dishonesty, detectable, and you learn nothing", correct: true },
+                    { text: "WW1 is too old to write about", correct: false },
+                    { text: "AI doesn't know history", correct: false }
+                ],
+                explanation: "Submitting AI-generated work as your own is academic fraud. Teachers use AI detectors, and AI essays often have tell-tale patterns. More importantly, you miss the learning. Instead, use AI as a research assistant, outline helper, or to check your own draft.",
+                betterPrompt: "I'm writing a 2000-word essay on WW1 causes. I've identified these main points: [your points]. Can you suggest what I might be missing? Also, help me structure these into a logical essay outline with topic sentences for each paragraph. I'll write the content myself.",
+                principle: "Use AI as Assistant, Not Author"
+            },
+            {
+                badPrompt: "Give me ideas",
+                context: "A student has a creative writing assignment but doesn't know where to start",
+                question: "How could this prompt be more useful?",
+                options: [
+                    { text: "AI can't be creative", correct: false },
+                    { text: "Add what kind of ideas, the assignment constraints, your interests, and what you've already rejected", correct: true },
+                    { text: "Just say 'more ideas please'", correct: false },
+                    { text: "This is the perfect brainstorming prompt", correct: false }
+                ],
+                explanation: "Ideas for what? A birthday party? A startup? A story? Even within creative writing, AI needs: genre, length, audience, themes you like/dislike, assignment requirements, and what approaches you've already considered and rejected.",
+                betterPrompt: "I need ideas for a short story (1500 words) for my Year 12 English creative writing portfolio. Theme is 'change'. I like sci-fi and mystery, hate romance. The story must include dialogue and be set in Australia. Give me 5 unique premises that aren't cliché.",
+                principle: "Constrain Creativity"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let results = [];
+        let shuffledQuestions = [];
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            shuffledQuestions = shuffle(questions);
+            currentQuestion = 0;
+            score = 0;
+            results = [];
+
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('endScreen').style.display = 'none';
+
+            initProgressDots();
+            loadQuestion();
+        }
+
+        function initProgressDots() {
+            const container = document.getElementById('progressDots');
+            container.innerHTML = shuffledQuestions.map((_, i) =>
+                `<div class="dot" id="dot-${i}"></div>`
+            ).join('');
+            document.getElementById('dot-0').classList.add('current');
+        }
+
+        function loadQuestion() {
+            const q = shuffledQuestions[currentQuestion];
+
+            document.getElementById('badPromptText').textContent = q.badPrompt;
+            document.getElementById('promptContext').innerHTML = `<strong>Context:</strong> ${q.context}`;
+            document.getElementById('questionText').textContent = q.question;
+
+            const optionsGrid = document.getElementById('optionsGrid');
+            const shuffledOptions = shuffle(q.options.map((opt, i) => ({ ...opt, originalIndex: i })));
+
+            optionsGrid.innerHTML = shuffledOptions.map((opt, i) => `
+                <button class="option-btn" onclick="selectOption(this, ${opt.correct})" data-correct="${opt.correct}">
+                    <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+                    ${opt.text}
+                </button>
+            `).join('');
+
+            document.getElementById('explanationPanel').classList.remove('show');
+            document.getElementById('explanationText').innerHTML = `<span class="tip-badge">${q.principle}</span> ${q.explanation}`;
+            document.getElementById('betterPromptText').textContent = q.betterPrompt;
+        }
+
+        function selectOption(btn, isCorrect) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.dataset.correct === 'true') {
+                    b.classList.add('correct');
+                }
+            });
+
+            btn.classList.add('selected');
+            if (!isCorrect) {
+                btn.classList.add('wrong');
+            }
+
+            // Update progress dots
+            const dot = document.getElementById(`dot-${currentQuestion}`);
+            dot.classList.remove('current');
+            dot.classList.add(isCorrect ? 'completed' : 'wrong');
+
+            if (isCorrect) {
+                score += 100;
+                results.push(true);
+            } else {
+                results.push(false);
+            }
+
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('explanationPanel').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+
+            if (currentQuestion >= shuffledQuestions.length) {
+                endGame();
+                return;
+            }
+
+            document.getElementById(`dot-${currentQuestion}`).classList.add('current');
+            loadQuestion();
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('endScreen').style.display = 'block';
+
+            document.getElementById('finalScore').textContent = score;
+
+            const correctCount = results.filter(r => r).length;
+            const accuracy = correctCount / shuffledQuestions.length;
+
+            let rank;
+            if (accuracy >= 0.9) rank = "PROMPT MASTER";
+            else if (accuracy >= 0.7) rank = "SKILLED PROMPTER";
+            else if (accuracy >= 0.5) rank = "PROMPT APPRENTICE";
+            else rank = "PROMPT NOVICE";
+
+            document.getElementById('rankBadge').textContent = rank;
+        }
+
+        function resetGame() {
+            document.getElementById('endScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
