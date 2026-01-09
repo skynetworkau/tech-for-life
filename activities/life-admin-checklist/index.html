@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Admin Checklist | Tech for Life</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #25253a;
+            --accent-primary: #00ff88;
+            --accent-secondary: #0dcdff;
+            --accent-tertiary: #ff0080;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .home-button {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--bg-tertiary);
+        }
+
+        .home-button:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .emoji-banner {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--bg-tertiary);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar-container {
+            background: var(--bg-tertiary);
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            font-weight: bold;
+            color: var(--bg-primary);
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .motivation-text {
+            text-align: center;
+            font-style: italic;
+            color: var(--accent-secondary);
+            font-size: 1.1em;
+        }
+
+        /* Achievements */
+        .achievements-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--bg-tertiary);
+        }
+
+        .achievements-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: var(--accent-primary);
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .achievement {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .achievement.unlocked {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            animation: unlockPulse 0.5s ease;
+        }
+
+        @keyframes unlockPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .achievement.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .achievement-name {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .achievement-desc {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+
+        /* Categories */
+        .category {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--bg-tertiary);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .category.completed {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .category-header {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-tertiary);
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            background: #2a2a40;
+        }
+
+        .category-title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-icon {
+            font-size: 1.8em;
+        }
+
+        .category-title {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .category-progress {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-count {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .collapse-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .category.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .category-items {
+            padding: 0 25px 25px 25px;
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .category.collapsed .category-items {
+            max-height: 0;
+            padding: 0 25px;
+        }
+
+        /* Checklist Items */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .checklist-item:hover {
+            background: #1a1a30;
+            border-color: var(--accent-secondary);
+            transform: translateX(5px);
+        }
+
+        .checklist-item.checked {
+            opacity: 0.7;
+            background: var(--bg-tertiary);
+        }
+
+        .checklist-item.checked:hover {
+            opacity: 1;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-primary);
+            border-radius: 6px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: var(--accent-primary);
+            animation: checkBounce 0.3s ease;
+        }
+
+        @keyframes checkBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .checkbox::after {
+            content: '✓';
+            color: var(--bg-primary);
+            font-size: 16px;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item.checked .checkbox::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-text {
+            font-size: 1.05em;
+            margin-bottom: 4px;
+        }
+
+        .checklist-item.checked .item-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .item-help {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .item-link {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .item-link:hover {
+            color: var(--accent-primary);
+            text-decoration: underline;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            border: 2px solid var(--accent-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Celebration Modal */
+        .celebration-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .celebration-modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .celebration-content {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 2px solid var(--accent-primary);
+            max-width: 500px;
+            animation: celebrationPop 0.5s ease;
+        }
+
+        @keyframes celebrationPop {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            50% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .celebration-emoji {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .celebration-title {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: var(--accent-primary);
+        }
+
+        .celebration-message {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            color: var(--text-secondary);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-primary);
+            position: absolute;
+            animation: confettiFall 3s linear;
+            z-index: 999;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-secondary);
+            padding: 20px 25px;
+            border-radius: 12px;
+            border: 2px solid var(--accent-primary);
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+            display: none;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .toast.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toast-icon {
+            font-size: 2em;
+        }
+
+        .toast-text {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: var(--accent-primary);
+        }
+
+        .toast-message {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .home-button {
+                position: static;
+                display: block;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+            .progress-section,
+            .achievements-section,
+            .category {
+                padding: 20px;
+            }
+
+            .progress-stats {
+                gap: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+
+            .achievements-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .category-header {
+                padding: 15px;
+            }
+
+            .category-items {
+                padding: 0 15px 15px 15px;
+            }
+
+            .checklist-item {
+                padding: 12px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .toast {
+                right: 15px;
+                left: 15px;
+                bottom: 15px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="../../index.html" class="home-button">← Home</a>
+            <div class="emoji-banner">🎓 📋 💼</div>
+            <h1>Life Admin Checklist</h1>
+            <p class="subtitle">Level up your adult skills before leaving school</p>
+        </header>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <div class="progress-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="completedCount">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalCount">0</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="streakCount">0</div>
+                        <div class="stat-label">Session Streak</div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+            </div>
+            <p class="motivation-text" id="motivationText">Let's get started! 🚀</p>
+        </div>
+
+        <!-- Achievements Section -->
+        <div class="achievements-section">
+            <h2 class="achievements-title">🏆 Achievements</h2>
+            <div class="achievements-grid" id="achievementsGrid"></div>
+        </div>
+
+        <!-- Checklist Categories -->
+        <div id="checklistContainer"></div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button class="btn btn-primary" onclick="shareProgress()">📤 Share Progress</button>
+            <button class="btn btn-secondary" onclick="expandAll()">📂 Expand All</button>
+            <button class="btn btn-secondary" onclick="collapseAll()">📁 Collapse All</button>
+            <button class="btn btn-danger" onclick="resetProgress()">🔄 Reset All</button>
+        </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div class="celebration-modal" id="celebrationModal">
+        <div class="celebration-content">
+            <div class="celebration-emoji">🎉</div>
+            <h2 class="celebration-title">You're Fully Loaded!</h2>
+            <p class="celebration-message">
+                Congrats! You've completed all your life admin tasks.
+                You're officially ready to adult! 💪
+            </p>
+            <button class="btn btn-primary" onclick="closeCelebration()">Awesome!</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <div class="toast-icon">🏆</div>
+            <div class="toast-text">
+                <div class="toast-title" id="toastTitle">Achievement Unlocked!</div>
+                <div class="toast-message" id="toastMessage">First Steps</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Structure
+        const checklistData = [
+            {
+                id: 'government',
+                icon: '🏛️',
+                title: 'Government & ID',
+                items: [
+                    {
+                        id: 'mygov',
+                        text: 'Create myGov account',
+                        help: 'Your gateway to all government services',
+                        link: 'https://my.gov.au'
+                    },
+                    {
+                        id: 'tfn',
+                        text: 'Apply for Tax File Number',
+                        help: 'Essential for working and tax returns',
+                        link: 'https://www.ato.gov.au'
+                    },
+                    {
+                        id: 'medicare',
+                        text: 'Get Medicare card in own name',
+                        help: 'Your healthcare access card',
+                        link: 'https://www.servicesaustralia.gov.au/medicare'
+                    },
+                    {
+                        id: 'link-medicare',
+                        text: 'Link Medicare to myGov',
+                        help: 'Manage your health online',
+                        link: 'https://my.gov.au'
+                    },
+                    {
+                        id: 'license',
+                        text: "Get/renew driver's license",
+                        help: 'Your primary photo ID',
+                        link: null
+                    },
+                    {
+                        id: 'proof-age',
+                        text: 'Get proof of age card (if no license)',
+                        help: 'Official ID alternative',
+                        link: null
+                    }
+                ]
+            },
+            {
+                id: 'money',
+                icon: '💰',
+                title: 'Money & Banking',
+                items: [
+                    {
+                        id: 'bank-account',
+                        text: 'Open bank account in own name',
+                        help: 'Time to be financially independent',
+                        link: null
+                    },
+                    {
+                        id: 'online-banking',
+                        text: 'Set up online banking app',
+                        help: 'Manage your money on the go',
+                        link: null
+                    },
+                    {
+                        id: 'payid',
+                        text: 'Set up PayID for receiving money',
+                        help: 'Easy payments with just your phone number',
+                        link: null
+                    },
+                    {
+                        id: 'payslips',
+                        text: 'Understand how to read payslips',
+                        help: 'Know what you\'re being paid (and what\'s taken out)',
+                        link: null
+                    },
+                    {
+                        id: 'min-wage',
+                        text: 'Know the current minimum wage ($24.10/hr casual)',
+                        help: 'Don\'t get ripped off!',
+                        link: 'https://www.fairwork.gov.au'
+                    }
+                ]
+            },
+            {
+                id: 'communication',
+                icon: '📧',
+                title: 'Communication',
+                items: [
+                    {
+                        id: 'email',
+                        text: 'Create professional email',
+                        help: 'firstname.lastname@gmail.com looks way better than xxcoolkid99xx@hotmail.com',
+                        link: 'https://gmail.com'
+                    },
+                    {
+                        id: 'phone-plan',
+                        text: 'Get phone plan in own name',
+                        help: 'Time to leave the family plan',
+                        link: null
+                    },
+                    {
+                        id: 'email-signature',
+                        text: 'Set up email signature',
+                        help: 'Look professional in every email',
+                        link: null
+                    },
+                    {
+                        id: 'update-email',
+                        text: 'Update important accounts to new email',
+                        help: 'Use your professional email for important stuff',
+                        link: null
+                    }
+                ]
+            },
+            {
+                id: 'work',
+                icon: '💼',
+                title: 'Work Ready',
+                items: [
+                    {
+                        id: 'resume',
+                        text: 'Create/update resume',
+                        help: 'Your ticket to getting hired',
+                        link: null
+                    },
+                    {
+                        id: 'references',
+                        text: 'Get 2-3 references lined up',
+                        help: 'Teachers, coaches, or previous employers',
+                        link: null
+                    },
+                    {
+                        id: 'linkedin',
+                        text: 'Create LinkedIn profile',
+                        help: 'Professional networking is key',
+                        link: 'https://www.linkedin.com'
+                    },
+                    {
+                        id: 'job-sites',
+                        text: 'Create accounts on Seek and Indeed',
+                        help: 'Where the jobs are',
+                        link: 'https://www.seek.com.au'
+                    },
+                    {
+                        id: 'local-jobs',
+                        text: 'Know where to find job listings locally',
+                        help: 'Community noticeboards, local Facebook groups',
+                        link: null
+                    }
+                ]
+            },
+            {
+                id: 'future',
+                icon: '🎯',
+                title: 'Future Planning',
+                items: [
+                    {
+                        id: 'pathway',
+                        text: 'Research pathway (uni/TAFE/apprenticeship/work)',
+                        help: 'What\'s your next move?',
+                        link: null
+                    },
+                    {
+                        id: 'dates',
+                        text: 'Know key application dates',
+                        help: 'Don\'t miss the deadline!',
+                        link: null
+                    },
+                    {
+                        id: 'usi',
+                        text: 'Apply for USI (if doing any training)',
+                        help: 'Unique Student Identifier for all training records',
+                        link: 'https://www.usi.gov.au'
+                    },
+                    {
+                        id: 'youth-allowance',
+                        text: 'Research Youth Allowance eligibility',
+                        help: 'Financial support if you qualify',
+                        link: 'https://www.servicesaustralia.gov.au'
+                    },
+                    {
+                        id: 'centrelink',
+                        text: 'Set up Centrelink account (if needed)',
+                        help: 'Link to myGov for payments',
+                        link: 'https://my.gov.au'
+                    }
+                ]
+            },
+            {
+                id: 'security',
+                icon: '🔒',
+                title: 'Digital Security',
+                items: [
+                    {
+                        id: 'password-manager',
+                        text: 'Use a password manager',
+                        help: 'Stop reusing "password123" everywhere',
+                        link: null
+                    },
+                    {
+                        id: '2fa',
+                        text: 'Enable 2FA on important accounts',
+                        help: 'Two-factor authentication = extra security',
+                        link: null
+                    },
+                    {
+                        id: 'backup',
+                        text: 'Back up important documents to cloud',
+                        help: 'Google Drive, Dropbox, OneDrive - pick one',
+                        link: null
+                    },
+                    {
+                        id: 'digital-footprint',
+                        text: "Know what's in your digital footprint",
+                        help: 'Google yourself - what do employers see?',
+                        link: null
+                    }
+                ]
+            }
+        ];
+
+        const achievements = [
+            {
+                id: 'first-steps',
+                icon: '👶',
+                name: 'First Steps',
+                description: 'Complete first item',
+                condition: (progress) => progress.completedCount >= 1
+            },
+            {
+                id: 'getting-started',
+                icon: '🚀',
+                name: 'Getting Started',
+                description: '25% complete',
+                condition: (progress) => progress.percentage >= 25
+            },
+            {
+                id: 'halfway',
+                icon: '⭐',
+                name: 'Halfway There',
+                description: '50% complete',
+                condition: (progress) => progress.percentage >= 50
+            },
+            {
+                id: 'almost-adult',
+                icon: '🎓',
+                name: 'Almost Adult',
+                description: '75% complete',
+                condition: (progress) => progress.percentage >= 75
+            },
+            {
+                id: 'fully-loaded',
+                icon: '💯',
+                name: 'Fully Loaded',
+                description: '100% complete',
+                condition: (progress) => progress.percentage >= 100
+            },
+            {
+                id: 'speed-runner',
+                icon: '⚡',
+                name: 'Speed Runner',
+                description: '5 items in one session',
+                condition: (progress) => progress.sessionStreak >= 5
+            },
+            {
+                id: 'government-gang',
+                icon: '🏛️',
+                name: 'Government Gang',
+                description: 'Complete all government items',
+                condition: (progress) => {
+                    const govCategory = checklistData.find(cat => cat.id === 'government');
+                    return govCategory.items.every(item =>
+                        progress.checkedItems.includes(`government-${item.id}`)
+                    );
+                }
+            },
+            {
+                id: 'money-moves',
+                icon: '💸',
+                name: 'Money Moves',
+                description: 'Complete all banking items',
+                condition: (progress) => {
+                    const moneyCategory = checklistData.find(cat => cat.id === 'money');
+                    return moneyCategory.items.every(item =>
+                        progress.checkedItems.includes(`money-${item.id}`)
+                    );
+                }
+            }
+        ];
+
+        const motivationMessages = [
+            { min: 0, max: 0, message: "Let's get started! 🚀" },
+            { min: 1, max: 24, message: "Great start! Keep going! 💪" },
+            { min: 25, max: 49, message: "You're making real progress! 🌟" },
+            { min: 50, max: 74, message: "Halfway there! You're crushing it! 🔥" },
+            { min: 75, max: 99, message: "So close! Finish strong! ⚡" },
+            { min: 100, max: 100, message: "YOU'RE FULLY LOADED! 🎉" }
+        ];
+
+        // State Management
+        let state = {
+            checkedItems: [],
+            sessionStreak: 0,
+            unlockedAchievements: [],
+            collapsedCategories: []
+        };
+
+        // Initialize
+        function init() {
+            loadState();
+            renderAchievements();
+            renderChecklist();
+            updateProgress();
+        }
+
+        // Local Storage
+        function loadState() {
+            const saved = localStorage.getItem('lifeAdminChecklist');
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('lifeAdminChecklist', JSON.stringify(state));
+        }
+
+        // Render Functions
+        function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = achievements.map(achievement => {
+                const unlocked = state.unlockedAchievements.includes(achievement.id);
+                return `
+                    <div class="achievement ${unlocked ? 'unlocked' : 'locked'}">
+                        <span class="achievement-icon">${achievement.icon}</span>
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div class="achievement-desc">${achievement.description}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = checklistData.map(category => {
+                const completedItems = category.items.filter(item =>
+                    state.checkedItems.includes(`${category.id}-${item.id}`)
+                ).length;
+                const totalItems = category.items.length;
+                const isCompleted = completedItems === totalItems;
+                const isCollapsed = state.collapsedCategories.includes(category.id);
+
+                return `
+                    <div class="category ${isCompleted ? 'completed' : ''} ${isCollapsed ? 'collapsed' : ''}"
+                         data-category="${category.id}">
+                        <div class="category-header" onclick="toggleCategory('${category.id}')">
+                            <div class="category-title-section">
+                                <span class="category-icon">${category.icon}</span>
+                                <span class="category-title">${category.title}</span>
+                            </div>
+                            <div class="category-progress">
+                                <span class="category-count">${completedItems}/${totalItems}</span>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="category-items">
+                            ${category.items.map(item => {
+                                const itemId = `${category.id}-${item.id}`;
+                                const isChecked = state.checkedItems.includes(itemId);
+                                const helpText = item.link
+                                    ? `${item.help} - <a href="${item.link}" target="_blank" class="item-link" onclick="event.stopPropagation()">Visit site</a>`
+                                    : item.help;
+
+                                return `
+                                    <div class="checklist-item ${isChecked ? 'checked' : ''}"
+                                         onclick="toggleItem('${itemId}')">
+                                        <div class="checkbox"></div>
+                                        <div class="item-content">
+                                            <div class="item-text">${item.text}</div>
+                                            <div class="item-help">${helpText}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle Functions
+        function toggleItem(itemId) {
+            const index = state.checkedItems.indexOf(itemId);
+
+            if (index === -1) {
+                state.checkedItems.push(itemId);
+                state.sessionStreak++;
+            } else {
+                state.checkedItems.splice(index, 1);
+                state.sessionStreak = Math.max(0, state.sessionStreak - 1);
+            }
+
+            saveState();
+            renderChecklist();
+            updateProgress();
+            checkAchievements();
+        }
+
+        function toggleCategory(categoryId) {
+            const index = state.collapsedCategories.indexOf(categoryId);
+
+            if (index === -1) {
+                state.collapsedCategories.push(categoryId);
+            } else {
+                state.collapsedCategories.splice(index, 1);
+            }
+
+            saveState();
+            renderChecklist();
+        }
+
+        function expandAll() {
+            state.collapsedCategories = [];
+            saveState();
+            renderChecklist();
+        }
+
+        function collapseAll() {
+            state.collapsedCategories = checklistData.map(cat => cat.id);
+            saveState();
+            renderChecklist();
+        }
+
+        // Progress Calculation
+        function updateProgress() {
+            const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
+            const completedItems = state.checkedItems.length;
+            const percentage = Math.round((completedItems / totalItems) * 100);
+
+            document.getElementById('completedCount').textContent = completedItems;
+            document.getElementById('totalCount').textContent = totalItems;
+            document.getElementById('streakCount').textContent = state.sessionStreak;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '%';
+
+            // Update motivation message
+            const message = motivationMessages.find(m =>
+                percentage >= m.min && percentage <= m.max
+            );
+            document.getElementById('motivationText').textContent = message.message;
+
+            // Show celebration at 100%
+            if (percentage === 100 && completedItems > 0) {
+                setTimeout(() => showCelebration(), 500);
+            }
+        }
+
+        // Achievements
+        function checkAchievements() {
+            const progress = {
+                completedCount: state.checkedItems.length,
+                percentage: Math.round((state.checkedItems.length /
+                    checklistData.reduce((sum, cat) => sum + cat.items.length, 0)) * 100),
+                sessionStreak: state.sessionStreak,
+                checkedItems: state.checkedItems
+            };
+
+            achievements.forEach(achievement => {
+                if (!state.unlockedAchievements.includes(achievement.id) &&
+                    achievement.condition(progress)) {
+                    unlockAchievement(achievement);
+                }
+            });
+        }
+
+        function unlockAchievement(achievement) {
+            state.unlockedAchievements.push(achievement.id);
+            saveState();
+            renderAchievements();
+            showToast(achievement.name, achievement.description, achievement.icon);
+        }
+
+        // UI Feedback
+        function showToast(title, message, icon = '🏆') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+            document.querySelector('.toast-icon').textContent = icon;
+
+            toast.classList.add('active');
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 4000);
+        }
+
+        function showCelebration() {
+            const modal = document.getElementById('celebrationModal');
+            modal.classList.add('active');
+            createConfetti();
+        }
+
+        function closeCelebration() {
+            const modal = document.getElementById('celebrationModal');
+            modal.classList.remove('active');
+        }
+
+        function createConfetti() {
+            const colors = ['#00ff88', '#0dcdff', '#ff0080', '#ffaa00'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // Actions
+        function shareProgress() {
+            const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
+            const completedItems = state.checkedItems.length;
+            const percentage = Math.round((completedItems / totalItems) * 100);
+
+            const categoryProgress = checklistData.map(cat => {
+                const completed = cat.items.filter(item =>
+                    state.checkedItems.includes(`${cat.id}-${item.id}`)
+                ).length;
+                return `${cat.icon} ${cat.title}: ${completed}/${cat.items.length}`;
+            }).join('\n');
+
+            const shareText = `🎓 My Life Admin Progress\n\n` +
+                `${percentage}% Complete (${completedItems}/${totalItems} tasks)\n` +
+                `🏆 ${state.unlockedAchievements.length}/${achievements.length} achievements unlocked\n\n` +
+                `${categoryProgress}\n\n` +
+                `Getting ready to adult! 💪`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Life Admin Progress',
+                    text: shareText
+                }).catch(() => copyToClipboard(shareText));
+            } else {
+                copyToClipboard(shareText);
+            }
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Copied!', 'Progress copied to clipboard', '📋');
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset ALL progress? This cannot be undone!')) {
+                if (confirm('Really really sure? All your hard work will be lost! 😱')) {
+                    state = {
+                        checkedItems: [],
+                        sessionStreak: 0,
+                        unlockedAchievements: [],
+                        collapsedCategories: []
+                    };
+                    saveState();
+                    renderAchievements();
+                    renderChecklist();
+                    updateProgress();
+                    showToast('Reset Complete', 'Starting fresh!', '🔄');
+                }
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

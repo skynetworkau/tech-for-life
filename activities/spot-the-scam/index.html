@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCAM HUNTER // Digital Detective Training</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff006e;
+            --neon-green: #39ff14;
+            --neon-orange: #ff9500;
+            --neon-purple: #bf5af2;
+            --neon-yellow: #ffd60a;
+            --dark-bg: #0a0a0f;
+            --card-bg: #12121a;
+            --text-primary: #e8e8e8;
+            --text-muted: #6b6b7a;
+            --danger: #ff3366;
+            --success: #00ff88;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo span:first-child {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+        }
+
+        .logo span:last-child {
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+        }
+
+        .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        /* Mode selection */
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .mode-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.2);
+        }
+
+        .mode-card.story:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 10px 40px rgba(191, 90, 242, 0.2);
+        }
+
+        .mode-card.speed:hover {
+            border-color: var(--neon-orange);
+            box-shadow: 0 10px 40px rgba(255, 149, 0, 0.2);
+        }
+
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .mode-card.classic .mode-title { color: var(--neon-cyan); }
+        .mode-card.story .mode-title { color: var(--neon-purple); }
+        .mode-card.speed .mode-title { color: var(--neon-orange); }
+
+        .mode-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 1rem;
+        }
+
+        .mode-card.classic .mode-badge {
+            background: rgba(0, 245, 255, 0.15);
+            color: var(--neon-cyan);
+        }
+
+        .mode-card.story .mode-badge {
+            background: rgba(191, 90, 242, 0.15);
+            color: var(--neon-purple);
+        }
+
+        .mode-card.speed .mode-badge {
+            background: rgba(255, 149, 0, 0.15);
+            color: var(--neon-orange);
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1rem 1.5rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+
+        .stat.streak .stat-value {
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange);
+        }
+
+        .stat.timer .stat-value {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px var(--neon-yellow);
+        }
+
+        .stat.timer.warning .stat-value {
+            color: var(--danger);
+            text-shadow: 0 0 10px var(--danger);
+            animation: pulse 0.5s ease infinite;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Story intro panel */
+        .story-intro {
+            background: linear-gradient(135deg, rgba(191, 90, 242, 0.1), rgba(0, 245, 255, 0.1));
+            border: 1px solid rgba(191, 90, 242, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .story-intro h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-purple);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .story-intro .victim-story {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        .story-intro .victim-name {
+            color: var(--neon-pink);
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        .story-intro .amount-lost {
+            color: var(--danger);
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .story-intro .context {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-style: normal;
+            font-size: 0.9rem;
+        }
+
+        /* Story/Intro panels */
+        .story-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            text-align: center;
+        }
+
+        .story-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--neon-cyan);
+        }
+
+        .story-panel p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .story-panel .highlight {
+            color: var(--neon-pink);
+            font-weight: 600;
+        }
+
+        .story-panel .stat-highlight {
+            display: inline-block;
+            background: rgba(255, 0, 110, 0.15);
+            color: var(--neon-pink);
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-weight: 700;
+            margin: 0.25rem;
+        }
+
+        /* Message card */
+        .message-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .message-card:hover {
+            border-color: rgba(0, 245, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+        }
+
+        .message-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+        }
+
+        .message-type.email {
+            background: rgba(0, 245, 255, 0.15);
+            color: var(--neon-cyan);
+        }
+
+        .message-type.sms {
+            background: rgba(57, 255, 20, 0.15);
+            color: var(--neon-green);
+        }
+
+        .message-type.social {
+            background: rgba(255, 0, 110, 0.15);
+            color: var(--neon-pink);
+        }
+
+        .message-type.website {
+            background: rgba(191, 90, 242, 0.15);
+            color: var(--neon-purple);
+        }
+
+        .message-type.phone {
+            background: rgba(255, 214, 10, 0.15);
+            color: var(--neon-yellow);
+        }
+
+        .message-sender {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .difficulty-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .difficulty-badge.easy {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .difficulty-badge.medium {
+            background: rgba(255, 149, 0, 0.2);
+            color: var(--neon-orange);
+        }
+
+        .difficulty-badge.hard {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--danger);
+        }
+
+        .message-content {
+            padding: 1.5rem 1.25rem;
+        }
+
+        .message-subject {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .message-body {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .message-body a {
+            color: var(--neon-cyan);
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .message-body .urgent {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .message-body .attachment {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* SMS style message */
+        .sms-bubble {
+            background: rgba(57, 255, 20, 0.1);
+            border-radius: 18px 18px 18px 4px;
+            padding: 1rem 1.25rem;
+            margin: 0.5rem 0;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        /* Phone transcript */
+        .phone-transcript {
+            background: rgba(255, 214, 10, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 214, 10, 0.2);
+        }
+
+        .phone-transcript .caller {
+            color: var(--neon-yellow);
+            font-weight: 600;
+        }
+
+        .phone-transcript p {
+            margin: 0.75rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid rgba(255, 214, 10, 0.3);
+        }
+
+        /* QR code display */
+        .qr-display {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 1rem 0;
+        }
+
+        .qr-display .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            background: repeating-linear-gradient(
+                45deg,
+                #000 0px,
+                #000 10px,
+                #fff 10px,
+                #fff 20px
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: #000;
+        }
+
+        /* Answer buttons */
+        .answer-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .answer-btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .answer-btn.legit {
+            background: transparent;
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .answer-btn.legit:hover {
+            background: var(--success);
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .answer-btn.scam {
+            background: transparent;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .answer-btn.scam:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.4);
+        }
+
+        .answer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Feedback panel */
+        .feedback-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid;
+            display: none;
+        }
+
+        .feedback-panel.correct {
+            border-color: var(--success);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .feedback-panel.incorrect {
+            border-color: var(--danger);
+            background: rgba(255, 51, 102, 0.05);
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feedback-panel.correct .feedback-icon {
+            background: var(--success);
+        }
+
+        .feedback-panel.incorrect .feedback-icon {
+            background: var(--danger);
+        }
+
+        .feedback-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .feedback-panel.correct .feedback-title {
+            color: var(--success);
+        }
+
+        .feedback-panel.incorrect .feedback-title {
+            color: var(--danger);
+        }
+
+        .feedback-points {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            margin-left: auto;
+        }
+
+        .red-flags {
+            margin-top: 1rem;
+        }
+
+        .red-flags h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--neon-pink);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .red-flag-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .red-flag-item:last-child {
+            border-bottom: none;
+        }
+
+        .flag-icon {
+            color: var(--neon-orange);
+            font-size: 1rem;
+            margin-top: 0.1rem;
+        }
+
+        .flag-text {
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        /* Real impact box */
+        .real-impact {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .real-impact h5 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .real-impact p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* Next button */
+        .next-btn {
+            width: 100%;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.3);
+        }
+
+        /* Start button */
+        .start-btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1.25rem 3rem;
+            border-radius: 12px;
+            border: 2px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 1rem;
+        }
+
+        .start-btn:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 40px rgba(0, 245, 255, 0.4);
+        }
+
+        /* Back button */
+        .back-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* Results screen */
+        .results-screen {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .results-grade {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results-label {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .results-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .result-stat {
+            text-align: center;
+        }
+
+        .result-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .result-stat-value.correct-color {
+            color: var(--success);
+        }
+
+        .result-stat-value.incorrect-color {
+            color: var(--danger);
+        }
+
+        .result-stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+
+        .rank-badge.expert {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            color: white;
+        }
+
+        .rank-badge.pro {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+        }
+
+        .rank-badge.rookie {
+            background: var(--neon-orange);
+            color: var(--dark-bg);
+        }
+
+        .rank-badge.trainee {
+            background: var(--text-muted);
+            color: var(--dark-bg);
+        }
+
+        /* Tips section */
+        .tips-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tips-section h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-cyan);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .tips-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-section li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .tips-section li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--neon-pink);
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .achievement {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        .achievement.unlocked {
+            opacity: 1;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 245, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 245, 255, 0.6); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* Hidden state */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-bar {
+                gap: 1rem;
+            }
+
+            .stat {
+                padding: 0.75rem 1rem;
+                min-width: 80px;
+            }
+
+            .stat-value {
+                font-size: 1.4rem;
+            }
+
+            .answer-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .message-content {
+                padding: 1rem;
+            }
+
+            .results-grade {
+                font-size: 3.5rem;
+            }
+
+            .results-stats {
+                gap: 1.5rem;
+            }
+
+            .mode-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo"><span>SCAM</span><span>HUNTER</span></h1>
+            <p class="subtitle">Digital Detective Training</p>
+        </header>
+
+        <!-- Stats bar - hidden during intro -->
+        <div class="stats-bar hidden" id="statsBar">
+            <div class="stat">
+                <div class="stat-value" id="scoreValue">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat streak">
+                <div class="stat-value" id="streakValue">0</div>
+                <div class="stat-label">Streak</div>
+            </div>
+            <div class="stat timer hidden" id="timerStat">
+                <div class="stat-value" id="timerValue">30</div>
+                <div class="stat-label">Seconds</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracyValue">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+
+        <!-- Progress bar - hidden during intro -->
+        <div class="progress-container hidden" id="progressContainer">
+            <div class="progress-text">
+                <span>CASE <span id="currentCase">1</span> OF <span id="totalCases">10</span></span>
+                <span id="difficultyLabel">ANALYSING...</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Main content area -->
+        <main id="mainContent">
+            <!-- Intro screen -->
+            <div id="introScreen" class="story-panel animate-in">
+                <h2>🔍 Welcome, Detective</h2>
+                <p>In 2024, Australians lost over <span class="stat-highlight">$2.03 billion</span> to scams.</p>
+                <p>That's <span class="stat-highlight">1 in 3 Australians</span> targeted every year.</p>
+                <p>Your mission: analyse incoming messages and determine which are <span class="highlight">legitimate</span> and which are <span class="highlight">scams</span>.</p>
+                <p>Look for red flags. Trust your instincts. Protect the people of WA.</p>
+
+                <div class="mode-selection">
+                    <div class="mode-card classic" onclick="startGame('classic')">
+                        <div class="mode-icon">🎯</div>
+                        <div class="mode-title">Classic Mode</div>
+                        <div class="mode-desc">25 cases to solve at your own pace. Learn the red flags.</div>
+                        <div class="mode-badge">Recommended</div>
+                    </div>
+                    <div class="mode-card story" onclick="startGame('story')">
+                        <div class="mode-icon">📖</div>
+                        <div class="mode-title">Story Mode</div>
+                        <div class="mode-desc">Real victim stories before each case. See the human impact.</div>
+                        <div class="mode-badge">15 Cases</div>
+                    </div>
+                    <div class="mode-card speed" onclick="startGame('speed')">
+                        <div class="mode-icon">⚡</div>
+                        <div class="mode-title">Speed Mode</div>
+                        <div class="mode-desc">30 seconds per case. How many can you get right?</div>
+                        <div class="mode-badge">Challenge</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game area (hidden initially) -->
+            <div id="gameArea" class="hidden">
+                <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+
+                <div id="storyIntro" class="story-intro hidden"></div>
+
+                <div id="messageCard" class="message-card animate-in"></div>
+
+                <div class="answer-buttons" id="answerButtons">
+                    <button class="answer-btn legit" onclick="submitAnswer(false)">✓ Legitimate</button>
+                    <button class="answer-btn scam" onclick="submitAnswer(true)">✗ It's a Scam</button>
+                </div>
+
+                <div class="feedback-panel" id="feedbackPanel"></div>
+
+                <button class="next-btn" id="nextBtn" onclick="nextCase()">Next Case →</button>
+            </div>
+
+            <!-- Results screen (hidden initially) -->
+            <div id="resultsScreen" class="hidden"></div>
+        </main>
+    </div>
+
+    <script>
+        // Extended game data - Australian scam examples with real stories
+        const allCases = [
+            // === HI MUM SCAMS ===
+            {
+                type: "sms",
+                sender: "+61 412 XXX XXX",
+                time: "2:34 PM",
+                difficulty: "easy",
+                content: `<div class="sms-bubble">Hi mum, I dropped my phone in the toilet 🚽 This is my new number. Can you save it? I need help paying a bill urgently - can you transfer $850 to this account? BSB: 062-XXX Acc: 1234XXXX. Love you xx</div>`,
+                isScam: true,
+                story: {
+                    victim: "Margaret, 62, from Perth",
+                    amount: "$4,800",
+                    text: "I got a message saying it was my daughter. She said her phone was broken and she needed money for a bill. I transferred it immediately because I wanted to help. When I called her real number later, she had no idea what I was talking about."
+                },
+                redFlags: [
+                    { icon: "⚠️", text: "The 'Hi Mum' scam is Australia's most common text scam. In 2024, it stole $2.6 million from 1,150+ victims." },
+                    { icon: "💰", text: "Urgent request for money transfer to an unknown bank account - classic pressure tactic." },
+                    { icon: "📱", text: "The phone number is unfamiliar. Always call your family member's OLD number or another family member to verify." },
+                    { icon: "🎭", text: "Scammers use emotional manipulation ('Love you') to lower your guard." }
+                ],
+                realImpact: "In the first half of 2025, 'Hi Mum' scams increased by 37.5% in Australia. The average loss is $4,200 per victim."
+            },
+            {
+                type: "sms",
+                sender: "+61 438 XXX XXX",
+                time: "7:22 PM",
+                difficulty: "medium",
+                content: `<div class="sms-bubble">Hey dad its me! My phone got stolen at schoolies and this is a temp number. Im in a bit of trouble and need $1200 for accommodation tonight. Can you bank transfer it asap? Ill explain everything tomorrow xx</div>`,
+                isScam: true,
+                story: {
+                    victim: "David, 55, from Bunbury",
+                    amount: "$1,200",
+                    text: "It was schoolies week and I thought my son was in trouble. The grammar was bad but I thought he was panicking. I sent the money within minutes. My son was actually at home the whole time."
+                },
+                redFlags: [
+                    { icon: "📅", text: "Scammers time their attacks around events like Schoolies, holidays, and uni exam periods when parents worry more." },
+                    { icon: "✍️", text: "Spelling and grammar errors ('its' instead of 'it's', 'asap') - but this can make it seem more 'genuine' to some." },
+                    { icon: "⏰", text: "Urgency and time pressure ('tonight', 'asap') prevent you from thinking clearly." },
+                    { icon: "📞", text: "Always call your child's known number or contact their friends before sending money." }
+                ],
+                realImpact: "Parents aged 55-64 lose the most to family impersonation scams, averaging $5,200 per incident."
+            },
+
+            // === DELIVERY SCAMS ===
+            {
+                type: "email",
+                sender: "no-reply@australiapost-delivery.com.au",
+                subject: "Your package is waiting - Action Required",
+                time: "Yesterday",
+                difficulty: "easy",
+                content: `<p class="urgent">⚠️ DELIVERY FAILED - IMMEDIATE ACTION REQUIRED</p>
+                <p>Dear Customer,</p>
+                <p>We attempted to deliver your parcel today but were unsuccessful. Your package will be returned to sender in 24 hours unless you confirm your delivery details.</p>
+                <p>Redelivery Fee: $2.99</p>
+                <p><a href="#">Click here to pay and reschedule: https://auspost-redelivery.com.au/confirm</a></p>
+                <p>Tracking: AP7829461AU</p>
+                <p>Australia Post Customer Service</p>`,
+                isScam: true,
+                story: {
+                    victim: "Chen, 28, from Fremantle",
+                    amount: "$3,400 (credit card compromised)",
+                    text: "I was expecting a package from overseas, so the email seemed legit. I entered my card details for the $2.99 fee. Two days later, there were purchases I didn't make totalling thousands."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "The email domain 'australiapost-delivery.com.au' is fake. Real Australia Post emails come from @auspost.com.au" },
+                    { icon: "🔗", text: "The link goes to 'auspost-redelivery.com.au' - not the official website. Always go directly to auspost.com.au" },
+                    { icon: "⏰", text: "False urgency ('24 hours') is a pressure tactic to make you act without thinking." },
+                    { icon: "💳", text: "Australia Post never asks for payment via email links. You'd pay at the post office or official website." }
+                ],
+                realImpact: "Delivery scams spiked 80% during and after COVID. They remain one of the top 5 scam types in Australia."
+            },
+            {
+                type: "sms",
+                sender: "AusPost",
+                time: "10:45 AM",
+                difficulty: "hard",
+                content: `<div class="sms-bubble">AusPost: Your parcel could not be delivered. A signature is required. Reschedule delivery at: auspost.com.au/redelivery?ref=9847261</div>`,
+                isScam: true,
+                story: {
+                    victim: "Priya, 34, from Joondalup",
+                    amount: "$890",
+                    text: "It looked exactly like a real AusPost message. The link even looked right. But when I clicked it, it wasn't the real website. They got my card details and made purchases before I noticed."
+                },
+                redFlags: [
+                    { icon: "🔗", text: "Even though it says 'auspost.com.au', clicking could redirect you to a fake site. Always type the address manually." },
+                    { icon: "📱", text: "Australia Post DOES send SMS notifications, but they never include clickable links for payments." },
+                    { icon: "🔍", text: "Check the tracking number on the official AusPost website or app - not through text links." },
+                    { icon: "⚠️", text: "This is a sophisticated scam that mimics real AusPost formatting exactly." }
+                ],
+                realImpact: "This type of 'near-perfect' scam catches even tech-savvy people. In 2024, 18-34 year olds reported the highest number of delivery scam losses."
+            },
+
+            // === TAX/GOVERNMENT SCAMS ===
+            {
+                type: "email",
+                sender: "refund@ato-gov-au.com",
+                subject: "Tax Refund Notification - $2,847.00 AUD",
+                time: "3 days ago",
+                difficulty: "easy",
+                content: `<p>Dear Taxpayer,</p>
+                <p>After reviewing your annual tax return, we have determined you are eligible for a tax refund of <strong>$2,847.00 AUD</strong>.</p>
+                <p>To receive your refund, please verify your banking details within 5 business days:</p>
+                <p><a href="#">https://ato-refund-au.com/verify-details</a></p>
+                <p>Reference: TXN-2024-7829461</p>
+                <p>Australian Taxation Office</p>`,
+                isScam: true,
+                story: {
+                    victim: "James, 24, from Rockingham (first job)",
+                    amount: "$2,100",
+                    text: "It was my first tax return and I didn't know how it worked. When I got an email saying I had a refund, I was excited and clicked the link. They got my bank login and emptied my savings."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "The domain 'ato-gov-au.com' is fake. The real ATO uses ato.gov.au - scammers add extra words to trick you." },
+                    { icon: "📧", text: "The ATO never emails asking you to click links to verify banking details." },
+                    { icon: "💵", text: "Tax refunds are processed through myGov, not random email links." },
+                    { icon: "⏰", text: "'5 business days' urgency is a pressure tactic. Real ATO communications aren't this pushy." }
+                ],
+                realImpact: "Young Australians filing their first tax returns are heavily targeted. The ATO never contacts you by email to verify bank details."
+            },
+            {
+                type: "phone",
+                sender: "Unknown Number",
+                time: "Incoming Call",
+                difficulty: "medium",
+                content: `<div class="phone-transcript">
+                    <p><span class="caller">[Automated Voice]:</span> "This is an urgent message from the Australian Taxation Office. Your Tax File Number has been suspended due to suspicious activity. You have an outstanding debt of $8,500. If you do not respond, a warrant will be issued for your arrest. Press 1 to speak to an officer immediately."</p>
+                </div>`,
+                isScam: true,
+                story: {
+                    victim: "Lin, 67, from Mandurah",
+                    amount: "$15,000 in gift cards",
+                    text: "They said police were coming to arrest me. I was terrified. They kept me on the phone for hours and made me buy gift cards to 'pay the debt'. I was too scared to hang up or tell anyone."
+                },
+                redFlags: [
+                    { icon: "📞", text: "The ATO NEVER makes threatening robocalls or threatens arrest over the phone." },
+                    { icon: "🎫", text: "No government agency accepts payment via gift cards - EVER. This is always a scam." },
+                    { icon: "😰", text: "Scammers use fear and keep you on the phone to prevent you from checking with others." },
+                    { icon: "🔢", text: "If you're unsure, hang up and call the ATO directly on 13 28 61." }
+                ],
+                realImpact: "ATO impersonation scams cost Australians $2.4 million in 2024. Elderly victims lose an average of $12,000."
+            },
+
+            // === BANK SCAMS ===
+            {
+                type: "email",
+                sender: "security-alert@commbank.com.au",
+                subject: "Important: Unusual activity detected on your account",
+                time: "Just now",
+                difficulty: "medium",
+                content: `<p>Dear Customer,</p>
+                <p>We've noticed unusual activity on your CommBank account and have temporarily limited your access.</p>
+                <p>To restore full access, please verify your identity:</p>
+                <p><a href="#">https://commbankk-secure.com/verify-account</a></p>
+                <p>If this wasn't you, please call us immediately on 13 2221.</p>
+                <p>Commonwealth Bank of Australia</p>`,
+                isScam: true,
+                story: {
+                    victim: "Robert, 45, from Subiaco",
+                    amount: "$28,000",
+                    text: "The email looked exactly like CommBank's real emails. I panicked about my account being compromised and clicked the link. I entered my NetBank details. Within an hour, my savings were gone."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "'commbankk-secure.com' has a typo (double 'k') and isn't the real domain. Real CommBank uses commbank.com.au" },
+                    { icon: "🔗", text: "Banks NEVER ask you to verify your account via email links. Always log in directly through the app or official website." },
+                    { icon: "😰", text: "Creating fear ('unusual activity', 'limited access') makes you panic and click without thinking." },
+                    { icon: "📞", text: "The phone number 13 2221 is real, but scammers include it to seem legitimate. If worried, call the number directly - don't click email links." }
+                ],
+                realImpact: "Bank impersonation scams stole $20.5 million from Australians in 2024. The average loss is $14,500."
+            },
+            {
+                type: "sms",
+                sender: "+61 2 8XXX XXXX",
+                time: "3:15 PM",
+                difficulty: "hard",
+                content: `<div class="sms-bubble">NAB: We've detected a suspicious transaction of $499.00 at JB Hi-Fi. If this wasn't you, call immediately: 02 8XXX XXXX</div>`,
+                isScam: true,
+                story: {
+                    victim: "Michelle, 38, from Claremont",
+                    amount: "$34,000",
+                    text: "I called the number thinking I was protecting my account. They sounded so professional. They said they needed to 'move my money to a safe account' while they investigated. I transferred everything."
+                },
+                redFlags: [
+                    { icon: "📱", text: "The number starting with '02 8XXX' is a landline format, not NAB's official number. NAB uses 13 22 65." },
+                    { icon: "🏦", text: "Banks will NEVER ask you to transfer money to a 'safe account'. Your money is already safe in your account." },
+                    { icon: "😰", text: "Creating panic about a fake transaction makes you call them - putting you in their control." },
+                    { icon: "✅", text: "Always call your bank using the number on the back of your card or their official website." }
+                ],
+                realImpact: "'Call-back' scams where you phone the scammer are increasingly common. Victims lose 3x more than in other scam types."
+            },
+
+            // === SOCIAL MEDIA / INVESTMENT SCAMS ===
+            {
+                type: "social",
+                sender: "@investwithcrypto_aus",
+                time: "Sponsored",
+                difficulty: "easy",
+                content: `<p><strong>🚀 AUSSIE TEEN MAKES $47,000 IN ONE WEEK! 🚀</strong></p>
+                <p>"I was working at Maccas making $15/hr... now I make that in MINUTES with crypto trading! 💰"</p>
+                <p>Perth student Jake (19) reveals the SECRET METHOD that financial advisors don't want you to know!</p>
+                <p>🔥 Limited spots available - DM "MONEY" to start TODAY!</p>
+                <p><a href="#">bit.ly/cryptoaussie247</a></p>`,
+                isScam: true,
+                story: {
+                    victim: "Tyler, 20, TAFE student from Midland",
+                    amount: "$8,500 (entire savings)",
+                    text: "I saw the ad on Instagram and it looked legit - heaps of comments saying it worked. I invested my car savings. At first, the 'app' showed my money growing. When I tried to withdraw, they wanted more 'fees'. I lost everything."
+                },
+                redFlags: [
+                    { icon: "🤑", text: "Unrealistic profit claims ('$47,000 in one week') are the #1 sign of investment scams." },
+                    { icon: "🔒", text: "'Secret methods' and 'what they don't want you to know' are manipulation tactics." },
+                    { icon: "⏰", text: "'Limited spots' creates false urgency - a classic scam technique." },
+                    { icon: "🔗", text: "Shortened URLs (bit.ly) hide the real destination. Never click these for financial offers." }
+                ],
+                realImpact: "Australians aged 18-24 lost $25 million to crypto/investment scams in 2024. Social media is the #1 source of these scams."
+            },
+            {
+                type: "social",
+                sender: "@elonmusk_giveaway_official",
+                time: "1 hour ago",
+                difficulty: "easy",
+                content: `<p><strong>🎉 ELON MUSK CRYPTO GIVEAWAY 🎉</strong></p>
+                <p>To celebrate Tesla's success, I'm giving back to the community!</p>
+                <p>Send 0.1 - 2 BTC to the address below and receive DOUBLE back within 24 hours!</p>
+                <p>Wallet: bc1qxy2kgdygjrsqtzq2n0yrf...</p>
+                <p>⚡ Only 500 spots remaining! ⚡</p>
+                <p>✓ Verified Account</p>`,
+                isScam: true,
+                story: {
+                    victim: "Sam, 22, from Scarborough",
+                    amount: "0.5 BTC (~$35,000 AUD)",
+                    text: "The account looked real with the blue tick. I thought it was a genuine giveaway - I'd seen celebrities do similar things. I sent $35,000 worth of Bitcoin and never got anything back."
+                },
+                redFlags: [
+                    { icon: "🎭", text: "Celebrity impersonation is rampant. The real Elon Musk will NEVER run crypto giveaways requiring you to send money first." },
+                    { icon: "💸", text: "No legitimate giveaway asks you to send money/crypto first. That's not how giveaways work." },
+                    { icon: "✓", text: "Fake 'verified' badges are easy to add. Always check the actual username carefully." },
+                    { icon: "🔙", text: "Cryptocurrency transactions are irreversible. Once sent, your money is gone forever." }
+                ],
+                realImpact: "Celebrity impersonation scams stole $53 million from Australians in 2024. Crypto-related scams are almost never recovered."
+            },
+
+            // === JOB SCAMS ===
+            {
+                type: "email",
+                sender: "careers@amazon-hiring-au.com",
+                subject: "Congratulations! You've been selected for a remote position",
+                time: "Today",
+                difficulty: "medium",
+                content: `<p>Dear Applicant,</p>
+                <p>Congratulations! Based on your online profile, you've been selected for a <strong>Work From Home Data Entry position</strong> at Amazon Australia.</p>
+                <p><strong>Salary:</strong> $45-65/hour<br>
+                <strong>Hours:</strong> Flexible, 15-40 hours/week<br>
+                <strong>Requirements:</strong> Laptop and internet connection</p>
+                <p>To begin your onboarding, please purchase the required software package ($299) which will be reimbursed in your first pay.</p>
+                <p><a href="#">Click here to complete registration</a></p>
+                <p>Amazon Talent Acquisition Team</p>`,
+                isScam: true,
+                story: {
+                    victim: "Emma, 19, recent graduate from Murdoch Uni",
+                    amount: "$850 (multiple 'fees')",
+                    text: "I was desperate for work after graduating. The salary seemed amazing for data entry. I paid the $299, then they asked for more 'training fees'. I kept paying because I thought I'd get it all back. The 'job' never existed."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "'amazon-hiring-au.com' is not Amazon's real domain. Amazon jobs are posted at amazon.jobs" },
+                    { icon: "💰", text: "$45-65/hour for data entry is unrealistically high. Market rate is $25-35/hour." },
+                    { icon: "🚫", text: "Legitimate employers NEVER ask you to pay for equipment, training, or software upfront." },
+                    { icon: "📧", text: "You never applied for this job - unsolicited job offers are almost always scams." }
+                ],
+                realImpact: "Job scams increased 150% in 2024, targeting graduates and job seekers. Victims pay $500-2,000 in fake 'fees' on average."
+            },
+            {
+                type: "sms",
+                sender: "+61 4XX XXX XXX",
+                time: "11:30 AM",
+                difficulty: "medium",
+                content: `<div class="sms-bubble">Hi! I'm Sarah from BlueSky Recruitment. We found your resume online. We have an urgent opening for an Administrative Assistant paying $38/hr. Interested? Reply YES or add me on WhatsApp: +61 4XX XXX XXX</div>`,
+                isScam: true,
+                story: {
+                    victim: "Jason, 23, from Balcatta",
+                    amount: "$1,200 plus identity theft",
+                    text: "I was looking for work so I replied. They interviewed me on WhatsApp and 'hired' me. They asked for my ID, tax file number, and bank details for 'payroll'. Then they asked me to buy gift cards as my 'first task'. I realised too late."
+                },
+                redFlags: [
+                    { icon: "📱", text: "Legitimate recruiters don't cold-text people asking them to move to WhatsApp immediately." },
+                    { icon: "🔍", text: "'Found your resume online' is vague - they don't mention which job board or position." },
+                    { icon: "⚡", text: "'Urgent opening' creates pressure. Real recruiters allow time for decisions." },
+                    { icon: "🆔", text: "Never provide TFN, ID, or bank details before signing a real employment contract in person or via verified channels." }
+                ],
+                realImpact: "Task scams and fake job offers often lead to identity theft. Your stolen details can be used to open accounts, take loans, or commit fraud in your name."
+            },
+
+            // === MEDICARE/HEALTH SCAMS ===
+            {
+                type: "sms",
+                sender: "+61 2 8XXX XXXX",
+                time: "4:56 PM",
+                difficulty: "easy",
+                content: `<div class="sms-bubble">MEDICARE: You have a pending rebate of $284.50. Claim now before it expires: medicare-rebate.com.au/claim?ref=7429</div>`,
+                isScam: true,
+                story: {
+                    victim: "Wendy, 58, from Morley",
+                    amount: "$3,200",
+                    text: "I'd been to the doctor recently so I thought it was real. I entered my Medicare and bank details. They took money from my account and I had to cancel all my cards."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "'medicare-rebate.com.au' is a fake website. Real Medicare claims are through myGov or the Medicare app." },
+                    { icon: "📱", text: "Medicare doesn't send SMS messages about rebates with clickable links." },
+                    { icon: "💰", text: "Medicare rebates are automatic - you don't need to 'claim' them via text message." },
+                    { icon: "⚠️", text: "This is a common scam targeting Australians. Always access Medicare through myGov directly." }
+                ],
+                realImpact: "Medicare scams increased 200% in 2024-2025. They target people who've recently visited a doctor, using leaked data."
+            },
+
+            // === TOLL/FINE SCAMS ===
+            {
+                type: "sms",
+                sender: "Linkt",
+                time: "9:14 AM",
+                difficulty: "medium",
+                content: `<div class="sms-bubble">Linkt: You have an unpaid toll of $4.90 from 15/01. Pay now to avoid $176 admin fee: linkt-pay.com.au/settle</div>`,
+                isScam: true,
+                story: {
+                    victim: "Marcus, 31, from Cannington",
+                    amount: "$2,800",
+                    text: "I drive on toll roads sometimes and $4.90 seemed believable. The website looked exactly like Linkt. After I 'paid', they drained my account."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "'linkt-pay.com.au' is fake. The real Linkt website is linkt.com.au" },
+                    { icon: "💵", text: "Small amounts ($4.90) are used deliberately - they seem too small to bother verifying." },
+                    { icon: "😰", text: "The threat of a $176 fee creates panic. Always verify toll debts through official channels." },
+                    { icon: "📱", text: "Log into your Linkt account directly or call them to check for unpaid tolls." }
+                ],
+                realImpact: "Toll road scams are particularly effective because the amounts seem so believable. Victims often don't realise until their entire account is drained."
+            },
+
+            // === NBN/TELCO SCAMS ===
+            {
+                type: "phone",
+                sender: "Private Number",
+                time: "Incoming Call",
+                difficulty: "medium",
+                content: `<div class="phone-transcript">
+                    <p><span class="caller">[Caller]:</span> "Hello, I'm calling from NBN Technical Support. We've detected a security issue with your internet connection that's allowing hackers to access your devices. I can help you fix this right now if you give me remote access to your computer."</p>
+                </div>`,
+                isScam: true,
+                story: {
+                    victim: "George, 72, from Dianella",
+                    amount: "$24,000 (life savings)",
+                    text: "He sounded so professional and concerned. I let him onto my computer to 'fix' it. He showed me fake 'hackers' on my screen. He said I needed to move my money to a 'secure government account' for protection. I believed him."
+                },
+                redFlags: [
+                    { icon: "📞", text: "NBN Co NEVER makes unsolicited calls about security issues or asks for remote access." },
+                    { icon: "💻", text: "Never give remote access to your computer to someone who called YOU." },
+                    { icon: "🎭", text: "Tech support scammers use fake 'evidence' of hackers to create fear." },
+                    { icon: "💰", text: "No company or government will ever ask you to move money to a 'safe account'." }
+                ],
+                realImpact: "Remote access scams cost Australians $15.5 million in 2024. Elderly Australians lose an average of $21,000 per incident."
+            },
+
+            // === ROMANCE SCAMS ===
+            {
+                type: "social",
+                sender: "Michael_Engineer_Perth",
+                time: "Dating App - 2 weeks chatting",
+                difficulty: "hard",
+                content: `<p><strong>Message from Michael:</strong></p>
+                <p>"Hey beautiful ❤️ I know we haven't met in person yet but I feel such a strong connection with you. I'm stuck on this mining project in Indonesia and there's been an accident with the equipment."</p>
+                <p>"The company is holding my wages until the project finishes. I hate to ask, but could you lend me $3,000 for medical supplies for my injured crew? I'll pay you back double when I return to Perth next month. I've never felt this way about anyone before. 💕"</p>`,
+                isScam: true,
+                story: {
+                    victim: "Sandra, 52, from Fremantle",
+                    amount: "$87,000 over 6 months",
+                    text: "We talked every day for months. He was charming, remembered everything about me. It started with small requests - $500 for a phone bill, $2,000 for travel. Each time there was a new emergency. My friends tried to warn me but I was in love. He never existed."
+                },
+                redFlags: [
+                    { icon: "💕", text: "Romance scammers build emotional connections before asking for money. It starts small and escalates." },
+                    { icon: "🌏", text: "'Working overseas' is a common excuse for never meeting in person - mining, military, oil rigs, medical missions." },
+                    { icon: "🆘", text: "Emergencies requiring money are invented. Real partners don't ask for money from people they've never met." },
+                    { icon: "📸", text: "Always reverse image search profile photos - romance scammers use stolen photos." }
+                ],
+                realImpact: "Romance scams caused $40.5 million in losses in Australia in 2024. The average victim loses $35,000 over several months. Many victims never report due to embarrassment."
+            },
+
+            // === LEGITIMATE MESSAGES ===
+            {
+                type: "email",
+                sender: "noreply@linkedin.com",
+                subject: "David, you have 3 new connection requests",
+                time: "10:22 AM",
+                difficulty: "easy",
+                content: `<p>Hi David,</p>
+                <p>You have pending connection requests from:</p>
+                <p>• Sarah Mitchell - HR Manager at Rio Tinto</p>
+                <p>• James Cooper - Recruitment Specialist</p>
+                <p>• Mining Careers WA - Company Page</p>
+                <p><a href="#">View your pending invitations on LinkedIn</a></p>
+                <p>This email was sent to your registered email address. You can adjust your notification settings in your LinkedIn account.</p>`,
+                isScam: false,
+                redFlags: [
+                    { icon: "✅", text: "The sender domain is the legitimate linkedin.com" },
+                    { icon: "✅", text: "The email format matches LinkedIn's actual notification style" },
+                    { icon: "✅", text: "No urgent payment requests or suspicious links" },
+                    { icon: "💡", text: "TIP: Even with legitimate emails, it's safer to open LinkedIn directly rather than clicking email links." }
+                ]
+            },
+            {
+                type: "sms",
+                sender: "Telstra",
+                time: "11:15 AM",
+                difficulty: "easy",
+                content: `<div class="sms-bubble">TELSTRA: Your bill of $127.43 is due on 15 Jan. Pay at my.telstra.com.au or call 13 22 00. Reply STOP to opt out of reminders.</div>`,
+                isScam: false,
+                redFlags: [
+                    { icon: "✅", text: "Uses official Telstra short code sender name" },
+                    { icon: "✅", text: "Directs to the official website (my.telstra.com.au) and real phone number (13 22 00)" },
+                    { icon: "✅", text: "Provides opt-out option - required by Australian law for legitimate businesses" },
+                    { icon: "💡", text: "TIP: If unsure, always go directly to my.telstra.com.au rather than clicking any links." }
+                ]
+            },
+            {
+                type: "email",
+                sender: "noreply@spotify.com",
+                subject: "Your Premium subscription is about to renew",
+                time: "2 days ago",
+                difficulty: "easy",
+                content: `<p>Hi there,</p>
+                <p>Just a heads up - your Spotify Premium subscription will renew on January 20, 2026 for $13.99/month.</p>
+                <p>If you'd like to make changes to your subscription or update your payment method, you can do so in your account settings.</p>
+                <p>Thanks for being a Premium member!</p>
+                <p>The Spotify Team</p>`,
+                isScam: false,
+                redFlags: [
+                    { icon: "✅", text: "Sent from the legitimate spotify.com domain" },
+                    { icon: "✅", text: "Standard renewal notification - no urgent threats or unusual requests" },
+                    { icon: "✅", text: "Doesn't ask you to click suspicious links or provide personal details" },
+                    { icon: "💡", text: "TIP: Even legitimate emails can be spoofed. If you want to manage your subscription, open Spotify directly." }
+                ]
+            },
+            {
+                type: "sms",
+                sender: "Centrelink",
+                time: "9:30 AM",
+                difficulty: "medium",
+                content: `<div class="sms-bubble">Your Centrelink payment of $612.00 has been deposited into your nominated account ending in **4521. View details in the myGov app.</div>`,
+                isScam: false,
+                redFlags: [
+                    { icon: "✅", text: "Uses official Centrelink sender name" },
+                    { icon: "✅", text: "Only shows partial account number (last 4 digits) - legitimate services protect your full details" },
+                    { icon: "✅", text: "Directs to the official myGov app, not a suspicious link" },
+                    { icon: "💡", text: "TIP: Centrelink does send payment notifications, but if ever unsure, log into myGov directly to check." }
+                ]
+            },
+            {
+                type: "email",
+                sender: "no-reply@commbank.com.au",
+                subject: "Your July statement is ready",
+                time: "Yesterday",
+                difficulty: "medium",
+                content: `<p>Hi,</p>
+                <p>Your CommBank Smart Access statement for the period ending 31 December 2025 is now available.</p>
+                <p>You can view your statement by logging into the CommBank app or NetBank.</p>
+                <p>If you have any questions, call us on 13 2221 or visit your local branch.</p>
+                <p>Commonwealth Bank of Australia</p>`,
+                isScam: false,
+                redFlags: [
+                    { icon: "✅", text: "Sent from legitimate commbank.com.au domain" },
+                    { icon: "✅", text: "Doesn't include any clickable links - tells you to log in via app or NetBank yourself" },
+                    { icon: "✅", text: "Provides the real CommBank phone number (13 2221)" },
+                    { icon: "💡", text: "TIP: This is how real bank emails look - no links, just instructions to log in directly." }
+                ]
+            },
+
+            // === MORE SCAMS ===
+            {
+                type: "sms",
+                sender: "+61 4XX XXX XXX",
+                time: "6:45 PM",
+                difficulty: "easy",
+                content: `<div class="sms-bubble">Hi I'm the guy from facebook marketplace about the PS5. Can you send $50 deposit to hold it? I've had lots of interest. Pay ID: randomname@gmail.com</div>`,
+                isScam: true,
+                story: {
+                    victim: "Liam, 17, from Kalamunda",
+                    amount: "$350 (multiple deposits)",
+                    text: "I was buying a cheap PS5. They kept asking for more deposits - delivery fee, insurance, etc. The PS5 never arrived and they blocked me."
+                },
+                redFlags: [
+                    { icon: "💰", text: "Never pay deposits for items on Marketplace before seeing them in person." },
+                    { icon: "📧", text: "PayID to a gmail address (not a phone number) is suspicious - real sellers use their phone number." },
+                    { icon: "⏰", text: "'Lots of interest' creates urgency to make you pay quickly without thinking." },
+                    { icon: "🤝", text: "For high-value items, always meet in person, inspect, and pay on pickup." }
+                ],
+                realImpact: "Marketplace scams accounted for $8.5 million in losses in 2024. Young Australians are the most affected group."
+            },
+            {
+                type: "email",
+                sender: "energy-rebate@aus-government.com",
+                subject: "Claim Your $500 Energy Rebate - Expires Soon!",
+                time: "Today",
+                difficulty: "medium",
+                content: `<p>Dear Householder,</p>
+                <p>The Australian Government is providing a <strong>$500 Energy Bill Relief</strong> payment to eligible households.</p>
+                <p>Our records show you haven't claimed your rebate yet. This offer expires on 31 January 2026.</p>
+                <p><a href="#">Claim your $500 rebate now →</a></p>
+                <p>Department of Energy and Climate Change</p>`,
+                isScam: true,
+                story: {
+                    victim: "The Nguyen family, Willetton",
+                    amount: "$4,500",
+                    text: "With energy bills so high, we were excited about the rebate. We clicked the link and entered our details. They got access to our internet banking."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "'aus-government.com' is fake. Government emails come from .gov.au domains only." },
+                    { icon: "💵", text: "Real energy rebates are applied automatically to your bill - you don't need to 'claim' them via email." },
+                    { icon: "⏰", text: "Fake expiry dates create urgency. Government programs don't pressure you like this." },
+                    { icon: "🔍", text: "Check energy.gov.au for legitimate information about rebates." }
+                ],
+                realImpact: "Energy rebate scams spiked 300% in 2024-2025 as cost of living increased. Scammers exploit genuine government programs."
+            },
+            {
+                type: "sms",
+                sender: "+61 4XX XXX XXX",
+                time: "Yesterday",
+                difficulty: "hard",
+                content: `<div class="sms-bubble">myGov: Your tax return has been processed. Refund amount: $1,847.00. Complete identity verification to receive payment: my-gov-au.com/verify</div>`,
+                isScam: true,
+                story: {
+                    victim: "Amber, 26, from Ellenbrook",
+                    amount: "$6,200",
+                    text: "I had just submitted my tax return so the timing seemed right. The website looked exactly like myGov. After I logged in, they had access to my real myGov and linked services."
+                },
+                redFlags: [
+                    { icon: "🌐", text: "'my-gov-au.com' is fake. The real myGov is my.gov.au - no hyphens." },
+                    { icon: "📱", text: "myGov doesn't send SMS messages with links. They tell you to log in to check messages." },
+                    { icon: "🎯", text: "Timing attacks around tax season catch people who are expecting refunds." },
+                    { icon: "🔐", text: "Fake myGov logins capture your credentials AND can access all linked services (ATO, Medicare, Centrelink)." }
+                ],
+                realImpact: "myGov impersonation gives scammers access to your entire digital identity - tax, Medicare, Centrelink, NDIS. The damage can take years to undo."
+            },
+            {
+                type: "website",
+                sender: "Facebook Ad",
+                time: "Sponsored Post",
+                difficulty: "hard",
+                content: `<p><strong>🔥 CLOSING DOWN SALE - Perth Store Only 🔥</strong></p>
+                <p><strong>Dyson V15 Vacuum - Was $1,299 NOW $89!</strong></p>
+                <p>Due to warehouse clearance, we're selling brand new Dyson products at MASSIVE discounts. Perth pickup or delivery available.</p>
+                <p>⭐⭐⭐⭐⭐ (847 reviews)</p>
+                <p>✅ Australian Stock ✅ Full Warranty ✅ PayPal Accepted</p>
+                <p><a href="#">www.dyson-clearance-perth.com</a></p>`,
+                isScam: true,
+                story: {
+                    victim: "Multiple victims via Facebook ads",
+                    amount: "$89-299 each, thousands affected",
+                    text: "The deal seemed too good but they had great reviews. Lots of people ordered. The products never arrived. The 'company' disappeared after a few weeks with hundreds of thousands of dollars."
+                },
+                redFlags: [
+                    { icon: "💰", text: "95% discount on premium products is impossible. Dyson never sells at these prices." },
+                    { icon: "🌐", text: "'dyson-clearance-perth.com' is not Dyson's website. The real site is dyson.com.au" },
+                    { icon: "⭐", text: "Fake reviews are easy to create. Check independent review sites, not just the store page." },
+                    { icon: "🔍", text: "For big brand deals, always check the official brand website or authorised retailers." }
+                ],
+                realImpact: "Fake online store scams cost Australians $4.6 million in 2024. They're most common on Facebook and Instagram ads."
+            }
+        ];
+
+        // Story mode subset with more detailed stories
+        const storyCases = allCases.filter(c => c.story);
+
+        // Game state
+        let currentCases = [];
+        let currentCase = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let correctAnswers = 0;
+        let totalAnswered = 0;
+        let gameMode = 'classic';
+        let timerInterval = null;
+        let timeRemaining = 30;
+
+        // Achievements
+        let achievements = {
+            perfectStreak5: false,
+            perfectStreak10: false,
+            speedDemon: false,
+            scamExpert: false,
+            firstTry: false
+        };
+
+        // Shuffle array function
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Start the game
+        function startGame(mode) {
+            gameMode = mode;
+            currentCase = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            correctAnswers = 0;
+            totalAnswered = 0;
+
+            // Select cases based on mode
+            if (mode === 'story') {
+                currentCases = shuffleArray(storyCases).slice(0, 15);
+            } else if (mode === 'speed') {
+                currentCases = shuffleArray(allCases).slice(0, 20);
+            } else {
+                currentCases = shuffleArray(allCases).slice(0, 25);
+            }
+
+            document.getElementById('introScreen').classList.add('hidden');
+            document.getElementById('statsBar').classList.remove('hidden');
+            document.getElementById('progressContainer').classList.remove('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            document.getElementById('totalCases').textContent = currentCases.length;
+
+            // Show/hide timer for speed mode
+            const timerStat = document.getElementById('timerStat');
+            if (mode === 'speed') {
+                timerStat.classList.remove('hidden');
+            } else {
+                timerStat.classList.add('hidden');
+            }
+
+            // Update stats display
+            document.getElementById('scoreValue').textContent = '0';
+            document.getElementById('streakValue').textContent = '0';
+            document.getElementById('accuracyValue').textContent = '0%';
+
+            loadCase();
+        }
+
+        // Back to menu
+        function backToMenu() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('statsBar').classList.add('hidden');
+            document.getElementById('progressContainer').classList.add('hidden');
+            document.getElementById('introScreen').classList.remove('hidden');
+        }
+
+        // Load current case
+        function loadCase() {
+            const caseData = currentCases[currentCase];
+            const card = document.getElementById('messageCard');
+            const storyIntro = document.getElementById('storyIntro');
+
+            // Update progress
+            document.getElementById('currentCase').textContent = currentCase + 1;
+            document.getElementById('progressFill').style.width = `${((currentCase) / currentCases.length) * 100}%`;
+
+            // Update difficulty label
+            const difficultyLabel = document.getElementById('difficultyLabel');
+            if (caseData.difficulty === 'easy') {
+                difficultyLabel.textContent = 'ROOKIE LEVEL';
+                difficultyLabel.style.color = 'var(--success)';
+            } else if (caseData.difficulty === 'medium') {
+                difficultyLabel.textContent = 'PRO LEVEL';
+                difficultyLabel.style.color = 'var(--neon-orange)';
+            } else {
+                difficultyLabel.textContent = 'EXPERT LEVEL';
+                difficultyLabel.style.color = 'var(--danger)';
+            }
+
+            // Show story intro in story mode
+            if (gameMode === 'story' && caseData.story && caseData.isScam) {
+                storyIntro.innerHTML = `
+                    <h3>📖 Real Victim Story</h3>
+                    <p class="victim-story">"${caseData.story.text}"</p>
+                    <p class="victim-story">— <span class="victim-name">${caseData.story.victim}</span>, lost <span class="amount-lost">${caseData.story.amount}</span></p>
+                    <p class="context">The message below is similar to what this person received. Can you spot the red flags they missed?</p>
+                `;
+                storyIntro.classList.remove('hidden');
+            } else {
+                storyIntro.classList.add('hidden');
+            }
+
+            // Build message HTML based on type
+            let typeClass = caseData.type;
+            let typeLabel = caseData.type.toUpperCase();
+            if (typeLabel === 'SOCIAL') typeLabel = 'SOCIAL POST';
+            if (typeLabel === 'WEBSITE') typeLabel = 'ONLINE AD';
+            if (typeLabel === 'PHONE') typeLabel = 'PHONE CALL';
+
+            let difficultyBadge = '';
+            if (gameMode !== 'story') {
+                difficultyBadge = `<span class="difficulty-badge ${caseData.difficulty}">${caseData.difficulty}</span>`;
+            }
+
+            let contentHTML = '';
+            if (caseData.type === 'email') {
+                contentHTML = `
+                    <div class="message-header">
+                        <span class="message-type ${typeClass}">${typeLabel}</span>
+                        <span class="message-sender">${caseData.sender}</span>
+                        <span class="message-time">${caseData.time}</span>
+                        ${difficultyBadge}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-subject">${caseData.subject}</div>
+                        <div class="message-body">${caseData.content}</div>
+                    </div>
+                `;
+            } else if (caseData.type === 'sms' || caseData.type === 'phone' || caseData.type === 'social' || caseData.type === 'website') {
+                contentHTML = `
+                    <div class="message-header">
+                        <span class="message-type ${typeClass}">${typeLabel}</span>
+                        <span class="message-sender">${caseData.sender}</span>
+                        <span class="message-time">${caseData.time}</span>
+                        ${difficultyBadge}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-body">${caseData.content}</div>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = contentHTML;
+            card.classList.remove('animate-in');
+            void card.offsetWidth; // Trigger reflow
+            card.classList.add('animate-in');
+
+            // Reset UI
+            document.getElementById('feedbackPanel').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = false);
+
+            // Start timer in speed mode
+            if (gameMode === 'speed') {
+                startTimer();
+            }
+        }
+
+        // Timer functions for speed mode
+        function startTimer() {
+            timeRemaining = 30;
+            updateTimerDisplay();
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    // Auto-submit wrong answer on timeout
+                    submitAnswer(!currentCases[currentCase].isScam);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerValue = document.getElementById('timerValue');
+            const timerStat = document.getElementById('timerStat');
+            timerValue.textContent = timeRemaining;
+
+            if (timeRemaining <= 10) {
+                timerStat.classList.add('warning');
+            } else {
+                timerStat.classList.remove('warning');
+            }
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // Submit answer
+        function submitAnswer(isScam) {
+            stopTimer();
+
+            const caseData = currentCases[currentCase];
+            const correct = isScam === caseData.isScam;
+
+            totalAnswered++;
+
+            // Calculate points
+            let pointsEarned = 0;
+            if (correct) {
+                correctAnswers++;
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+
+                // Base points by difficulty
+                let basePoints = 100;
+                if (caseData.difficulty === 'medium') basePoints = 150;
+                if (caseData.difficulty === 'hard') basePoints = 200;
+
+                // Streak bonus
+                const streakBonus = Math.min(streak - 1, 5) * 25;
+
+                // Speed bonus in speed mode
+                let speedBonus = 0;
+                if (gameMode === 'speed' && timeRemaining > 20) {
+                    speedBonus = 50;
+                }
+
+                pointsEarned = basePoints + streakBonus + speedBonus;
+                score += pointsEarned;
+
+                // Check achievements
+                if (streak === 5) achievements.perfectStreak5 = true;
+                if (streak === 10) achievements.perfectStreak10 = true;
+                if (gameMode === 'speed' && timeRemaining > 25) achievements.speedDemon = true;
+            } else {
+                streak = 0;
+            }
+
+            // Update stats
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('streakValue').textContent = streak;
+            document.getElementById('accuracyValue').textContent = `${Math.round((correctAnswers / totalAnswered) * 100)}%`;
+
+            // Show feedback
+            showFeedback(correct, caseData, pointsEarned);
+
+            // Disable buttons
+            document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+        }
+
+        // Show feedback panel
+        function showFeedback(correct, caseData, pointsEarned) {
+            const panel = document.getElementById('feedbackPanel');
+            const isScamText = caseData.isScam ? "a SCAM" : "LEGITIMATE";
+
+            let redFlagsHTML = caseData.redFlags.map(flag => `
+                <div class="red-flag-item">
+                    <span class="flag-icon">${flag.icon}</span>
+                    <span class="flag-text">${flag.text}</span>
+                </div>
+            `).join('');
+
+            // Add real impact section for scams
+            let realImpactHTML = '';
+            if (caseData.isScam && caseData.realImpact) {
+                realImpactHTML = `
+                    <div class="real-impact">
+                        <h5>📊 Real-World Impact</h5>
+                        <p>${caseData.realImpact}</p>
+                    </div>
+                `;
+            }
+
+            let pointsHTML = correct ? `<span class="feedback-points">+${pointsEarned} pts</span>` : '';
+
+            panel.innerHTML = `
+                <div class="feedback-header">
+                    <div class="feedback-icon">${correct ? '✓' : '✗'}</div>
+                    <div class="feedback-title">${correct ? 'Correct!' : 'Not quite...'}</div>
+                    ${pointsHTML}
+                </div>
+                <p>This message was <strong>${isScamText}</strong>.</p>
+                <div class="red-flags">
+                    <h4>${caseData.isScam ? '🚩 Red Flags to Spot' : '✅ Why It\'s Legitimate'}</h4>
+                    ${redFlagsHTML}
+                </div>
+                ${realImpactHTML}
+            `;
+
+            panel.className = `feedback-panel ${correct ? 'correct' : 'incorrect'}`;
+            panel.style.display = 'block';
+
+            if (!correct) {
+                document.getElementById('messageCard').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('messageCard').classList.remove('shake');
+                }, 500);
+            }
+
+            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('nextBtn').textContent = currentCase < currentCases.length - 1 ? 'Next Case →' : 'View Results →';
+        }
+
+        // Next case
+        function nextCase() {
+            currentCase++;
+            if (currentCase < currentCases.length) {
+                loadCase();
+            } else {
+                showResults();
+            }
+        }
+
+        // Show results
+        function showResults() {
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('progressContainer').classList.add('hidden');
+
+            const percentage = Math.round((correctAnswers / currentCases.length) * 100);
+            let rank, rankClass;
+
+            if (percentage >= 90) {
+                rank = "EXPERT DETECTIVE";
+                rankClass = "expert";
+                achievements.scamExpert = true;
+            } else if (percentage >= 70) {
+                rank = "PRO INVESTIGATOR";
+                rankClass = "pro";
+            } else if (percentage >= 50) {
+                rank = "ROOKIE AGENT";
+                rankClass = "rookie";
+            } else {
+                rank = "TRAINEE";
+                rankClass = "trainee";
+            }
+
+            // Check first try achievement
+            if (percentage >= 80) {
+                achievements.firstTry = true;
+            }
+
+            // Build achievements HTML
+            let achievementsHTML = `
+                <div class="achievements-grid">
+                    <div class="achievement ${achievements.perfectStreak5 ? 'unlocked' : ''}">
+                        <div class="achievement-icon">🔥</div>
+                        <div class="achievement-name">5 Streak</div>
+                    </div>
+                    <div class="achievement ${achievements.perfectStreak10 ? 'unlocked' : ''}">
+                        <div class="achievement-icon">⚡</div>
+                        <div class="achievement-name">10 Streak</div>
+                    </div>
+                    <div class="achievement ${achievements.speedDemon ? 'unlocked' : ''}">
+                        <div class="achievement-icon">🚀</div>
+                        <div class="achievement-name">Speed Demon</div>
+                    </div>
+                    <div class="achievement ${achievements.scamExpert ? 'unlocked' : ''}">
+                        <div class="achievement-icon">🏆</div>
+                        <div class="achievement-name">Scam Expert</div>
+                    </div>
+                </div>
+            `;
+
+            const resultsScreen = document.getElementById('resultsScreen');
+            resultsScreen.innerHTML = `
+                <div class="results-screen animate-in">
+                    <h2>Training Complete!</h2>
+                    <div class="results-grade">${percentage}%</div>
+                    <div class="results-label">Detection Rate</div>
+
+                    <div class="rank-badge ${rankClass}">${rank}</div>
+
+                    <div class="results-stats">
+                        <div class="result-stat">
+                            <div class="result-stat-value correct-color">${correctAnswers}</div>
+                            <div class="result-stat-label">Correct</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-value incorrect-color">${currentCases.length - correctAnswers}</div>
+                            <div class="result-stat-label">Missed</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-value">${score}</div>
+                            <div class="result-stat-label">Score</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-stat-value" style="color: var(--neon-orange);">${maxStreak}</div>
+                            <div class="result-stat-label">Best Streak</div>
+                        </div>
+                    </div>
+
+                    ${achievementsHTML}
+
+                    <div class="tips-section">
+                        <h3>🛡️ Remember These Golden Rules</h3>
+                        <ul>
+                            <li>Never click links in unexpected emails or texts - go directly to the official website</li>
+                            <li>Check the sender's email domain carefully - scammers use lookalike addresses</li>
+                            <li>If a family member asks for money via text, call them on their known number first</li>
+                            <li>Legitimate organisations never ask for passwords or PINs via email or SMS</li>
+                            <li>Banks and government never ask you to transfer money to a "safe account"</li>
+                            <li>If it sounds too good to be true (free money, 90% off deals), it's a scam</li>
+                            <li>Report scams to <strong>Scamwatch.gov.au</strong> to help protect others</li>
+                        </ul>
+                    </div>
+
+                    <button class="start-btn" onclick="backToMenu()" style="margin-top: 2rem;">Back to Menu</button>
+                </div>
+            `;
+            resultsScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

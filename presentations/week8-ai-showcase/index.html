@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 8: AI Showcase - Tech for Life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #141420;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #888;
+            --accent: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-tertiary: #ec4899;
+            --gradient: linear-gradient(135deg, var(--accent), var(--accent-secondary), var(--accent-tertiary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .content-box {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            font-size: 1.2rem;
+            line-height: 2;
+        }
+
+        li {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .highlight {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            margin: 1.5rem 0;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 2rem;
+        }
+
+        .category-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+        }
+
+        .category-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .category-card p {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 2rem;
+        }
+
+        .tool-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+        }
+
+        .tool-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .tool-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .tool-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.8rem 1.5rem;
+            border-radius: 100px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: var(--accent);
+            transform: scale(1.5);
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .criteria-list {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .criteria-list li {
+            font-size: 1.1rem;
+        }
+
+        .timeline {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-number {
+            min-width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-content h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .category-grid,
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            ul, ol {
+                font-size: 1rem;
+            }
+
+            .home-btn {
+                top: 0.5rem;
+                left: 0.5rem;
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.active .content-box {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-btn">← Home</a>
+
+    <div class="slides-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="content-box" style="text-align: center;">
+                <div class="emoji">🌟✨🚀</div>
+                <h1>AI Showcase</h1>
+                <p class="subtitle">Celebrating Creative AI Applications</p>
+                <p style="font-size: 1.2rem; color: var(--text-muted); margin-top: 2rem;">Week 8 | Tech for Life</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Journey Recap -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>Our AI Journey: Weeks 1-7</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-number">1</div>
+                        <div class="timeline-content">
+                            <h4>Introduction to AI</h4>
+                            <p>Understanding what AI is and how it works</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">2</div>
+                        <div class="timeline-content">
+                            <h4>Text Generation</h4>
+                            <p>ChatGPT, Claude, Gemini for writing and research</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">3</div>
+                        <div class="timeline-content">
+                            <h4>Image Generation</h4>
+                            <p>Creating visual content with AI tools</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">4</div>
+                        <div class="timeline-content">
+                            <h4>Video & Audio</h4>
+                            <p>Multimodal AI applications</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">5-7</div>
+                        <div class="timeline-content">
+                            <h4>Real-World Applications</h4>
+                            <p>Study tools, coding, workflows, and creative projects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: AI Tools Gallery Part 1 -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <h2>AI Tools We've Explored</h2>
+                <p class="subtitle">Chat & Research</p>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64" alt="ChatGPT">
+                        </div>
+                        <h4>ChatGPT</h4>
+                        <p>Conversational AI</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude">
+                        </div>
+                        <h4>Claude</h4>
+                        <p>Advanced reasoning</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini">
+                        </div>
+                        <h4>Gemini</h4>
+                        <p>Google's AI assistant</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&sz=64" alt="NotebookLM">
+                        </div>
+                        <h4>NotebookLM</h4>
+                        <p>AI research assistant</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="Perplexity">
+                        </div>
+                        <h4>Perplexity</h4>
+                        <p>AI-powered search</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=teacherscreen.com.au&sz=64" alt="TeacherScreen">
+                        </div>
+                        <h4>TeacherScreen</h4>
+                        <p>Educational AI</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: AI Tools Gallery Part 2 -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <h2>AI Tools We've Explored</h2>
+                <p class="subtitle">Creative & Development</p>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=midjourney.com&sz=64" alt="Midjourney">
+                        </div>
+                        <h4>Midjourney</h4>
+                        <p>AI art generation</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=ideogram.ai&sz=64" alt="Ideogram">
+                        </div>
+                        <h4>Ideogram</h4>
+                        <p>Text-in-image AI</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=recraft.ai&sz=64" alt="Recraft">
+                        </div>
+                        <h4>Recraft</h4>
+                        <p>Design AI tool</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=capcut.com&sz=64" alt="CapCut">
+                        </div>
+                        <h4>CapCut</h4>
+                        <p>AI video editing</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=runwayml.com&sz=64" alt="Runway">
+                        </div>
+                        <h4>Runway</h4>
+                        <p>Advanced video AI</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://www.google.com/s2/favicons?domain=cursor.sh&sz=64" alt="Cursor">
+                        </div>
+                        <h4>Cursor / Claude Code</h4>
+                        <p>AI coding assistants</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Today's Goal -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <div class="emoji">🎯</div>
+                <h2>Today's Mission</h2>
+                <div class="highlight" style="text-align: left; max-width: 800px; margin: 2rem auto;">
+                    <h3>Share Your AI Discoveries</h3>
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-top: 1rem;">
+                        You've had 7 weeks to explore AI tools. Now it's your turn to show us how <strong>you've</strong> been creative, innovative, or just plain clever with these technologies.
+                    </p>
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-top: 1rem;">
+                        This isn't about perfection—it's about <strong>sharing what you learned</strong> and <strong>inspiring others</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Presentation Format -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>Presentation Guidelines</h2>
+                <div class="two-column">
+                    <div>
+                        <h3>Format</h3>
+                        <ul>
+                            <li><strong>2-3 minutes</strong> per student</li>
+                            <li>Show your AI tool/workflow in action</li>
+                            <li>Explain <strong>why</strong> you chose it</li>
+                            <li>Demonstrate the <strong>results</strong></li>
+                            <li>Share what you <strong>learned</strong></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>What to Show</h3>
+                        <ul>
+                            <li>Live demo (preferred)</li>
+                            <li>Screenshots or screen recording</li>
+                            <li>Before/after comparisons</li>
+                            <li>Your creative process</li>
+                            <li>Unexpected discoveries</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Evaluation Criteria -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>What We're Looking For</h2>
+                <div class="criteria-list">
+                    <ul>
+                        <li><strong>Creativity</strong> – Did you use AI in an interesting or unexpected way?</li>
+                        <li><strong>Usefulness</strong> – Does this solve a real problem or improve a workflow?</li>
+                        <li><strong>Understanding</strong> – Can you explain how and why the AI tool works?</li>
+                        <li><strong>Ethics Consideration</strong> – Did you think about responsible use, attribution, or limitations?</li>
+                        <li><strong>Presentation Clarity</strong> – Can others understand and potentially use your approach?</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 2rem; color: var(--text-muted); font-size: 1.1rem;">
+                    <strong>Remember:</strong> This is about learning and sharing, not competing!
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Showcase Categories -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <h2>Showcase Categories</h2>
+                <p class="subtitle">Which one describes your project best?</p>
+                <div class="category-grid">
+                    <div class="category-card">
+                        <h4>📚 Best AI Study Hack</h4>
+                        <p>AI tools that improved your learning or productivity</p>
+                    </div>
+                    <div class="category-card">
+                        <h4>🎨 Most Creative AI Art</h4>
+                        <p>Visual projects that pushed creative boundaries</p>
+                    </div>
+                    <div class="category-card">
+                        <h4>⚡ Best Workflow Automation</h4>
+                        <p>Using AI to save time or streamline tasks</p>
+                    </div>
+                    <div class="category-card">
+                        <h4>💡 Most Useful Discovery</h4>
+                        <p>An AI tool or technique that genuinely helps</p>
+                    </div>
+                </div>
+                <p style="margin-top: 2rem; color: var(--text-muted); font-size: 1rem;">
+                    Don't fit in these boxes? That's even better—surprise us!
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Demo Time Structure -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>Demo Time Structure</h2>
+                <div class="highlight">
+                    <h3 style="margin-bottom: 1.5rem;">Each Presentation Should Include:</h3>
+                    <ol style="font-size: 1.2rem;">
+                        <li><strong>Introduction</strong> (30 seconds)
+                            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                                <li>What AI tool(s) you used</li>
+                                <li>What problem you were solving</li>
+                            </ul>
+                        </li>
+                        <li><strong>Demo</strong> (1-2 minutes)
+                            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                                <li>Show it in action</li>
+                                <li>Highlight key features or techniques</li>
+                            </ul>
+                        </li>
+                        <li><strong>Reflection</strong> (30 seconds)
+                            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                                <li>What surprised you?</li>
+                                <li>What would you do differently?</li>
+                                <li>Any ethical considerations?</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Peer Feedback Framework -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>Peer Feedback Framework</h2>
+                <p class="subtitle">While watching your classmates present, consider:</p>
+                <div class="two-column">
+                    <div class="highlight">
+                        <h3>Positive Feedback</h3>
+                        <ul>
+                            <li>What impressed you most?</li>
+                            <li>What was creative or innovative?</li>
+                            <li>What could <strong>you</strong> use in your own work?</li>
+                            <li>What questions do you have?</li>
+                        </ul>
+                    </div>
+                    <div class="highlight">
+                        <h3>Constructive Ideas</h3>
+                        <ul>
+                            <li>How could this be expanded?</li>
+                            <li>What other tools might work?</li>
+                            <li>What ethical considerations arise?</li>
+                            <li>How could this be improved?</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 2rem; color: var(--text-muted); font-size: 1.1rem; text-align: center;">
+                    <strong>Keep feedback specific, kind, and actionable</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Inspiration Examples -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>Need Inspiration? Here Are Some Ideas</h2>
+                <div class="two-column">
+                    <div>
+                        <h3>Study & Productivity</h3>
+                        <ul>
+                            <li>Using NotebookLM to create study podcasts</li>
+                            <li>ChatGPT for flashcard generation</li>
+                            <li>AI-powered note summarization</li>
+                            <li>Creating practice quizzes with AI</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Creative Projects</h3>
+                        <ul>
+                            <li>AI-generated story illustrations</li>
+                            <li>Video editing with AI effects</li>
+                            <li>Music visualization with AI art</li>
+                            <li>Social media content creation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem;">
+                    <h3>Workflow Automation</h3>
+                    <ul>
+                        <li>Using AI to draft emails or messages</li>
+                        <li>Automating research with Perplexity</li>
+                        <li>Code generation for personal projects</li>
+                        <li>AI-assisted lesson planning (for future teachers!)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Discussion Question -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <div class="emoji">💭</div>
+                <h2>Discussion Time</h2>
+                <div class="highlight" style="max-width: 900px; margin: 2rem auto; text-align: left;">
+                    <h3>Reflection Questions:</h3>
+                    <ul style="font-size: 1.3rem; line-height: 2.2;">
+                        <li>What surprised you about how <strong>others</strong> used AI?</li>
+                        <li>Did anyone discover a tool or technique you hadn't thought of?</li>
+                        <li>What ethical considerations did people mention?</li>
+                        <li>How has your understanding of AI changed over the past 7 weeks?</li>
+                        <li>What's one AI tool you'll keep using after this unit?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Key Takeaways -->
+        <div class="slide">
+            <div class="content-box">
+                <h2>Key Takeaways from AI Unit</h2>
+                <div class="highlight">
+                    <ul style="font-size: 1.3rem; line-height: 2.2;">
+                        <li><strong>AI is a tool</strong>, not a replacement for human creativity and critical thinking</li>
+                        <li><strong>Context matters</strong> – the quality of your prompts determines the quality of results</li>
+                        <li><strong>Verification is essential</strong> – always fact-check AI-generated content</li>
+                        <li><strong>Ethics and attribution</strong> are important considerations</li>
+                        <li><strong>Continuous learning</strong> – AI tools are evolving rapidly</li>
+                        <li><strong>Responsible use</strong> means understanding limitations and potential biases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Looking Ahead -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <div class="emoji">🔐</div>
+                <h2>What's Next?</h2>
+                <p class="subtitle">Transitioning to Cyber Safety (Weeks 9-14)</p>
+                <div class="highlight" style="max-width: 900px; margin: 2rem auto; text-align: left;">
+                    <h3>Coming Up:</h3>
+                    <ul style="font-size: 1.2rem; line-height: 2;">
+                        <li><strong>Week 9:</strong> Digital footprints and online privacy</li>
+                        <li><strong>Week 10:</strong> Cybersecurity fundamentals</li>
+                        <li><strong>Week 11:</strong> Social engineering and phishing</li>
+                        <li><strong>Week 12:</strong> Password security and 2FA</li>
+                        <li><strong>Week 13:</strong> Safe social media practices</li>
+                        <li><strong>Week 14:</strong> Cyber safety showcase and assessment</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 2rem; font-size: 1.1rem; color: var(--text-muted);">
+                    We'll build on what we've learned about AI to explore how to stay safe in the digital world.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 15: Closing -->
+        <div class="slide">
+            <div class="content-box" style="text-align: center;">
+                <div class="emoji">🎉🌟</div>
+                <h1>Thank You!</h1>
+                <p class="subtitle">Celebrating your creativity and innovation with AI</p>
+                <div class="highlight" style="max-width: 700px; margin: 3rem auto;">
+                    <p style="font-size: 1.3rem; color: var(--text-secondary); line-height: 1.8;">
+                        You've explored cutting-edge technology, pushed creative boundaries, and learned to use AI responsibly. That's something to be proud of.
+                    </p>
+                    <p style="font-size: 1.3rem; color: var(--text-secondary); line-height: 1.8; margin-top: 1.5rem;">
+                        <strong>Keep experimenting, keep learning, and keep creating!</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+    </div>
+
+    <div class="slide-number">
+        <span id="current-slide">1</span> / <span id="total-slides">15</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressDots = document.querySelectorAll('.progress-dot');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            progressDots[currentSlide].classList.remove('active');
+
+            currentSlide = (n + totalSlides) % totalSlides;
+
+            slides[currentSlide].classList.add('active');
+            progressDots[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+
+        // Touch/swipe navigation
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevSlide();
+            }
+        }
+
+        // Click on progress dots
+        progressDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+
+        // Click navigation (left/right half of screen)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.home-btn') || e.target.closest('.progress-bar')) {
+                return;
+            }
+
+            const clickX = e.clientX;
+            const screenWidth = window.innerWidth;
+
+            if (clickX < screenWidth / 2) {
+                prevSlide();
+            } else {
+                nextSlide();
+            }
+        });
+    </script>
+</body>
+</html>

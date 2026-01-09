@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Which Pathway Suits You? - Year 12 Career Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0f0f1e;
+            --bg-card: #1a1a2e;
+            --accent-purple: #9333ea;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border: #2d2d44;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+        }
+
+        .home-btn {
+            position: absolute;
+            left: 0;
+            top: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Mascot */
+        .mascot {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            font-size: 60px;
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .mascot.thinking { animation: wiggle 0.5s ease-in-out; }
+        .mascot.happy { animation: bounce 0.6s ease-in-out; }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-number {
+            color: var(--accent-purple);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: clamp(20px, 3vw, 26px);
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .option {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .option:hover {
+            border-color: var(--accent-purple);
+            transform: translateX(5px);
+            background: rgba(147, 51, 234, 0.1);
+        }
+
+        .option:hover::before {
+            left: 100%;
+        }
+
+        .option:active {
+            transform: scale(0.98);
+        }
+
+        /* Celebration */
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border: 2px solid var(--accent-purple);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            animation: popIn 0.5s ease;
+            box-shadow: 0 0 100px rgba(147, 51, 234, 0.5);
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .celebration h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .celebration p {
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        /* Results */
+        .results {
+            animation: slideIn 0.5s ease;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-title {
+            font-size: clamp(24px, 4vw, 32px);
+            margin-bottom: 10px;
+        }
+
+        .result-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .pathway-card {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(147, 51, 234, 0.3);
+        }
+
+        .pathway-card h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pathway-card .personality {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .pathway-card .description {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .secondary-pathway {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .secondary-pathway h4 {
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .profile-summary {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .profile-summary h4 {
+            color: var(--accent-green);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .profile-traits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .trait {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .trait-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .trait-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .resources {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .resources h4 {
+            color: var(--accent-orange);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .resources ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .resources a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .resources a:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(5px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(147, 51, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-purple);
+            background: rgba(147, 51, 234, 0.1);
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .start-screen h2 {
+            font-size: clamp(28px, 5vw, 40px);
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+            text-align: left;
+        }
+
+        .feature {
+            background: var(--bg-dark);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .feature h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--accent-purple);
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 15px;
+            }
+
+            .quiz-card {
+                padding: 25px;
+            }
+
+            .home-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+
+            .header {
+                padding: 20px 0;
+            }
+
+            .option {
+                padding: 15px;
+            }
+
+            .celebration {
+                padding: 30px 20px;
+                margin: 0 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-purple);
+            position: fixed;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 999;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="../../index.html" class="home-btn">← Home</a>
+            <h1>Which Pathway Suits You?</h1>
+            <p class="subtitle">Discover your ideal post-school direction</p>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="quiz-card start-screen">
+            <div class="mascot">🎓</div>
+            <h2>Ready to discover your pathway?</h2>
+            <p>Answer 15 quick questions about your interests, learning style, and goals. We'll suggest which post-school pathway might suit you best.</p>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Personalised Results</h3>
+                    <p>Get recommendations based on your unique answers</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>WA Resources</h3>
+                    <p>Links to local pathways and support</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✨</div>
+                    <h3>No Wrong Answers</h3>
+                    <p>Every pathway is valuable and worth celebrating</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startQuiz()">Let's Go! 🚀</button>
+        </div>
+
+        <!-- Progress Bar (hidden initially) -->
+        <div id="progressContainer" class="progress-container hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Question 1 of 15</div>
+        </div>
+
+        <!-- Mascot (hidden initially) -->
+        <div id="mascot" class="mascot hidden">🤔</div>
+
+        <!-- Quiz Card (hidden initially) -->
+        <div id="quizCard" class="quiz-card hidden">
+            <div class="question-number" id="questionNumber">Question 1 of 15</div>
+            <h2 class="question-text" id="questionText"></h2>
+            <div class="options" id="options"></div>
+        </div>
+
+        <!-- Results (hidden initially) -->
+        <div id="results" class="quiz-card results hidden"></div>
+    </div>
+
+    <script>
+        // Quiz data
+        const questions = [
+            {
+                question: "How do you learn best?",
+                options: [
+                    { text: "Reading, lectures, and theory", scores: { uni: 3, tafe: 1 } },
+                    { text: "Hands-on practice and doing", scores: { apprenticeship: 3, tafe: 2 } },
+                    { text: "A mix of theory and practical", scores: { tafe: 3, uni: 1 } },
+                    { text: "On the job, learning as I go", scores: { work: 3, apprenticeship: 1 } }
+                ]
+            },
+            {
+                question: "How important is earning money right now?",
+                options: [
+                    { text: "I can wait 3-4 years to earn", scores: { uni: 3 } },
+                    { text: "I want to earn while I learn", scores: { apprenticeship: 3, tafe: 1 } },
+                    { text: "I need income ASAP", scores: { work: 3, apprenticeship: 1 } },
+                    { text: "I can wait 1-2 years", scores: { tafe: 3, uni: 1 } }
+                ]
+            },
+            {
+                question: "Where do you see yourself in 5 years?",
+                options: [
+                    { text: "In a professional office career", scores: { uni: 3, tafe: 1 } },
+                    { text: "Running my own business", scores: { work: 2, apprenticeship: 2, tafe: 1 } },
+                    { text: "Working in a skilled trade", scores: { apprenticeship: 3, tafe: 2 } },
+                    { text: "Still figuring it out", scores: { work: 2, tafe: 1 } }
+                ]
+            },
+            {
+                question: "How do you feel about exams and tests?",
+                options: [
+                    { text: "Bring them on! I perform well under pressure", scores: { uni: 3, tafe: 1 } },
+                    { text: "I prefer assignments and projects", scores: { uni: 2, tafe: 2 } },
+                    { text: "I'd rather do practical assessments", scores: { tafe: 3, apprenticeship: 2 } },
+                    { text: "I prefer to show my skills on the job", scores: { apprenticeship: 3, work: 2 } }
+                ]
+            },
+            {
+                question: "What sounds most appealing right now?",
+                options: [
+                    { text: "Diving deep into subjects I'm passionate about", scores: { uni: 3 } },
+                    { text: "Learning specific skills for a career", scores: { tafe: 3, apprenticeship: 1 } },
+                    { text: "Getting certified while earning money", scores: { apprenticeship: 3, tafe: 1 } },
+                    { text: "Starting work and gaining real experience", scores: { work: 3 } }
+                ]
+            },
+            {
+                question: "How do you handle uncertainty?",
+                options: [
+                    { text: "I like having a clear roadmap and structure", scores: { uni: 2, tafe: 2 } },
+                    { text: "I'm comfortable with some flexibility", scores: { tafe: 2, apprenticeship: 1 } },
+                    { text: "I prefer to adapt as I go", scores: { work: 3, apprenticeship: 1 } },
+                    { text: "I'm okay with not knowing everything yet", scores: { work: 2, tafe: 1 } }
+                ]
+            },
+            {
+                question: "What's your ideal study/work environment?",
+                options: [
+                    { text: "Campus life with libraries and lectures", scores: { uni: 3 } },
+                    { text: "Smaller classes with practical facilities", scores: { tafe: 3 } },
+                    { text: "On-site at a workplace", scores: { apprenticeship: 3, work: 2 } },
+                    { text: "A professional workplace environment", scores: { work: 3, tafe: 1 } }
+                ]
+            },
+            {
+                question: "How long do you want to study before working full-time?",
+                options: [
+                    { text: "3-5 years is fine with me", scores: { uni: 3 } },
+                    { text: "1-2 years sounds about right", scores: { tafe: 3 } },
+                    { text: "I want to work and study at the same time", scores: { apprenticeship: 3, tafe: 1 } },
+                    { text: "I'd rather start working now", scores: { work: 3 } }
+                ]
+            },
+            {
+                question: "What type of qualification matters most to you?",
+                options: [
+                    { text: "A bachelor's degree or higher", scores: { uni: 3 } },
+                    { text: "A diploma or certificate", scores: { tafe: 3, apprenticeship: 1 } },
+                    { text: "Trade certification and licensing", scores: { apprenticeship: 3 } },
+                    { text: "Work experience and references", scores: { work: 3, apprenticeship: 1 } }
+                ]
+            },
+            {
+                question: "How do you feel about student debt/HECS?",
+                options: [
+                    { text: "It's worth it for my career goals", scores: { uni: 3 } },
+                    { text: "I'd prefer to minimise it with shorter courses", scores: { tafe: 3 } },
+                    { text: "I want to avoid debt entirely", scores: { apprenticeship: 3, work: 2 } },
+                    { text: "I'm not worried either way", scores: { uni: 1, tafe: 1 } }
+                ]
+            },
+            {
+                question: "What describes your career interests?",
+                options: [
+                    { text: "Research, analysis, or professional services", scores: { uni: 3 } },
+                    { text: "Creative, technical, or healthcare fields", scores: { tafe: 3, uni: 1 } },
+                    { text: "Building, fixing, or making things", scores: { apprenticeship: 3 } },
+                    { text: "Customer service, retail, or hospitality", scores: { work: 3, tafe: 1 } }
+                ]
+            },
+            {
+                question: "How independent are you with study?",
+                options: [
+                    { text: "Very independent - I can manage myself", scores: { uni: 3, work: 1 } },
+                    { text: "I like some guidance and structure", scores: { tafe: 3, apprenticeship: 1 } },
+                    { text: "I learn best with mentorship", scores: { apprenticeship: 3, work: 1 } },
+                    { text: "I prefer learning on the job with support", scores: { work: 3, apprenticeship: 2 } }
+                ]
+            },
+            {
+                question: "What's your approach to work-life balance?",
+                options: [
+                    { text: "I'm happy to study hard now for flexibility later", scores: { uni: 3 } },
+                    { text: "I want a balanced mix throughout", scores: { tafe: 3, apprenticeship: 1 } },
+                    { text: "I'm ready to work hard in a demanding job", scores: { apprenticeship: 2, work: 2 } },
+                    { text: "I want to start earning and build from there", scores: { work: 3 } }
+                ]
+            },
+            {
+                question: "How do you feel about moving for study or work?",
+                options: [
+                    { text: "I'm happy to relocate for the right opportunity", scores: { uni: 2, work: 1 } },
+                    { text: "I'd prefer to stay close to home", scores: { tafe: 2, work: 2 } },
+                    { text: "I'm open to local or regional opportunities", scores: { apprenticeship: 2, tafe: 2 } },
+                    { text: "I want to stay in my local area", scores: { work: 3, tafe: 1 } }
+                ]
+            },
+            {
+                question: "What's most important to you right now?",
+                options: [
+                    { text: "Following my passion and interests", scores: { uni: 2, tafe: 2 } },
+                    { text: "Getting qualified in a secure field", scores: { tafe: 3, apprenticeship: 1 } },
+                    { text: "Learning a trade I can use anywhere", scores: { apprenticeship: 3 } },
+                    { text: "Gaining experience and building skills", scores: { work: 3, apprenticeship: 1 } }
+                ]
+            }
+        ];
+
+        // Pathway definitions
+        const pathways = {
+            uni: {
+                name: "University",
+                icon: "🎓",
+                personalities: ["The Scholar", "The Researcher", "The Professional", "The Academic"],
+                descriptions: [
+                    "You thrive in academic environments and love diving deep into subjects. University will give you the theoretical foundation and credentials for professional careers.",
+                    "Your analytical mind and love for learning make university a great fit. You're ready to invest time in education for long-term career goals.",
+                    "You value in-depth knowledge and academic achievement. University offers the environment and qualifications you're looking for."
+                ],
+                resources: [
+                    { name: "TISC (Tertiary Institutions Service Centre)", url: "https://www.tisc.edu.au/" },
+                    { name: "Curtin University", url: "https://www.curtin.edu.au/" },
+                    { name: "UWA (University of Western Australia)", url: "https://www.uwa.edu.au/" },
+                    { name: "Murdoch University", url: "https://www.murdoch.edu.au/" },
+                    { name: "ECU (Edith Cowan University)", url: "https://www.ecu.edu.au/" },
+                    { name: "Study Assist (HECS-HELP information)", url: "https://www.studyassist.gov.au/" }
+                ],
+                traits: {
+                    learningStyle: "Academic & Theoretical",
+                    timeline: "3-5 years of study",
+                    workStyle: "Research & Analysis",
+                    earningPriority: "Long-term career investment"
+                }
+            },
+            tafe: {
+                name: "TAFE",
+                icon: "📚",
+                personalities: ["The Practical Learner", "The Skilled Professional", "The Balanced Student"],
+                descriptions: [
+                    "You want practical skills with solid theory behind them. TAFE offers hands-on learning in smaller classes with clear career pathways.",
+                    "You value a balanced approach - gaining qualifications without spending years in lectures. TAFE gives you job-ready skills faster.",
+                    "You're practical and career-focused. TAFE's industry connections and applied learning suit your style perfectly."
+                ],
+                resources: [
+                    { name: "North Metropolitan TAFE", url: "https://www.northmetrotafe.wa.edu.au/" },
+                    { name: "South Metropolitan TAFE", url: "https://www.southmetrotafe.wa.edu.au/" },
+                    { name: "Central Regional TAFE", url: "https://www.centralregionaltafe.wa.edu.au/" },
+                    { name: "South Regional TAFE", url: "https://www.southregionaltafe.wa.edu.au/" },
+                    { name: "North Regional TAFE", url: "https://www.northregionaltafe.wa.edu.au/" },
+                    { name: "Training.gov.au (Course search)", url: "https://training.gov.au/" }
+                ],
+                traits: {
+                    learningStyle: "Mix of theory & practical",
+                    timeline: "1-2 years",
+                    workStyle: "Hands-on with structure",
+                    earningPriority: "Balanced approach"
+                }
+            },
+            apprenticeship: {
+                name: "Apprenticeship",
+                icon: "🔧",
+                personalities: ["The Builder", "The Craftsperson", "The Tradesperson"],
+                descriptions: [
+                    "You're hands-on and love seeing tangible results from your work. An apprenticeship lets you earn while you learn a valuable trade.",
+                    "You want real-world skills and immediate earning potential. Apprenticeships offer mentorship, certification, and job security.",
+                    "You're practical and self-motivated. Learning a trade gives you skills you can use anywhere, plus the option to run your own business one day."
+                ],
+                resources: [
+                    { name: "Australian Apprenticeships", url: "https://www.australianapprenticeships.gov.au/" },
+                    { name: "Apprenticeship Office WA", url: "https://www.dtwd.wa.gov.au/apprenticeship-office" },
+                    { name: "Jobs and Skills WA", url: "https://www.jobsandskills.wa.gov.au/" },
+                    { name: "Group Training Organisations WA", url: "https://www.gto.com.au/" },
+                    { name: "Master Builders Association WA", url: "https://www.mbawa.com/" },
+                    { name: "Seek Apprenticeships", url: "https://www.seek.com.au/apprenticeships" }
+                ],
+                traits: {
+                    learningStyle: "Hands-on with mentorship",
+                    timeline: "3-4 years (while earning)",
+                    workStyle: "Practical & trade-based",
+                    earningPriority: "Earn while you learn"
+                }
+            },
+            work: {
+                name: "Direct to Work",
+                icon: "💼",
+                personalities: ["The Go-Getter", "The Entrepreneur", "The Pragmatist"],
+                descriptions: [
+                    "You're ready to jump straight into the workforce. You'll gain real experience, build networks, and figure out your direction while earning money.",
+                    "You're practical and motivated. Starting work now gives you immediate income and real-world experience to guide your future choices.",
+                    "You learn best by doing. Work experience will teach you valuable skills and help you discover what you're passionate about."
+                ],
+                resources: [
+                    { name: "Seek", url: "https://www.seek.com.au/" },
+                    { name: "Indeed", url: "https://au.indeed.com/" },
+                    { name: "Jobs and Skills WA", url: "https://www.jobsandskills.wa.gov.au/" },
+                    { name: "Australian JobSearch", url: "https://jobsearch.gov.au/" },
+                    { name: "LinkedIn Jobs", url: "https://www.linkedin.com/jobs/" },
+                    { name: "Youth Employment Hub", url: "https://www.jobsandskills.wa.gov.au/youth" }
+                ],
+                traits: {
+                    learningStyle: "On-the-job learning",
+                    timeline: "Immediate start",
+                    workStyle: "Practical & flexible",
+                    earningPriority: "Immediate income"
+                }
+            }
+        };
+
+        // State
+        let currentQuestion = 0;
+        let scores = { uni: 0, tafe: 0, apprenticeship: 0, work: 0 };
+        let userAnswers = [];
+
+        // Elements
+        const startScreen = document.getElementById('startScreen');
+        const progressContainer = document.getElementById('progressContainer');
+        const mascot = document.getElementById('mascot');
+        const quizCard = document.getElementById('quizCard');
+        const results = document.getElementById('results');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const questionNumber = document.getElementById('questionNumber');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('options');
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            progressContainer.classList.remove('hidden');
+            mascot.classList.remove('hidden');
+            quizCard.classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            // Update progress
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressFill.style.width = progress + '%';
+            progressText.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            questionNumber.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+
+            // Show halfway celebration
+            if (currentQuestion === Math.floor(questions.length / 2)) {
+                showCelebration();
+            }
+
+            // Update question
+            const q = questions[currentQuestion];
+            questionText.textContent = q.question;
+
+            // Update mascot
+            const mascotEmojis = ['🤔', '💭', '🎯', '✨', '🚀', '💡'];
+            mascot.textContent = mascotEmojis[currentQuestion % mascotEmojis.length];
+            mascot.className = 'mascot thinking';
+
+            // Create options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.textContent = option.text;
+                btn.onclick = () => selectOption(index);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Re-trigger animation
+            quizCard.style.animation = 'none';
+            setTimeout(() => {
+                quizCard.style.animation = '';
+            }, 10);
+        }
+
+        function selectOption(optionIndex) {
+            const q = questions[currentQuestion];
+            const selectedOption = q.options[optionIndex];
+
+            // Update scores
+            Object.keys(selectedOption.scores).forEach(pathway => {
+                scores[pathway] += selectedOption.scores[pathway];
+            });
+
+            // Store answer
+            userAnswers.push({
+                question: q.question,
+                answer: selectedOption.text
+            });
+
+            // Happy mascot
+            mascot.className = 'mascot happy';
+            mascot.textContent = ['🎉', '⭐', '✨', '🌟'][Math.floor(Math.random() * 4)];
+
+            // Next question
+            currentQuestion++;
+            setTimeout(showQuestion, 400);
+        }
+
+        function showCelebration() {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.innerHTML = `
+                <h2>🎉 Halfway There! 🎉</h2>
+                <p>You're doing great! Just a few more questions...</p>
+            `;
+            document.body.appendChild(celebration);
+
+            // Create confetti
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => createConfetti(), i * 30);
+            }
+
+            setTimeout(() => {
+                celebration.remove();
+            }, 2000);
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.background = ['#9333ea', '#3b82f6', '#10b981', '#f59e0b'][Math.floor(Math.random() * 4)];
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(confetti);
+
+            setTimeout(() => confetti.remove(), 3000);
+        }
+
+        function showResults() {
+            // Hide quiz elements
+            progressContainer.classList.add('hidden');
+            mascot.classList.add('hidden');
+            quizCard.classList.add('hidden');
+
+            // Calculate top pathways
+            const sortedPathways = Object.entries(scores)
+                .sort(([, a], [, b]) => b - a);
+
+            const topPathway = sortedPathways[0][0];
+            const secondPathway = sortedPathways[1][0];
+
+            // Check if very close scores (might be gap year candidate)
+            const maxScore = sortedPathways[0][1];
+            const allSimilar = sortedPathways.every(([, score]) =>
+                Math.abs(score - maxScore) < maxScore * 0.3
+            );
+
+            const pathway = pathways[topPathway];
+            const secondary = pathways[secondPathway];
+
+            // Random personality and description
+            const personality = pathway.personalities[Math.floor(Math.random() * pathway.personalities.length)];
+            const description = pathway.descriptions[Math.floor(Math.random() * pathway.descriptions.length)];
+
+            // Build results HTML
+            let html = `
+                <div class="result-header">
+                    <div class="mascot">🎊</div>
+                    <h2 class="result-title">Your Results Are In!</h2>
+                    <p class="result-subtitle">Based on your answers, here's what we think...</p>
+                </div>
+
+                <div class="pathway-card">
+                    <h3>${pathway.icon} ${pathway.name}</h3>
+                    <div class="personality">"${personality}"</div>
+                    <div class="description">${description}</div>
+                </div>
+            `;
+
+            // Gap year suggestion for indecisive answers
+            if (allSimilar) {
+                html += `
+                    <div class="secondary-pathway" style="border-color: var(--accent-green);">
+                        <h4>🌏 Wait... Have You Considered a Gap Year?</h4>
+                        <p>Your answers show you're open to multiple pathways! A gap year could give you time to work, travel, volunteer, or explore different options before committing to a direction. There's no rush!</p>
+                    </div>
+                `;
+            }
+
+            // Secondary pathway
+            html += `
+                <div class="secondary-pathway">
+                    <h4>Also worth considering: ${secondary.icon} ${secondary.name}</h4>
+                    <p>${secondary.descriptions[0]}</p>
+                </div>
+            `;
+
+            // Profile summary
+            html += `
+                <div class="profile-summary">
+                    <h4>Your Profile</h4>
+                    <div class="profile-traits">
+                        <div class="trait">
+                            <div class="trait-label">Learning Style</div>
+                            <div class="trait-value">${pathway.traits.learningStyle}</div>
+                        </div>
+                        <div class="trait">
+                            <div class="trait-label">Timeline</div>
+                            <div class="trait-value">${pathway.traits.timeline}</div>
+                        </div>
+                        <div class="trait">
+                            <div class="trait-label">Work Style</div>
+                            <div class="trait-value">${pathway.traits.workStyle}</div>
+                        </div>
+                        <div class="trait">
+                            <div class="trait-label">Priority</div>
+                            <div class="trait-value">${pathway.traits.earningPriority}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Resources
+            html += `
+                <div class="resources">
+                    <h4>Next Steps: WA Resources</h4>
+                    <ul>
+                        ${pathway.resources.map(r =>
+                            `<li><a href="${r.url}" target="_blank">→ ${r.name}</a></li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Important note
+            html += `
+                <div class="secondary-pathway" style="border-color: var(--accent-purple);">
+                    <h4>💜 Remember</h4>
+                    <p><strong>Every pathway is valuable.</strong> This quiz is a guide, not a rulebook. You can change direction, combine pathways, or take your time deciding. Your journey is uniquely yours!</p>
+                </div>
+            `;
+
+            // Action buttons
+            html += `
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="retakeQuiz()">🔄 Retake Quiz</button>
+                    <button class="btn btn-secondary" onclick="shareResults()">📤 Share Results</button>
+                    <a href="../../index.html" class="btn btn-secondary">🏠 Back to Home</a>
+                </div>
+            `;
+
+            results.innerHTML = html;
+            results.classList.remove('hidden');
+
+            // Confetti celebration
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => createConfetti(), i * 20);
+            }
+        }
+
+        function retakeQuiz() {
+            currentQuestion = 0;
+            scores = { uni: 0, tafe: 0, apprenticeship: 0, work: 0 };
+            userAnswers = [];
+
+            results.classList.add('hidden');
+            progressContainer.classList.remove('hidden');
+            mascot.classList.remove('hidden');
+            quizCard.classList.remove('hidden');
+
+            showQuestion();
+        }
+
+        function shareResults() {
+            const sortedPathways = Object.entries(scores).sort(([, a], [, b]) => b - a);
+            const topPathway = pathways[sortedPathways[0][0]];
+
+            const shareText = `I just took the "Which Pathway Suits You?" quiz and my result is: ${topPathway.name}! Find out your ideal post-school pathway.`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Which Pathway Suits You?',
+                    text: shareText,
+                    url: window.location.href
+                }).catch(() => {
+                    copyToClipboard(shareText);
+                });
+            } else {
+                copyToClipboard(shareText);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Results copied to clipboard! Share with your friends 📋');
+            }).catch(() => {
+                alert('Unable to copy. Try sharing manually!');
+            });
+        }
+    </script>
+</body>
+</html>

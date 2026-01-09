@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image & Design Tools // Week 3 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-pink: #ec4899;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Tool cards */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-card:nth-child(1) { border-color: var(--accent-violet); }
+        .tool-card:nth-child(2) { border-color: var(--accent-pink); }
+        .tool-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .tool-card:nth-child(4) { border-color: var(--accent-amber); }
+        .tool-card:nth-child(5) { border-color: var(--accent-emerald); }
+        .tool-card:nth-child(6) { border-color: var(--accent-rose); }
+        .tool-card:nth-child(7) { border-color: var(--accent-blue); }
+        .tool-card:nth-child(8) { border-color: var(--accent-violet); }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .tool-type {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Feature grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .feature-card:nth-child(1) { border-color: var(--accent-violet); }
+        .feature-card:nth-child(2) { border-color: var(--accent-cyan); }
+        .feature-card:nth-child(3) { border-color: var(--accent-pink); }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Use cases */
+        .use-cases-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .use-case-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            align-items: flex-start;
+        }
+
+        .use-case-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .use-case-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .use-case-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* Ethics comparison */
+        .ethics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .ethics-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 2px solid;
+        }
+
+        .ethics-box.good { border-color: var(--accent-emerald); }
+        .ethics-box.bad { border-color: var(--accent-rose); }
+
+        .ethics-label {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ethics-box.good .ethics-label { color: var(--accent-emerald); }
+        .ethics-box.bad .ethics-label { color: var(--accent-rose); }
+
+        .ethics-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ethics-list li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ethics-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Tips list */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Activity link */
+        .activity-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-pink));
+            border-radius: 100px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .activity-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Image prompt example */
+        .prompt-example {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+            border-left: 4px solid var(--accent-violet);
+        }
+
+        .prompt-example-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-violet);
+            margin-bottom: 1rem;
+        }
+
+        .prompt-example-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .prompt-example-tip {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Video tools */
+        .video-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* Data visualization bars */
+        .data-viz-container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .bar-chart {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .bar-chart-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .bar-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .bar-label-text {
+            color: var(--text-secondary);
+        }
+
+        .bar-label-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .bar-track {
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink));
+            border-radius: 8px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Tool logo grid */
+        .tool-logo-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .tool-logo-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tool-logo-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-logo-card:nth-child(1) { border-color: var(--accent-violet); }
+        .tool-logo-card:nth-child(2) { border-color: var(--accent-pink); }
+        .tool-logo-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .tool-logo-card:nth-child(4) { border-color: var(--accent-amber); }
+        .tool-logo-card:nth-child(5) { border-color: var(--accent-emerald); }
+        .tool-logo-card:nth-child(6) { border-color: var(--accent-rose); }
+        .tool-logo-card:nth-child(7) { border-color: var(--accent-blue); }
+        .tool-logo-card:nth-child(8) { border-color: var(--accent-violet); }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+        }
+
+        .tool-logo-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .tool-logo-url {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tool-logo-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Video embed */
+        .video-embed-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .tool-logo-grid { grid-template-columns: repeat(2, 1fr); }
+            .feature-grid { grid-template-columns: 1fr; }
+            .ethics-grid { grid-template-columns: 1fr; }
+            .video-tools-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">AI Image & <em>Design</em> Tools</h1>
+            <p class="slide-subtitle">From text prompts to stunning visuals — exploring AI-powered creativity</p>
+            <p class="stat-source">Week 3 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: What's Possible -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What AI Can Create</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-title">Images & Artwork</div>
+                    <div class="feature-desc">Generate realistic photos, illustrations, logos, and digital art from text descriptions</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎬</div>
+                    <div class="feature-title">Video Content</div>
+                    <div class="feature-desc">Create, edit, and enhance videos with AI-powered effects, transitions, and captions</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✏️</div>
+                    <div class="feature-title">Design Assets</div>
+                    <div class="feature-desc">Generate presentations, posters, social media graphics, and marketing materials</div>
+                </div>
+            </div>
+            <p class="stat-source">AI design tools are democratising creativity — anyone can create professional-quality content</p>
+        </div>
+
+        <!-- Slide 3: AI Image & Design Tools -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Image & Design Tools</h2>
+            <div class="tool-logo-grid">
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=ideogram.ai&sz=64" alt="Ideogram" class="tool-logo">
+                    <div class="tool-logo-name">Ideogram</div>
+                    <div class="tool-logo-url">ideogram.ai</div>
+                    <div class="tool-logo-desc">Best for typography and text in images, logos with readable text</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=midjourney.com&sz=64" alt="Midjourney" class="tool-logo">
+                    <div class="tool-logo-name">Midjourney</div>
+                    <div class="tool-logo-url">midjourney.com</div>
+                    <div class="tool-logo-desc">Artistic, stylised images. Popular with digital artists. Discord-based</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=teacherscreen.com.au&sz=64" alt="Teacher Screen" class="tool-logo">
+                    <div class="tool-logo-name">Teacher Screen</div>
+                    <div class="tool-logo-url">teacherscreen.com.au</div>
+                    <div class="tool-logo-desc">Australian AI teaching tool for educational content creation</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=canva.com&sz=64" alt="Canva" class="tool-logo">
+                    <div class="tool-logo-name">Canva AI</div>
+                    <div class="tool-logo-url">canva.com</div>
+                    <div class="tool-logo-desc">Complete design suite with AI image generation and Magic Design</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=recraft.ai&sz=64" alt="Recraft" class="tool-logo">
+                    <div class="tool-logo-name">Recraft</div>
+                    <div class="tool-logo-url">recraft.ai</div>
+                    <div class="tool-logo-desc">Vector graphics and design assets, great for consistent brand styles</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=firefly.adobe.com&sz=64" alt="Adobe Firefly" class="tool-logo">
+                    <div class="tool-logo-name">Adobe Firefly</div>
+                    <div class="tool-logo-url">firefly.adobe.com</div>
+                    <div class="tool-logo-desc">Trained on licensed content only — safer for commercial use</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="DALL-E 3" class="tool-logo">
+                    <div class="tool-logo-name">DALL-E 3</div>
+                    <div class="tool-logo-url">Built into ChatGPT</div>
+                    <div class="tool-logo-desc">Great for realistic images and following detailed prompts closely</div>
+                </div>
+                <div class="tool-logo-card">
+                    <img src="https://www.google.com/s2/favicons?domain=stability.ai&sz=64" alt="Stable Diffusion" class="tool-logo">
+                    <div class="tool-logo-name">Stable Diffusion</div>
+                    <div class="tool-logo-url">stability.ai</div>
+                    <div class="tool-logo-desc">Open-source model. Free to use, highly customisable</div>
+                </div>
+            </div>
+            <p class="stat-source">Each tool has different strengths — experiment to find what works for your project</p>
+        </div>
+
+        <!-- Slide 4: Market Data -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Design: By the <em>Numbers</em></h2>
+            <div class="data-viz-container">
+                <div class="bar-chart">
+                    <div class="bar-chart-title">AI Image Generation Market Value</div>
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span class="bar-label-text">2025</span>
+                            <span class="bar-label-value">$USD 6.8 billion</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 54%;"></div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span class="bar-label-text">2026 (projected)</span>
+                            <span class="bar-label-value">$USD 12.6 billion</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bar-chart">
+                    <div class="bar-chart-title">Professional Adoption Rates</div>
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span class="bar-label-text">Designers using AI tools regularly</span>
+                            <span class="bar-label-value">68%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 68%;"></div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span class="bar-label-text">Australian creative agencies using AI</span>
+                            <span class="bar-label-value">42%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 42%;"></div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span class="bar-label-text">Students using AI for assignments</span>
+                            <span class="bar-label-value">81%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 81%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Sources: Grand View Research 2025, Adobe Creative Trends Report 2025</p>
+        </div>
+
+        <!-- Slide 5: Video Demo -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">See It in <em>Action</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Watch how AI generates images from text prompts in real-time</p>
+            <div class="video-embed-container">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/gYzYEZS8cxo" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">AI image generation capabilities continue to improve rapidly — what seemed impossible a year ago is now routine</p>
+        </div>
+
+        <!-- Slide 6: How Image Prompts Work -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Writing Good Image Prompts</h2>
+            <div class="prompt-example">
+                <div class="prompt-example-label">Example Prompt</div>
+                <div class="prompt-example-text">
+                    "A serene Australian beach at sunset, golden hour lighting, turquoise water, white sand, native coastal plants in foreground, photorealistic style, high detail, vibrant colours"
+                </div>
+                <div class="prompt-example-tip">
+                    <strong>Tip:</strong> Be specific about subject, style, lighting, mood, and details. More detail = better results.
+                </div>
+            </div>
+            <div style="margin-top: 2rem; max-width: 800px;">
+                <div class="tip-item">
+                    <span class="tip-icon">💡</span>
+                    <div class="tip-content">
+                        <h4>Key Elements to Include</h4>
+                        <p>Subject • Style (realistic, cartoon, watercolour) • Lighting • Colours • Mood • Perspective • Level of detail</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Canva Magic Features -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Canva's AI Magic</h2>
+            <div class="use-cases-list">
+                <div class="use-case-item">
+                    <div class="use-case-icon">✨</div>
+                    <div class="use-case-content">
+                        <h4>Magic Design</h4>
+                        <p>Upload an image or describe what you need, and Canva generates complete designs (presentations, posters, social media posts) in seconds.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">✍️</div>
+                    <div class="use-case-content">
+                        <h4>Magic Write</h4>
+                        <p>AI writing assistant built into Canva. Generate captions, headlines, body copy, and more. Helps beat writer's block.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">🖼️</div>
+                    <div class="use-case-content">
+                        <h4>Background Remover</h4>
+                        <p>One-click background removal. Perfect for creating transparent PNGs, product photos, or composite designs.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">🎭</div>
+                    <div class="use-case-content">
+                        <h4>Magic Edit & Eraser</h4>
+                        <p>Remove unwanted objects from photos or add new elements using text prompts. Edit photos without Photoshop skills.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: AI Video Tools -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Video Tools</h2>
+            <div class="video-tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">🎥</div>
+                    <div class="tool-name">CapCut</div>
+                    <div class="tool-type">Free video editor. AI captions, effects, background removal. Popular with students.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">🎬</div>
+                    <div class="tool-name">Runway</div>
+                    <div class="tool-type">Advanced AI video tools. Text-to-video, green screen, motion tracking.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📱</div>
+                    <div class="tool-name">Descript</div>
+                    <div class="tool-type">Edit video by editing text transcript. Remove filler words, add captions.</div>
+                </div>
+            </div>
+            <div style="margin-top: 3rem; max-width: 800px;">
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Popular AI Video Features</h4>
+                        <p>Auto-captions • Background music generation • Smart transitions • Object removal • Voice cloning • Text-to-speech</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Practical School Uses -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Use Cases for School</h2>
+            <div class="use-cases-list">
+                <div class="use-case-item">
+                    <div class="use-case-icon">📊</div>
+                    <div class="use-case-content">
+                        <h4>Presentations & Reports</h4>
+                        <p>Generate custom graphics, diagrams, and cover images that match your topic. Stand out from stock photos.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">📸</div>
+                    <div class="use-case-content">
+                        <h4>Media Projects</h4>
+                        <p>Create video thumbnails, intro graphics, and promotional materials for film or media studies.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">🗣️</div>
+                    <div class="use-case-content">
+                        <h4>Visual Aids</h4>
+                        <p>Generate historical scenes, scientific concepts, or geographical features that are hard to photograph.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">🎨</div>
+                    <div class="use-case-content">
+                        <h4>Art & Design</h4>
+                        <p>Create mood boards, explore artistic styles, generate references for traditional artwork.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Copyright & Ethics -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Copyright <em>Matters</em></h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h2 style="font-size: 2rem;">Who Owns AI-Generated Images?</h2>
+                    <p>AI images are created by training on millions of existing images from the internet — often without permission from original artists.</p>
+                    <p><strong style="color: var(--accent-amber);">The legal status is unclear.</strong> Courts are still deciding whether AI art infringes copyright.</p>
+                </div>
+                <div>
+                    <div class="tip-item">
+                        <span class="tip-icon">⚖️</span>
+                        <div class="tip-content">
+                            <h4>Current Legal Position</h4>
+                            <p>In Australia, copyright may not protect AI-generated works without substantial human creativity. Commercial use is risky.</p>
+                        </div>
+                    </div>
+                    <div class="tip-item" style="margin-top: 1rem;">
+                        <span class="tip-icon">🎓</span>
+                        <div class="tip-content">
+                            <h4>For School Projects</h4>
+                            <p>Generally OK for educational purposes, but always disclose when you use AI-generated content.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: When to Use (or Not) -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Appropriate <em>vs</em> Inappropriate Use</h2>
+            <div class="ethics-grid">
+                <div class="ethics-box good">
+                    <div class="ethics-label">✓ Appropriate Uses</div>
+                    <ul class="ethics-list">
+                        <li>Placeholder images for mockups and drafts</li>
+                        <li>Concept exploration and brainstorming</li>
+                        <li>Educational projects where AI use is disclosed</li>
+                        <li>Generating references for traditional art</li>
+                        <li>Personal creative experiments</li>
+                        <li>When you lack photography/design budget</li>
+                    </ul>
+                </div>
+                <div class="ethics-box bad">
+                    <div class="ethics-label">✗ Inappropriate Uses</div>
+                    <ul class="ethics-list">
+                        <li>Pretending AI art is your own original work</li>
+                        <li>Replacing human artists when you have budget</li>
+                        <li>Creating deepfakes or misleading images</li>
+                        <li>Generating images of real people without consent</li>
+                        <li>Commercial use without checking terms of service</li>
+                        <li>Assignments that explicitly require original work</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Ethical Considerations -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Think About the Impact</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">👨‍🎨</span>
+                    <div class="tip-content">
+                        <h4>Impact on Artists</h4>
+                        <p>Many artists feel their work was used without permission to train AI models. Consider supporting human creators when possible.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🌍</span>
+                    <div class="tip-content">
+                        <h4>Bias & Representation</h4>
+                        <p>AI models can perpetuate stereotypes and biases from their training data. Be critical of what they generate.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔍</span>
+                    <div class="tip-content">
+                        <h4>Misinformation Risk</h4>
+                        <p>Photorealistic AI images can be used to deceive. Always be transparent when sharing AI-generated content.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💰</span>
+                    <div class="tip-content">
+                        <h4>Economic Impact</h4>
+                        <p>AI tools are displacing some creative jobs. Think about how your use affects professional creatives.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Best Practices -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Image <em>Best Practices</em></h2>
+            <div class="use-cases-list">
+                <div class="use-case-item">
+                    <div class="use-case-icon">📝</div>
+                    <div class="use-case-content">
+                        <h4>Always Disclose</h4>
+                        <p>Label AI-generated images as such. Don't pass them off as your own photography or artwork.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">✏️</div>
+                    <div class="use-case-content">
+                        <h4>Add Your Own Creativity</h4>
+                        <p>Use AI as a starting point. Edit, combine, and enhance with your own ideas to make it truly yours.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">📋</div>
+                    <div class="use-case-content">
+                        <h4>Check Terms of Service</h4>
+                        <p>Different AI tools have different rules about commercial use, attribution, and ownership.</p>
+                    </div>
+                </div>
+                <div class="use-case-item">
+                    <div class="use-case-icon">🤔</div>
+                    <div class="use-case-content">
+                        <h4>Consider Alternatives</h4>
+                        <p>Stock photos, Creative Commons images, or hiring student artists can be better choices sometimes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Quality Tips -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Getting Better Results</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Be Specific with Prompts</h4>
+                        <p>Include details about style, lighting, composition, colours, and mood. "A beach" vs "a serene beach at golden hour"</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔄</span>
+                    <div class="tip-content">
+                        <h4>Iterate and Refine</h4>
+                        <p>Generate multiple versions. Use the one closest to your vision and refine from there.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📐</span>
+                    <div class="tip-content">
+                        <h4>Choose the Right Aspect Ratio</h4>
+                        <p>Square for Instagram, 16:9 for presentations, 9:16 for stories. Pick before generating.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎨</span>
+                    <div class="tip-content">
+                        <h4>Reference Artistic Styles</h4>
+                        <p>"In the style of..." or mention art movements: impressionist, minimalist, cyberpunk, etc.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🚫</span>
+                    <div class="tip-content">
+                        <h4>Use Negative Prompts</h4>
+                        <p>Many tools let you specify what NOT to include: "no text, no watermarks, no people"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Activity Intro -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 3rem;">Time to <em>Create</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem; max-width: 900px;">Choose one of the AI tools we discussed and create something practical for a real or fictional project. Focus on writing effective prompts and iterating to improve your results.</p>
+            <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; max-width: 700px; margin-top: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; font-weight: 600;">Activity Options:</h3>
+                <ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+                    <li>Generate a hero image for a school project presentation</li>
+                    <li>Create a poster design using Canva Magic Design</li>
+                    <li>Design a thumbnail for a YouTube video project</li>
+                    <li>Generate visual references for an art assignment</li>
+                    <li>Create social media graphics for a school event</li>
+                </ul>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">15 minutes • Document your prompts • Share what worked and what didn't</p>
+        </div>
+
+        <!-- Slide 14: Debrief -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Let's <em>Debrief</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">💭</span>
+                    <div class="tip-content">
+                        <h4>What tool did you use?</h4>
+                        <p>Share which AI tool you experimented with and what you created.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>What prompts worked best?</h4>
+                        <p>Did being more specific help? What details made the biggest difference?</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤔</span>
+                    <div class="tip-content">
+                        <h4>What surprised you?</h4>
+                        <p>Did the AI do something unexpected? What limitations did you encounter?</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">⚖️</span>
+                    <div class="tip-content">
+                        <h4>When would you use AI vs human creators?</h4>
+                        <p>Thinking about ethics and quality, when is AI appropriate for your projects?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: End -->
+        <div class="slide gradient-bg">
+            <h1 class="slide-title">Create <em>Responsibly</em></h1>
+            <p class="slide-subtitle">AI design tools are powerful creative assistants — but always disclose their use, respect artists, and add your own human creativity to the mix.</p>
+            <p class="stat-source" style="margin-top: 3rem; font-size: 1rem;">Next week: AI writing and productivity tools</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 17</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

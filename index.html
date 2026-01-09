@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech for Life // Year 12 Course Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f12;
+            --bg-card: #1a1a20;
+            --bg-hover: #22222a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #f472b6;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border: #27272a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .meta-item span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Term sections */
+        .term-section {
+            margin-bottom: 3rem;
+        }
+
+        .term-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .term-badge {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .term-badge.ai { background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan)); }
+        .term-badge.cyber { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); }
+        .term-badge.skills { background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan)); }
+
+        .term-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .term-weeks {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Session grid */
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .session-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .session-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .session-card.has-activity {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .session-card.coming-soon {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .session-card.coming-soon:hover {
+            transform: none;
+            border-color: var(--border);
+            background: var(--bg-card);
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .session-week {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+        }
+
+        .session-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .session-status.ready {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--accent-green);
+        }
+
+        .session-status.planned {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .session-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .session-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .session-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: var(--bg-dark);
+            color: var(--text-muted);
+        }
+
+        .tag.activity {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        .tag.presentation {
+            background: rgba(244, 114, 182, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .tag.discussion {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--accent-orange);
+        }
+
+        /* Session links */
+        .session-links {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .session-links a {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .session-links a:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* Activities section */
+        .activities-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .activities-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .activities-icon {
+            font-size: 2rem;
+        }
+
+        .activities-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .activity-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .activity-link:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-hover);
+        }
+
+        .activity-emoji {
+            font-size: 2rem;
+        }
+
+        .activity-info h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Teacher notes */
+        .teacher-notes {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(244, 114, 182, 0.1));
+            border: 1px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .teacher-notes h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .teacher-notes ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .teacher-notes li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .teacher-notes li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .term-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .term-weeks {
+                margin-left: 0;
+            }
+
+            .sessions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">Tech for Life</h1>
+            <p class="subtitle">Year 12 Digital Literacy Program — Denmark SHS</p>
+            <div class="meta-info">
+                <div class="meta-item">📅 <span>16 Sessions</span></div>
+                <div class="meta-item">⏱️ <span>30 min instruction</span></div>
+                <div class="meta-item">🎯 <span>Formative Learning</span></div>
+                <div class="meta-item">📍 <span>WA Context</span></div>
+            </div>
+        </header>
+
+        <!-- Term 1: AI & Smart Tech -->
+        <section class="term-section">
+            <div class="term-header">
+                <span class="term-badge ai">AI Focus</span>
+                <h2 class="term-title">AI & Smart Tech Use</h2>
+                <span class="term-weeks">Weeks 1-8</span>
+            </div>
+
+            <div class="sessions-grid">
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 1</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">What is AI?</h3>
+                    <p class="session-desc">Introduction to ChatGPT, Copilot, Gemini. Hands-on exploration of different AI tools.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Hands-on</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week1-what-is-ai/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 2</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">AI for Study & Productivity</h3>
+                    <p class="session-desc">Using AI for research, summaries, brainstorming, and study notes.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Study Skills</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week2-ai-study/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 3</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">AI Image & Design Tools</h3>
+                    <p class="session-desc">Canva Magic, DALL-E, and practical design tasks using AI.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Creative</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week3-ai-design/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 4</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">AI Ethics & Bias</h3>
+                    <p class="session-desc">Critical thinking — when AI gets it wrong. Understanding bias and limitations.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag discussion">Discussion</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week4-ai-ethics/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 5</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">AI Misinformation</h3>
+                    <p class="session-desc">Spotting AI-generated content, deepfakes, and misinformation.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Media Literacy</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week5-ai-misinfo/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 6</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Your AI Policy</h3>
+                    <p class="session-desc">How workplaces and unis handle AI. Creating personal guidelines.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Future Planning</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week6-ai-policy/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 7</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">AI Prompt Engineering</h3>
+                    <p class="session-desc">Getting better results from AI tools. Master the art of effective prompts.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag activity">Interactive Activity</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week7-ai-prompts/index.html">📊 Slides</a>
+                        <a href="activities/ai-prompt-lab/index.html">🧪 Activity</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 8</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">AI Showcase</h3>
+                    <p class="session-desc">Students demo creative AI use cases they've discovered.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Student-Led</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week8-ai-showcase/index.html">📊 Slides</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Term 2: Cyber Safety -->
+        <section class="term-section">
+            <div class="term-header">
+                <span class="term-badge cyber">Cyber Safety</span>
+                <h2 class="term-title">Cyber Safety & Privacy</h2>
+                <span class="term-weeks">Weeks 9-14</span>
+            </div>
+
+            <div class="sessions-grid">
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 9</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Spot the Scam</h3>
+                    <p class="session-desc">Phishing emails, SMS scams, WA-specific examples. Real stories and statistics.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag activity">Interactive Game</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week9-scams/index.html">📊 Slides</a>
+                        <a href="activities/spot-the-scam/index.html">🕵️ Activity</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 10</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Password & Account Security</h3>
+                    <p class="session-desc">Password managers, 2FA, data breaches. Real breach statistics.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag activity">Interactive Lab</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week10-passwords/index.html">📊 Slides</a>
+                        <a href="activities/password-lab/index.html">🔐 Activity</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 11</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Digital Footprint</h3>
+                    <p class="session-desc">What employers find. Real hiring statistics. Personal audit.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag activity">Self-Assessment</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week11-footprint/index.html">📊 Slides</a>
+                        <a href="activities/digital-footprint/index.html">👣 Activity</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 12</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Social Media & Your Future</h3>
+                    <p class="session-desc">Employer searches, LinkedIn, managing your digital reputation.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Career Prep</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week12-social-media/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 13</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Online Privacy Settings</h3>
+                    <p class="session-desc">Practical session: reviewing and updating privacy settings across platforms.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Hands-on</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week13-privacy-settings/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 14</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Life Admin Setup</h3>
+                    <p class="session-desc">myGov, TFN, Medicare, banking - everything you need sorted before leaving school.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Life Skills</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week14-digital-wellbeing/index.html">📊 Slides</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Term 3: Leaving School Ready -->
+        <section class="term-section">
+            <div class="term-header">
+                <span class="term-badge skills">Leaving School</span>
+                <h2 class="term-title">Leaving School Ready</h2>
+                <span class="term-weeks">Weeks 15-16</span>
+            </div>
+
+            <div class="sessions-grid">
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 15</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Getting Work Ready</h3>
+                    <p class="session-desc">AI hiring systems, resume hacks, video interviews, job search platforms.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">Cheat Codes</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week15-digital-docs/index.html">📊 Slides</a>
+                    </div>
+                </div>
+
+                <div class="session-card has-activity">
+                    <div class="session-header">
+                        <span class="session-week">Week 16</span>
+                        <span class="session-status ready">Complete</span>
+                    </div>
+                    <h3 class="session-title">Your Pathway</h3>
+                    <p class="session-desc">Uni, TAFE, apprenticeships, work - all options explained with real steps.</p>
+                    <div class="session-tags">
+                        <span class="tag presentation">Presentation</span>
+                        <span class="tag">All Pathways</span>
+                    </div>
+                    <div class="session-links">
+                        <a href="presentations/week16-professional-presence/index.html">📊 Slides</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Access to Activities -->
+        <section class="activities-section">
+            <div class="activities-header">
+                <span class="activities-icon">🎮</span>
+                <h2 class="activities-title">Interactive Activities</h2>
+            </div>
+
+            <div class="activities-grid">
+                <a href="activities/spot-the-scam/index.html" class="activity-link">
+                    <span class="activity-emoji">🕵️</span>
+                    <div class="activity-info">
+                        <h4>Scam Hunter</h4>
+                        <p>Spot the scam quiz game</p>
+                    </div>
+                </a>
+
+                <a href="activities/ai-prompt-lab/index.html" class="activity-link">
+                    <span class="activity-emoji">🧪</span>
+                    <div class="activity-info">
+                        <h4>Prompt Lab</h4>
+                        <p>AI prompt engineering training</p>
+                    </div>
+                </a>
+
+                <a href="activities/digital-footprint/index.html" class="activity-link">
+                    <span class="activity-emoji">👣</span>
+                    <div class="activity-info">
+                        <h4>Footprint Finder</h4>
+                        <p>Digital footprint audit</p>
+                    </div>
+                </a>
+
+                <a href="activities/password-lab/index.html" class="activity-link">
+                    <span class="activity-emoji">🔐</span>
+                    <div class="activity-info">
+                        <h4>Password Lab</h4>
+                        <p>Password security demo</p>
+                    </div>
+                </a>
+
+                <a href="activities/life-admin-checklist/index.html" class="activity-link">
+                    <span class="activity-emoji">✅</span>
+                    <div class="activity-info">
+                        <h4>Life Admin Checklist</h4>
+                        <p>Track your adulting progress</p>
+                    </div>
+                </a>
+
+                <a href="activities/resume-checker/index.html" class="activity-link">
+                    <span class="activity-emoji">📝</span>
+                    <div class="activity-info">
+                        <h4>Resume Checker</h4>
+                        <p>Beat the ATS robots</p>
+                    </div>
+                </a>
+
+                <a href="activities/pathway-quiz/index.html" class="activity-link">
+                    <span class="activity-emoji">🧭</span>
+                    <div class="activity-info">
+                        <h4>Pathway Quiz</h4>
+                        <p>Find your best fit</p>
+                    </div>
+                </a>
+
+                <a href="activities/interview-practice/index.html" class="activity-link">
+                    <span class="activity-emoji">🎥</span>
+                    <div class="activity-info">
+                        <h4>Interview Practice</h4>
+                        <p>AI video interview simulator</p>
+                    </div>
+                </a>
+
+                <a href="resources/ai-tools/index.html" class="activity-link">
+                    <span class="activity-emoji">🤖</span>
+                    <div class="activity-info">
+                        <h4>AI Tools Directory</h4>
+                        <p>38+ AI tools with links</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Teacher Notes -->
+        <div class="teacher-notes">
+            <h3>📋 Teacher Notes</h3>
+            <ul>
+                <li><strong>Format:</strong> 30 min instruction + 30 min study time per session</li>
+                <li><strong>Assessment:</strong> All formative — no formal assessments</li>
+                <li><strong>Activities:</strong> Self-paced, can be used as individual or whole-class activities</li>
+                <li><strong>Context:</strong> All examples use Australian/WA-specific scenarios</li>
+                <li><strong>Finance Topics:</strong> Covered separately via Mandy Money platform</li>
+                <li><strong>Guest Speakers:</strong> Consider inviting cyber security professionals, local business owners</li>
+                <li><strong>Activities work best on:</strong> Chrome, Safari, Firefox (no special software needed)</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            <p>Tech for Life — Denmark Senior High School — 2026</p>
+            <p>Activities designed for Year 12 students in Western Australia</p>
+        </footer>
+    </div>
+</body>
+</html>

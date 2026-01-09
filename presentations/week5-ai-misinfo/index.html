@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Misinformation // Week 5 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-rose), var(--accent-amber), var(--accent-violet));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-rose);
+            color: var(--accent-rose);
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Warning card */
+        .warning-card {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(245, 158, 11, 0.1));
+            border: 2px solid var(--accent-rose);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .warning-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-stat {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3.5rem;
+            color: var(--accent-rose);
+            margin-bottom: 1rem;
+        }
+
+        .warning-text {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Example cards */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .example-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid;
+            transition: transform 0.3s ease;
+        }
+
+        .example-card:hover {
+            transform: translateX(5px);
+        }
+
+        .example-card.danger { border-color: var(--accent-rose); }
+        .example-card.warning { border-color: var(--accent-amber); }
+        .example-card.info { border-color: var(--accent-blue); }
+
+        .example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .example-icon {
+            font-size: 1.5rem;
+        }
+
+        .example-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .example-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .example-year {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        /* Detection tips */
+        .detection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+        }
+
+        .detection-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.75rem;
+            text-align: center;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .detection-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .detection-card:nth-child(1) { border-color: var(--accent-rose); }
+        .detection-card:nth-child(2) { border-color: var(--accent-amber); }
+        .detection-card:nth-child(3) { border-color: var(--accent-violet); }
+        .detection-card:nth-child(4) { border-color: var(--accent-blue); }
+        .detection-card:nth-child(5) { border-color: var(--accent-cyan); }
+        .detection-card:nth-child(6) { border-color: var(--accent-emerald); }
+
+        .detection-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .detection-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        .detection-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Deepfake anatomy */
+        .anatomy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+        }
+
+        .anatomy-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .anatomy-section h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-violet);
+        }
+
+        .anatomy-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .anatomy-section li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .anatomy-section li:last-child {
+            border-bottom: none;
+        }
+
+        .anatomy-section li strong {
+            color: var(--text-primary);
+        }
+
+        /* Tools showcase */
+        .tools-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .tool-item {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tool-item:hover {
+            border-color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        .tool-emoji {
+            font-size: 2.5rem;
+        }
+
+        .tool-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .tool-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Action steps */
+        .action-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .action-step {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--accent-rose);
+            font-weight: 400;
+            min-width: 3rem;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+            max-width: 1100px;
+        }
+
+        .column-content {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+        }
+
+        .column-content h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .column-content li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        /* Stats highlight */
+        .stats-highlight {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 900px;
+            text-align: center;
+            border: 2px solid var(--accent-amber);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            color: var(--accent-amber);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(244, 63, 94, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+        }
+
+        .slide.danger-bg {
+            background-image: radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.05) 0%, transparent 70%);
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-icon {
+            font-size: 1.5rem;
+            min-width: 2rem;
+        }
+
+        .checklist-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Tool logo items */
+        .tool-logo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .tool-logo-item {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tool-logo-item:hover {
+            border-color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            flex-shrink: 0;
+        }
+
+        .tool-logo-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            font-size: 1.1rem;
+        }
+
+        .tool-logo-content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .tool-url {
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Chart container */
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            min-width: 80px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .bar-bg {
+            flex: 1;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-rose), var(--accent-amber));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-weight: 600;
+            transition: width 1s ease;
+        }
+
+        .pie-chart {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--accent-emerald) 0deg 234deg,
+                var(--accent-rose) 234deg 360deg
+            );
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .pie-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pie-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pie-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .pie-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .pie-percent {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Video embed */
+        .video-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-caption {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .examples-grid { grid-template-columns: 1fr; }
+            .detection-grid { grid-template-columns: repeat(2, 1fr); }
+            .anatomy-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr; gap: 1rem; }
+            .tool-logo-grid { grid-template-columns: 1fr; }
+            .pie-chart { width: 240px; height: 240px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">AI <em>Misinformation</em></h1>
+            <p class="slide-subtitle">When artificial intelligence makes it impossible to trust what you see, hear, or read online</p>
+            <p class="stat-source">Week 5 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide danger-bg">
+            <div class="warning-card">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-stat">73%</div>
+                <div class="warning-text">
+                    of Australians encountered misinformation online in 2024. With AI tools now freely available, fake content is easier to create—and harder to spot—than ever before.
+                </div>
+                <p class="stat-source">Australian Communications and Media Authority, 2024</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: What Are Deepfakes? -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Are <em>Deepfakes</em>?</h2>
+            <div class="anatomy-grid">
+                <div class="anatomy-section">
+                    <h3>The Technology</h3>
+                    <ul>
+                        <li><strong>AI-generated media</strong> that swaps faces, mimics voices, or creates entirely fake people</li>
+                        <li><strong>Machine learning</strong> analyses thousands of images/audio samples</li>
+                        <li><strong>Neural networks</strong> recreate realistic facial movements and speech patterns</li>
+                        <li><strong>Accessible tools</strong> mean anyone can create convincing fakes in minutes</li>
+                    </ul>
+                </div>
+                <div class="anatomy-section">
+                    <h3>How They're Made</h3>
+                    <ul>
+                        <li><strong>Face-swapping apps</strong> like Reface, FaceSwap, DeepFaceLab</li>
+                        <li><strong>Voice cloning</strong> with ElevenLabs, Descript, Play.ht</li>
+                        <li><strong>AI video generators</strong> like Synthesia, D-ID, HeyGen</li>
+                        <li><strong>Free online tools</strong> with no technical knowledge required</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Many deepfake tools are marketed as "fun" or "creative" but can be weaponised for misinformation.</p>
+        </div>
+
+        <!-- Slide 4: Real Examples - Political -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real Examples: <em>Political</em> Deepfakes</h2>
+            <div class="examples-grid">
+                <div class="example-card danger">
+                    <div class="example-header">
+                        <span class="example-icon">🎭</span>
+                        <span class="example-title">Fake Biden Robocalls</span>
+                    </div>
+                    <p class="example-desc">AI-generated voice mimicking US President Biden told voters to skip primaries. Thousands received the calls before they were traced and stopped.</p>
+                    <p class="example-year">USA, January 2024</p>
+                </div>
+                <div class="example-card danger">
+                    <div class="example-header">
+                        <span class="example-icon">🗳️</span>
+                        <span class="example-title">UK Election Misinformation</span>
+                    </div>
+                    <p class="example-desc">Deepfake videos of political candidates "admitting" to scandals spread across social media during the 2024 UK general election campaign.</p>
+                    <p class="example-year">UK, June 2024</p>
+                </div>
+                <div class="example-card danger">
+                    <div class="example-header">
+                        <span class="example-icon">🇦🇺</span>
+                        <span class="example-title">Australian Political Ads</span>
+                    </div>
+                    <p class="example-desc">AI-generated videos of Australian politicians "saying" things they never said circulated on Facebook and X during state elections.</p>
+                    <p class="example-year">Australia, 2024-2025</p>
+                </div>
+                <div class="example-card danger">
+                    <div class="example-header">
+                        <span class="example-icon">🌍</span>
+                        <span class="example-title">Ukraine War Deepfakes</span>
+                    </div>
+                    <p class="example-desc">Fake video of Ukrainian President Zelenskyy appeared to show him surrendering to Russia. Debunked within hours but widely shared.</p>
+                    <p class="example-year">Ukraine, March 2022</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Real Examples - Celebrity & Scams -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real Examples: <em>Scams</em> & Celebrity Fakes</h2>
+            <div class="examples-grid">
+                <div class="example-card warning">
+                    <div class="example-header">
+                        <span class="example-icon">💰</span>
+                        <span class="example-title">Fake Elon Musk Crypto Scam</span>
+                    </div>
+                    <p class="example-desc">Deepfake livestreams of Elon Musk promoting fake cryptocurrency giveaways. Scammers stole over $2 million from victims.</p>
+                    <p class="example-year">Global, 2023-2024</p>
+                </div>
+                <div class="example-card warning">
+                    <div class="example-header">
+                        <span class="example-icon">🎤</span>
+                        <span class="example-title">AI-Generated Taylor Swift Scam</span>
+                    </div>
+                    <p class="example-desc">Fake audio of Taylor Swift "endorsing" fraudulent investments shared on TikTok. Fans lost thousands of dollars.</p>
+                    <p class="example-year">USA/Australia, 2024</p>
+                </div>
+                <div class="example-card warning">
+                    <div class="example-header">
+                        <span class="example-icon">📞</span>
+                        <span class="example-title">Voice-Cloning Family Scam</span>
+                    </div>
+                    <p class="example-desc">Scammers used AI to clone a teenager's voice, called parents pretending to be kidnapped, demanded ransom. Multiple Australian families targeted.</p>
+                    <p class="example-year">Australia, 2024-2025</p>
+                </div>
+                <div class="example-card warning">
+                    <div class="example-header">
+                        <span class="example-icon">👨‍💼</span>
+                        <span class="example-title">CEO Voice Fraud</span>
+                    </div>
+                    <p class="example-desc">AI voice clone of company CEO convinced employee to transfer $35 million. The employee thought they were speaking to their boss.</p>
+                    <p class="example-year">Hong Kong, February 2024</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: AI-Generated Text -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI-Generated <em>Text</em> & Fake News</h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>The Problem</h3>
+                    <ul>
+                        <li>ChatGPT & similar tools can generate convincing fake articles in seconds</li>
+                        <li>Bot networks flood social media with AI-written propaganda</li>
+                        <li>Fake reviews, testimonials, and "news" sites</li>
+                        <li>Can mimic specific writing styles and outlets</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Australian Examples</h3>
+                    <ul>
+                        <li>Fake ABC News articles about major events</li>
+                        <li>AI-generated local news sites pushing scams</li>
+                        <li>Fabricated quotes from politicians and officials</li>
+                        <li>Bot networks spreading misinformation during bushfire season</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Over 50% of all online content may be AI-generated by 2026 — making verification critical.</p>
+        </div>
+
+        <!-- 7: How to Spot Deepfakes -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How to Spot <em>Deepfakes</em></h2>
+            <div class="detection-grid">
+                <div class="detection-card">
+                    <div class="detection-icon">👁️</div>
+                    <div class="detection-title">Unnatural Eye Movement</div>
+                    <div class="detection-desc">Eyes don't blink naturally or gaze direction looks "off". Watch for fixed stares or odd blinking patterns.</div>
+                </div>
+                <div class="detection-card">
+                    <div class="detection-icon">👄</div>
+                    <div class="detection-title">Lip Sync Issues</div>
+                    <div class="detection-desc">Mouth movements don't quite match the words. Audio and video may be slightly out of sync.</div>
+                </div>
+                <div class="detection-card">
+                    <div class="detection-icon">🌫️</div>
+                    <div class="detection-title">Blurry Edges</div>
+                    <div class="detection-desc">Face edges look fuzzy or blended. Hair, ears, and jawline may appear unnatural or distorted.</div>
+                </div>
+                <div class="detection-card">
+                    <div class="detection-icon">💡</div>
+                    <div class="detection-title">Weird Lighting</div>
+                    <div class="detection-desc">Face lighting doesn't match the scene. Shadows fall in wrong directions or look artificial.</div>
+                </div>
+                <div class="detection-card">
+                    <div class="detection-icon">🎨</div>
+                    <div class="detection-title">Skin Texture Problems</div>
+                    <div class="detection-desc">Skin looks too smooth, waxy, or plastic-like. Pores, wrinkles, and imperfections may be missing.</div>
+                </div>
+                <div class="detection-card">
+                    <div class="detection-icon">🔊</div>
+                    <div class="detection-title">Audio Clues</div>
+                    <div class="detection-desc">Voice sounds robotic, monotone, or has unnatural pauses. Background audio cuts out unnaturally.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Spotting AI Text -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Spotting AI-Generated <em>Text</em></h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <span class="checklist-icon">🤖</span>
+                    <div class="checklist-text"><strong>Generic or overly polished language</strong> — AI often writes in a formal, error-free style that lacks personality or unique voice</div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon">🔁</span>
+                    <div class="checklist-text"><strong>Repetitive phrasing</strong> — Similar sentence structures, repeated words, or circular arguments without adding new information</div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon">❓</span>
+                    <div class="checklist-text"><strong>Vague or surface-level information</strong> — Lacks specific details, dates, or citations that a human expert would include</div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon">📚</span>
+                    <div class="checklist-text"><strong>Outdated or incorrect facts</strong> — AI models have knowledge cut-offs and can "hallucinate" false information confidently</div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon">🎯</span>
+                    <div class="checklist-text"><strong>Too balanced or non-committal</strong> — AI tends to present "both sides" even when one side lacks credibility</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Verification Tools -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Verification <em>Tools</em></h2>
+            <div class="tools-showcase">
+                <div class="tool-item">
+                    <div class="tool-emoji">🔍</div>
+                    <div class="tool-content">
+                        <h4>Reverse Image Search</h4>
+                        <p>Google Images, TinEye, or Yandex let you find the original source of an image. Upload or paste a URL to see where else it appears online and when it was first posted.</p>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-emoji">📸</div>
+                    <div class="tool-content">
+                        <h4>InVID / WeVerify</h4>
+                        <p>Browser extension for journalists that breaks videos into frames, runs reverse image searches, and analyses metadata. Free to use.</p>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-emoji">✅</div>
+                    <div class="tool-content">
+                        <h4>Fact-Checking Sites</h4>
+                        <p>RMIT FactLab (Australia), Snopes, and FactCheck.org investigate viral claims. Check before you share suspicious content.</p>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-emoji">🛡️</div>
+                    <div class="tool-content">
+                        <h4>AI Detection Tools</h4>
+                        <p>GPTZero, AI Detector, and Copyleaks can analyse text to estimate likelihood it's AI-generated. Not perfect, but helpful as one indicator.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9A: Deepfake Detection Tools -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Professional Deepfake <em>Detection Tools</em></h2>
+            <div class="tool-logo-grid">
+                <div class="tool-logo-item">
+                    <img src="https://www.google.com/s2/favicons?domain=microsoft.com&sz=48" alt="Microsoft" class="tool-logo">
+                    <div class="tool-logo-content">
+                        <h4>Microsoft Video Authenticator</h4>
+                        <p>Enterprise-grade tool that analyses videos frame-by-frame to detect manipulation. Provides a confidence score for authenticity.</p>
+                        <div class="tool-url">microsoft.com</div>
+                    </div>
+                </div>
+                <div class="tool-logo-item">
+                    <img src="https://www.google.com/s2/favicons?domain=sensity.ai&sz=48" alt="Sensity" class="tool-logo">
+                    <div class="tool-logo-content">
+                        <h4>Sensity AI</h4>
+                        <p>Monitors and detects deepfakes across the internet. Used by governments and media organizations to identify synthetic media.</p>
+                        <div class="tool-url">sensity.ai</div>
+                    </div>
+                </div>
+                <div class="tool-logo-item">
+                    <img src="https://www.google.com/s2/favicons?domain=realitydefender.com&sz=48" alt="Reality Defender" class="tool-logo">
+                    <div class="tool-logo-content">
+                        <h4>Reality Defender</h4>
+                        <p>AI-powered platform that detects deepfakes, voice clones, and synthetic text in real-time. Protects against fraud.</p>
+                        <div class="tool-url">realitydefender.com</div>
+                    </div>
+                </div>
+                <div class="tool-logo-item">
+                    <img src="https://www.google.com/s2/favicons?domain=hivemoderation.com&sz=48" alt="Hive Moderation" class="tool-logo">
+                    <div class="tool-logo-content">
+                        <h4>Hive Moderation</h4>
+                        <p>Content moderation AI that identifies deepfakes, manipulated media, and synthetic content at scale for platforms.</p>
+                        <div class="tool-url">hivemoderation.com</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">These professional tools are increasingly used by newsrooms, social platforms, and security teams.</p>
+        </div>
+
+        <!-- Slide 9B: Deepfake Growth Statistics -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Deepfake Videos Are <em>Exploding</em></h2>
+            <div class="chart-container">
+                <div class="chart-title">Deepfake Videos Detected Online (2020-2025)</div>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">2020</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 10%;">15,000</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">2021</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 20%;">30,000</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">2022</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 35%;">52,000</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">2023</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 60%;">90,000</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">2024</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 85%;">125,000</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">2025</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 100%;">150,000+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">500% increase from 2023-2025 • Sources: Sensity AI, Deeptrace Research</p>
+        </div>
+
+        <!-- Slide 9C: Understanding Deepfakes Video -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Understanding <em>Deepfakes</em></h2>
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/1OqFY_2JE1c" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <p class="video-caption">CBS News: How deepfakes are changing politics and elections worldwide</p>
+            </div>
+            <div class="warning-text" style="max-width: 800px; text-align: center; margin-top: 2rem; color: var(--text-secondary); line-height: 1.7;">
+                This technology is advancing faster than regulations can keep up. What you see here today will be outdated in months. The key is learning to think critically, not memorizing what's fake.
+            </div>
+        </div>
+
+        <!-- Slide 10: Social Media Spread -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Misinformation <em>Spreads</em></h2>
+            <div class="stats-highlight">
+                <h3 style="font-size: 1.8rem; margin-bottom: 1rem; font-family: 'Instrument Serif', serif;">The Social Media Effect</h3>
+                <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 2rem;">False information spreads faster and wider than truth on social media. Here's why:</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-number">6×</div>
+                        <div class="stat-label">Fake news spreads 6 times faster than real news on Twitter/X</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">70%</div>
+                        <div class="stat-label">of users share content without reading past the headline</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1.5s</div>
+                        <div class="stat-label">Average time spent deciding whether to share a post</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Algorithms amplify emotional, shocking content — even if it's fake.</p>
+        </div>
+
+        <!-- Slide 11: Australian Context -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>Australian</em> Impacts</h2>
+            <div class="examples-grid">
+                <div class="example-card info">
+                    <div class="example-header">
+                        <span class="example-icon">🔥</span>
+                        <span class="example-title">Bushfire Misinformation</span>
+                    </div>
+                    <p class="example-desc">During 2024-25 fire season, fake evacuation orders, doctored emergency service posts, and false arson claims spread panic on social media.</p>
+                </div>
+                <div class="example-card info">
+                    <div class="example-header">
+                        <span class="example-icon">💉</span>
+                        <span class="example-title">Health Scams</span>
+                    </div>
+                    <p class="example-desc">AI-generated fake doctor testimonials promoting unproven treatments. Australian health authorities issued warnings about fake TGA approvals.</p>
+                </div>
+                <div class="example-card info">
+                    <div class="example-header">
+                        <span class="example-icon">🏦</span>
+                        <span class="example-title">Banking Fraud</span>
+                    </div>
+                    <p class="example-desc">Deepfake videos of bank CEOs used to trick employees and customers. Losses exceeded $15 million across major Australian banks in 2024.</p>
+                </div>
+                <div class="example-card info">
+                    <div class="example-header">
+                        <span class="example-icon">📱</span>
+                        <span class="example-title">Youth Targeting</span>
+                    </div>
+                    <p class="example-desc">AI-generated fake sponsorship offers, prize scams, and deepfake influencer videos specifically target teens on TikTok and Instagram.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: What To Do -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What to Do When You Encounter <em>Misinformation</em></h2>
+            <div class="action-steps">
+                <div class="action-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Stop & Verify</h4>
+                        <p>Don't share immediately. Check the source, search for fact-checks, and look for verification from trusted outlets.</p>
+                    </div>
+                </div>
+                <div class="action-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Report It</h4>
+                        <p>Use platform reporting tools. Flag misinformation on Facebook, Instagram, TikTok, X, and YouTube. Report scams to Scamwatch.</p>
+                    </div>
+                </div>
+                <div class="action-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Warn Others</h4>
+                    <p>Comment on false posts with corrections and fact-check links. Message friends who've shared it. Break the chain.</p>
+                    </div>
+                </div>
+                <div class="action-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Don't Engage with Rage</h4>
+                        <p>Algorithms reward engagement. Arguing or angry replies actually boost misinformation's reach. Report and move on.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Media Literacy Skills -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Build Your Media <em>Literacy</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Critical Questions</h3>
+                    <ul>
+                        <li>Who created this? What's their agenda?</li>
+                        <li>When was it created? Is it current or recycled?</li>
+                        <li>What's the original source? Can I verify it?</li>
+                        <li>Who benefits if I believe or share this?</li>
+                        <li>Does this trigger a strong emotional response? Why?</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Good Habits</h3>
+                    <ul>
+                        <li>Read past the headline before forming opinions</li>
+                        <li>Check date stamps and context before sharing</li>
+                        <li>Follow trusted news sources and fact-checkers</li>
+                        <li>Be sceptical of "too good to be true" content</li>
+                        <li>Pause before clicking "share"</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Media literacy is the 21st-century superpower. Question everything, verify before you share.</p>
+        </div>
+
+        <!-- Slide 14: Australian Resources -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Australian <em>Resources</em></h2>
+            <div class="tools-showcase">
+                <div class="tool-item">
+                    <div class="tool-emoji">🇦🇺</div>
+                    <div class="tool-content">
+                        <h4>RMIT FactLab</h4>
+                        <p>Australian fact-checking service. Verifies claims about politics, health, science, and viral content. factlab.rmit.edu.au</p>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-emoji">🛡️</div>
+                    <div class="tool-content">
+                        <h4>Scamwatch (ACCC)</h4>
+                        <p>Report scams, check warnings, learn how to protect yourself. Tracks AI voice cloning and deepfake scams. scamwatch.gov.au</p>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-emoji">📡</div>
+                    <div class="tool-content">
+                        <h4>eSafety Commissioner</h4>
+                        <p>Report harmful content, image-based abuse, and serious online threats. Handles deepfake intimate images. esafety.gov.au</p>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-emoji">🎓</div>
+                    <div class="tool-content">
+                        <h4>Australian Curriculum: Digital Literacy</h4>
+                        <p>Resources for evaluating sources, verifying information, and understanding online manipulation. v9.australiancurriculum.edu.au</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: The Bigger Picture -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>Bigger</em> Picture</h2>
+            <div class="warning-card" style="border-color: var(--accent-violet); background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));">
+                <div class="warning-icon">💭</div>
+                <div class="warning-text" style="font-size: 1.2rem; margin-bottom: 1.5rem;">
+                    AI misinformation isn't just about fake videos and scam calls. It's about trust.
+                </div>
+                <div class="warning-text" style="font-size: 1rem;">
+                    When we can't trust what we see or hear, democracy suffers. Conversations break down. Scammers thrive. The solution isn't to stop using technology—it's to become smarter, more critical consumers of information.
+                </div>
+            </div>
+            <p class="stat-source">Your generation will define how society navigates the AI age. Choose wisely what you believe and share.</p>
+        </div>
+
+        <!-- Slide 16: End -->
+        <div class="slide">
+            <h1 class="slide-title">Question <em>Everything</em></h1>
+            <p class="slide-subtitle">In the age of AI, healthy scepticism isn't paranoia—it's survival. Verify before you trust, think before you share.</p>
+            <p class="stat-source" style="font-size: 1rem; margin-top: 3rem;">
+                Further reading: RMIT FactLab • eSafety Commissioner • Scamwatch<br>
+                Report misinformation: Your platform's report function • Scamwatch.gov.au
+            </p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 19</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

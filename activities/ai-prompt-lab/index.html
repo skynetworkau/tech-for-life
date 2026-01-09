@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROMPT LAB // AI Training Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: #667eea;
+            --gradient-2: #764ba2;
+            --gradient-3: #f093fb;
+            --accent-blue: #00d4ff;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-input: #16162a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Animated gradient background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(240, 147, 251, 0.05) 0%, transparent 70%);
+            animation: gradientShift 15s ease infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Achievement badges */
+        .achievements-bar {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .achievement-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .achievement-badge.unlocked {
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+            animation: badgeUnlock 0.5s ease;
+        }
+
+        .achievement-badge.locked {
+            opacity: 0.3;
+            filter: grayscale(1);
+        }
+
+        @keyframes badgeUnlock {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .achievement-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievement-badge:hover .achievement-tooltip {
+            opacity: 1;
+        }
+
+        /* Progress tracker */
+        .progress-tracker {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.completed {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .progress-dot.current {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px var(--accent-purple);
+            transform: scale(1.2);
+        }
+
+        /* Main content panels */
+        .panel {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Mode selection screen */
+        .mode-selection {
+            text-align: center;
+        }
+
+        .mode-selection h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .mode-card {
+            background: var(--bg-input);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .mode-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .mode-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .mode-features {
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .mode-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Intro screen */
+        .intro-screen {
+            text-align: center;
+        }
+
+        .intro-screen h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-screen p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .intro-screen .highlight {
+            color: var(--accent-pink);
+            font-weight: 600;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .skill-card {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .skill-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Prompt Builder Tool */
+        .prompt-builder {
+            background: var(--bg-input);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .builder-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .builder-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .builder-toggle {
+            background: none;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .builder-toggle:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .builder-content {
+            display: none;
+        }
+
+        .builder-content.visible {
+            display: block;
+        }
+
+        .builder-section {
+            margin-bottom: 1rem;
+        }
+
+        .builder-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .builder-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+        .builder-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .builder-preview {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .builder-preview-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .builder-preview-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .builder-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .builder-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--accent-blue);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .builder-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .builder-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Timer display for challenge mode */
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--accent-yellow);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .timer-display.warning {
+            color: var(--error);
+            animation: pulse 1s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Challenge display */
+        .challenge-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .challenge-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .challenge-category {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .difficulty-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .difficulty-badge.easy {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .difficulty-badge.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .difficulty-badge.hard {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .challenge-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .challenge-scenario {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-purple);
+        }
+
+        .scenario-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .scenario-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* AI Response Examples */
+        .response-examples {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .response-examples-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-pink);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .response-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 700px) {
+            .response-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .response-box {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 2px solid;
+        }
+
+        .response-box.weak {
+            border-color: var(--error);
+        }
+
+        .response-box.strong {
+            border-color: var(--success);
+        }
+
+        .response-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .response-box-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .response-box.weak .response-box-label {
+            color: var(--error);
+        }
+
+        .response-box.strong .response-box-label {
+            color: var(--success);
+        }
+
+        .response-box-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .response-box-output {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Prompt input area */
+        .prompt-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .prompt-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 1.25rem;
+            background: var(--bg-input);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .prompt-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .char-count {
+            text-align: right;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Hints section */
+        .hints-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .hints-toggle:hover {
+            color: var(--accent-pink);
+        }
+
+        .hints-content {
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            display: none;
+        }
+
+        .hints-content.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .hint-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hint-icon {
+            color: var(--accent-blue);
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback panel */
+        .feedback-panel {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .feedback-panel.visible {
+            display: block;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-input);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+        }
+
+        .score-circle.needs-work {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+        }
+
+        .score-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .score-sublabel {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .points-earned {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            color: var(--accent-yellow);
+            margin-top: 0.5rem;
+        }
+
+        /* Criteria breakdown */
+        .criteria-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .criteria-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--bg-input);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+        }
+
+        .criteria-name {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .criteria-icon {
+            font-size: 1.2rem;
+        }
+
+        .criteria-text {
+            font-size: 0.95rem;
+        }
+
+        .criteria-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .criteria-status.pass {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .criteria-status.partial {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .criteria-status.fail {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+        }
+
+        /* Example comparison */
+        .comparison-section {
+            margin-top: 1.5rem;
+        }
+
+        .comparison-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-pink);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 700px) {
+            .prompt-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .prompt-box {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 2px solid;
+        }
+
+        .prompt-box.yours {
+            border-color: var(--accent-blue);
+        }
+
+        .prompt-box.example {
+            border-color: var(--success);
+        }
+
+        .prompt-box-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .prompt-box.yours .prompt-box-label {
+            color: var(--accent-blue);
+        }
+
+        .prompt-box.example .prompt-box-label {
+            color: var(--success);
+        }
+
+        .prompt-box-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Buttons row */
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--text-secondary);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .primary-btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Results screen */
+        .results-screen {
+            text-align: center;
+        }
+
+        .final-score {
+            font-family: 'Space Mono', monospace;
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 1rem 0;
+        }
+
+        .results-breakdown {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Achievements display */
+        .achievements-display {
+            background: var(--bg-input);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .achievements-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-yellow);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .achievement-item {
+            text-align: center;
+        }
+
+        .achievement-icon-large {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .achievement-desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Key learnings */
+        .learnings-section {
+            background: var(--bg-input);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .learnings-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .learning-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .learning-item:last-child {
+            border-bottom: none;
+        }
+
+        .learning-icon {
+            color: var(--accent-pink);
+        }
+
+        .learning-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .panel {
+                padding: 1.5rem;
+            }
+
+            .challenge-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn-row {
+                flex-direction: column;
+            }
+
+            .score-circle {
+                width: 100px;
+                height: 100px;
+                font-size: 2rem;
+            }
+
+            .stats-bar {
+                gap: 1rem;
+            }
+
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">PROMPT LAB</h1>
+            <p class="subtitle">AI Training Simulator</p>
+        </header>
+
+        <!-- Stats bar (shown during and after training) -->
+        <div class="stats-bar hidden" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPointsDisplay">0</div>
+                <div class="stat-label">Total Points</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="streakDisplay">0</div>
+                <div class="stat-label">Streak</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="completedDisplay">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+
+        <!-- Achievements bar (shown during and after training) -->
+        <div class="achievements-bar hidden" id="achievementsBar">
+            <!-- Generated dynamically -->
+        </div>
+
+        <!-- Progress dots -->
+        <div class="progress-tracker hidden" id="progressTracker">
+            <!-- Generated dynamically -->
+        </div>
+
+        <main id="mainContent">
+            <!-- Intro screen -->
+            <div id="introScreen" class="panel intro-screen">
+                <h2>Master the Art of AI Prompts</h2>
+                <p>AI tools like ChatGPT, Copilot, and Gemini can be incredibly powerful — but only if you know how to <span class="highlight">communicate with them effectively</span>.</p>
+                <p>In this training, you'll learn to craft prompts that get <span class="highlight">better, more useful results</span> from AI systems.</p>
+
+                <div class="skill-grid">
+                    <div class="skill-card">
+                        <div class="skill-icon">🎯</div>
+                        <div class="skill-name">Be Specific</div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">📋</div>
+                        <div class="skill-name">Give Context</div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">🎭</div>
+                        <div class="skill-name">Set a Role</div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">📐</div>
+                        <div class="skill-name">Define Format</div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">⚖️</div>
+                        <div class="skill-name">Add Constraints</div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">💡</div>
+                        <div class="skill-name">Give Examples</div>
+                    </div>
+                </div>
+
+                <button class="submit-btn" onclick="showModeSelection()">Start Training</button>
+            </div>
+
+            <!-- Mode selection screen -->
+            <div id="modeScreen" class="panel mode-selection hidden">
+                <h2>Choose Your Training Mode</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Select how you want to learn prompt engineering</p>
+
+                <div class="mode-grid">
+                    <div class="mode-card" onclick="selectMode('training')">
+                        <div class="mode-icon">🎓</div>
+                        <div class="mode-title">Training Mode</div>
+                        <div class="mode-desc">Learn the basics with guided feedback and helpful hints.</div>
+                        <div class="mode-features">
+                            <div class="mode-feature">✓ 15 challenges across 6 categories</div>
+                            <div class="mode-feature">✓ Detailed feedback on every prompt</div>
+                            <div class="mode-feature">✓ Hints available when needed</div>
+                            <div class="mode-feature">✓ No time pressure</div>
+                        </div>
+                    </div>
+
+                    <div class="mode-card" onclick="selectMode('challenge')">
+                        <div class="mode-icon">⚡</div>
+                        <div class="mode-title">Challenge Mode</div>
+                        <div class="mode-desc">Test your skills with timed challenges and competitive scoring.</div>
+                        <div class="mode-features">
+                            <div class="mode-feature">⏱ 3 minutes per challenge</div>
+                            <div class="mode-feature">⚡ Bonus points for speed</div>
+                            <div class="mode-feature">🏆 Performance tracking</div>
+                            <div class="mode-feature">🔥 Streak multipliers</div>
+                        </div>
+                    </div>
+
+                    <div class="mode-card" onclick="selectMode('sandbox')">
+                        <div class="mode-icon">🎨</div>
+                        <div class="mode-title">Sandbox Mode</div>
+                        <div class="mode-desc">Free-form practice with the Prompt Builder tool and instant tips.</div>
+                        <div class="mode-features">
+                            <div class="mode-feature">🛠 RTCFCE Prompt Builder</div>
+                            <div class="mode-feature">📊 Real-time quality analysis</div>
+                            <div class="mode-feature">💡 Smart suggestions</div>
+                            <div class="mode-feature">🔄 Unlimited practice</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="secondary-btn" onclick="backToIntro()" style="margin-top: 2rem; max-width: 300px; margin-left: auto; margin-right: auto;">← Back</button>
+            </div>
+
+            <!-- Challenge screen -->
+            <div id="challengeScreen" class="hidden">
+                <!-- Timer (Challenge mode only) -->
+                <div class="timer-display hidden" id="timerDisplay">03:00</div>
+
+                <div class="panel">
+                    <div class="challenge-header">
+                        <span class="challenge-number" id="challengeNumber">Challenge 1 of 15</span>
+                        <span class="challenge-category" id="challengeCategory">WACE Study</span>
+                        <span class="difficulty-badge" id="difficultyBadge">Easy</span>
+                    </div>
+
+                    <h2 class="challenge-title" id="challengeTitle">Write a Prompt</h2>
+
+                    <div class="challenge-scenario">
+                        <div class="scenario-label">📝 Your Task</div>
+                        <p class="scenario-text" id="scenarioText">Scenario description goes here</p>
+                    </div>
+
+                    <!-- Response examples (shown in some challenges) -->
+                    <div class="response-examples hidden" id="responseExamples">
+                        <h3 class="response-examples-title">See How Prompts Affect AI Responses</h3>
+                        <div class="response-comparison">
+                            <div class="response-box weak">
+                                <div class="response-box-header">
+                                    <span class="response-box-label">❌ Weak Prompt</span>
+                                </div>
+                                <div class="response-box-text" id="weakPromptText"></div>
+                                <div class="response-box-output" id="weakResponseText"></div>
+                            </div>
+                            <div class="response-box strong">
+                                <div class="response-box-header">
+                                    <span class="response-box-label">✅ Strong Prompt</span>
+                                </div>
+                                <div class="response-box-text" id="strongPromptText"></div>
+                                <div class="response-box-output" id="strongResponseText"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Builder (Sandbox mode) -->
+                    <div class="prompt-builder hidden" id="promptBuilder">
+                        <div class="builder-header">
+                            <span class="builder-title">🛠 RTCFCE Prompt Builder</span>
+                            <button class="builder-toggle" onclick="toggleBuilder()">Collapse</button>
+                        </div>
+                        <div class="builder-content visible">
+                            <div class="builder-section">
+                                <label class="builder-label">R - Role: Who should the AI act as?</label>
+                                <input type="text" class="builder-input" id="builderRole" placeholder="e.g., 'Act as a chemistry tutor' or 'You are a professional editor'">
+                            </div>
+                            <div class="builder-section">
+                                <label class="builder-label">T - Task: What do you want it to do?</label>
+                                <input type="text" class="builder-input" id="builderTask" placeholder="e.g., 'Explain redox reactions' or 'Proofread my essay'">
+                            </div>
+                            <div class="builder-section">
+                                <label class="builder-label">C - Context: What background info is needed?</label>
+                                <textarea class="builder-input" id="builderContext" rows="2" placeholder="e.g., 'I'm a Year 12 student preparing for my WACE Chemistry exam'"></textarea>
+                            </div>
+                            <div class="builder-section">
+                                <label class="builder-label">F - Format: How should the output look?</label>
+                                <input type="text" class="builder-input" id="builderFormat" placeholder="e.g., 'bullet points', 'step-by-step guide', 'table format'">
+                            </div>
+                            <div class="builder-section">
+                                <label class="builder-label">C - Constraints: Any limitations or requirements?</label>
+                                <input type="text" class="builder-input" id="builderConstraints" placeholder="e.g., 'Keep it under 200 words', 'Use simple language'">
+                            </div>
+                            <div class="builder-section">
+                                <label class="builder-label">E - Examples: Sample inputs/outputs (optional)</label>
+                                <textarea class="builder-input" id="builderExamples" rows="2" placeholder="e.g., 'Like: Question → Clear answer with diagram'"></textarea>
+                            </div>
+                            <div class="builder-preview">
+                                <div class="builder-preview-label">Generated Prompt Preview</div>
+                                <div class="builder-preview-text" id="builderPreview">Fill in the fields above to build your prompt...</div>
+                            </div>
+                            <div class="builder-actions">
+                                <button class="builder-btn secondary" onclick="clearBuilder()">Clear All</button>
+                                <button class="builder-btn" onclick="useBuiltPrompt()">Use This Prompt</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prompt-section">
+                        <label class="prompt-label">Your Prompt</label>
+                        <textarea class="prompt-input" id="promptInput" placeholder="Type your prompt here... Think about what you need from the AI and how to communicate that clearly."></textarea>
+                        <div class="char-count"><span id="charCount">0</span> characters</div>
+                    </div>
+
+                    <button class="hints-toggle" onclick="toggleHints()">
+                        <span>💡</span>
+                        <span id="hintsToggleText">Show Hints</span>
+                    </button>
+
+                    <div class="hints-content" id="hintsContent">
+                        <!-- Generated dynamically -->
+                    </div>
+
+                    <button class="submit-btn" id="submitBtn" onclick="evaluatePrompt()">Analyse My Prompt</button>
+                </div>
+
+                <!-- Feedback panel -->
+                <div class="panel feedback-panel" id="feedbackPanel">
+                    <div class="score-display">
+                        <div class="score-circle" id="scoreCircle">85</div>
+                        <div class="score-label" id="scoreLabel">Great Work!</div>
+                        <div class="score-sublabel" id="scoreSublabel">Your prompt covers most key elements</div>
+                        <div class="points-earned" id="pointsEarned">+85 points</div>
+                    </div>
+
+                    <div class="criteria-section">
+                        <h3 class="criteria-title">Evaluation Criteria</h3>
+                        <div id="criteriaList">
+                            <!-- Generated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="comparison-section">
+                        <h3 class="comparison-title">Compare Your Prompt</h3>
+                        <div class="prompt-comparison">
+                            <div class="prompt-box yours">
+                                <div class="prompt-box-label">Your Prompt</div>
+                                <p class="prompt-box-text" id="yourPromptText"></p>
+                            </div>
+                            <div class="prompt-box example">
+                                <div class="prompt-box-label">Example Strong Prompt</div>
+                                <p class="prompt-box-text" id="examplePromptText"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="secondary-btn" onclick="tryAgain()">Try Again</button>
+                        <button class="primary-btn" id="nextBtn" onclick="nextChallenge()">Next Challenge →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results screen -->
+            <div id="resultsScreen" class="panel results-screen hidden">
+                <h2>Training Complete!</h2>
+                <div class="final-score" id="finalScore">0</div>
+                <p>Total Points Earned</p>
+
+                <div class="results-breakdown">
+                    <div class="result-item">
+                        <div class="result-value" id="challengesCompleted">0</div>
+                        <div class="result-label">Challenges</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="avgScore">0%</div>
+                        <div class="result-label">Avg Score</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="bestScore">0%</div>
+                        <div class="result-label">Best Score</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="maxStreak">0</div>
+                        <div class="result-label">Max Streak</div>
+                    </div>
+                </div>
+
+                <!-- Achievements earned -->
+                <div class="achievements-display">
+                    <h3 class="achievements-title">🏆 Achievements Unlocked</h3>
+                    <div class="achievements-grid" id="unlockedAchievements">
+                        <!-- Generated dynamically -->
+                    </div>
+                </div>
+
+                <div class="learnings-section">
+                    <h3 class="learnings-title">🧠 Key Prompt Engineering Principles</h3>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Be Specific:</strong> Vague prompts get vague answers. Tell the AI exactly what you want.</span>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Provide Context:</strong> Give background information so the AI understands your situation.</span>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Assign a Role:</strong> "Act as a..." helps the AI respond with the right expertise and tone.</span>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Define the Format:</strong> Specify if you want bullet points, paragraphs, code, tables, etc.</span>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Set Constraints:</strong> Word limits, reading levels, and other boundaries improve outputs.</span>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Use Examples:</strong> Showing what you want helps the AI match your expectations.</span>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">→</span>
+                        <span class="learning-text"><strong>Iterate:</strong> The first prompt rarely gives perfect results. Refine and try again!</span>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="secondary-btn" onclick="backToModeSelect()">Change Mode</button>
+                    <button class="primary-btn" onclick="restartTraining()">Train Again</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Challenge data with 15+ challenges across 6 categories
+        const challenges = [
+            // WACE STUDY HELP - Chemistry
+            {
+                title: "Chemistry Study Notes",
+                category: "WACE Study",
+                difficulty: "easy",
+                scenario: "You have a WACE Chemistry exam next week on redox reactions and electrochemistry. You want AI to help you create focused study notes. Write a prompt that will get you useful, exam-focused material.",
+                hints: [
+                    "Mention the specific subject and topic (Year 12 Chemistry, redox reactions)",
+                    "Specify what kind of notes you want (summary, detailed, with examples?)",
+                    "Include that it's for WACE exams - Australian curriculum",
+                    "Ask for specific sections that might appear in the exam"
+                ],
+                criteria: [
+                    { name: "Specific Topic", desc: "Mentions redox/electrochemistry and chemistry", weight: 20 },
+                    { name: "Context Given", desc: "Includes Year 12/WACE/exam context", weight: 25 },
+                    { name: "Format Specified", desc: "Describes how notes should be structured", weight: 25 },
+                    { name: "Actionable Request", desc: "Clear about what output is needed", weight: 30 }
+                ],
+                keywords: {
+                    topic: ["redox", "electrochemistry", "oxidation", "reduction", "chemistry", "chem"],
+                    context: ["year 12", "wace", "exam", "test", "study", "revision", "australian", "atar"],
+                    format: ["notes", "summary", "bullet", "points", "list", "structure", "section", "headings", "examples"],
+                    actionable: ["create", "make", "write", "generate", "help", "explain", "cover", "include"]
+                },
+                examplePrompt: "Act as a Year 12 Chemistry tutor. Create comprehensive study notes on redox reactions and electrochemistry for my upcoming WACE exam. Include: oxidation and reduction definitions, how to balance redox equations, electrochemical cells, and the relationship between voltage and spontaneity. Format with clear headings and bullet points. Focus on concepts likely to appear in exam questions.",
+                responseExample: {
+                    weak: "Tell me about redox reactions.",
+                    weakResponse: "Redox reactions involve the transfer of electrons between substances. Oxidation is the loss of electrons and reduction is the gain of electrons...",
+                    strong: "Act as a Year 12 Chemistry tutor. Create study notes on redox reactions for my WACE exam. Include: definitions of oxidation/reduction, how to identify oxidising and reducing agents, balancing redox equations, and electrochemical cells. Use bullet points and provide 2 practice examples.",
+                    strongResponse: "**REDOX REACTIONS - WACE Study Notes**\n\n**Key Definitions:**\n• Oxidation: Loss of electrons (increase in oxidation state)\n• Reduction: Gain of electrons (decrease in oxidation state)\n• Oxidising agent: Causes oxidation (gets reduced itself)\n• Reducing agent: Causes reduction (gets oxidised itself)\n\n**Balancing Redox Equations:**\n1. Identify oxidation states...\n\n**Practice Examples:**\nExample 1: Zn + Cu²⁺ → Zn²⁺ + Cu..."
+                }
+            },
+
+            // WACE STUDY HELP - Physics
+            {
+                title: "Physics Problem Solver",
+                category: "WACE Study",
+                difficulty: "medium",
+                scenario: "You're stuck on WACE Physics problems about projectile motion. You need AI to explain the concepts and help you solve similar problems. Write a prompt that will give you both understanding AND practice.",
+                hints: [
+                    "Set a role - ask AI to act as a physics tutor",
+                    "Specify what you don't understand about projectile motion",
+                    "Ask for both explanation and worked examples",
+                    "Mention you want to practice solving problems yourself"
+                ],
+                criteria: [
+                    { name: "Role Assigned", desc: "Gives AI a tutor/teacher role", weight: 20 },
+                    { name: "Topic Specified", desc: "Clearly mentions projectile motion", weight: 20 },
+                    { name: "Learning Goal", desc: "States what understanding is needed", weight: 25 },
+                    { name: "Practice Requested", desc: "Asks for examples and practice", weight: 35 }
+                ],
+                keywords: {
+                    topic: ["projectile", "motion", "physics", "trajectory", "parabolic", "velocity", "angle"],
+                    context: ["stuck", "don't understand", "need help", "year 12", "wace", "explain", "confused"],
+                    format: ["example", "worked", "practice", "step", "show", "demonstrate", "solve"],
+                    actionable: ["explain", "teach", "help", "tutor", "understand", "learn", "solve", "problems"]
+                },
+                examplePrompt: "Act as a physics tutor. I'm struggling with WACE projectile motion problems - specifically breaking velocity into horizontal and vertical components and using kinematic equations. Can you: 1) Explain the key concepts in simple terms, 2) Show me a fully worked example with a ball launched at 30° at 20 m/s, 3) Give me 2 similar practice problems to try myself. Format with clear steps.",
+                responseExample: {
+                    weak: "How do I do projectile motion?",
+                    weakResponse: "Projectile motion involves objects moving in two dimensions under gravity. You use kinematic equations to solve problems...",
+                    strong: "Act as a physics tutor. Explain projectile motion for WACE Physics. I understand basic kinematics but struggle with breaking initial velocity into components. Show me a worked example calculating maximum height and range, then give me practice problems.",
+                    strongResponse: "**PROJECTILE MOTION - Tutorial**\n\n**Key Concept:** Separate horizontal and vertical motion!\n\nHorizontal: constant velocity (no acceleration)\nVertical: constant acceleration (g = -9.8 m/s²)\n\n**Breaking Down Initial Velocity:**\nIf launched at angle θ with speed v₀:\n• Horizontal component: vₓ = v₀ cos(θ)\n• Vertical component: vᵧ = v₀ sin(θ)\n\n**Worked Example:**\nA ball is launched at 20 m/s at 30° above horizontal..."
+                }
+            },
+
+            // WACE STUDY HELP - English
+            {
+                title: "English Essay Analyser",
+                category: "WACE Study",
+                difficulty: "medium",
+                scenario: "You're writing a WACE English essay analysing themes in 'The Great Gatsby' and need AI to help you develop a strong thesis statement and find supporting evidence from the text.",
+                hints: [
+                    "Mention the specific text and theme you're analysing",
+                    "Ask for help with thesis development, not just writing the essay",
+                    "Request specific quotes and analysis techniques",
+                    "Specify WACE essay requirements (TEEL structure, etc.)"
+                ],
+                criteria: [
+                    { name: "Text Specified", desc: "Names the literary work", weight: 20 },
+                    { name: "Theme/Focus Clear", desc: "States what aspect to analyse", weight: 25 },
+                    { name: "Learning Focus", desc: "Asks for guidance, not complete essay", weight: 30 },
+                    { name: "WACE Structure", desc: "Mentions essay structure/requirements", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["gatsby", "great gatsby", "theme", "analyse", "analyze", "essay", "literature", "english"],
+                    context: ["wace", "year 12", "help", "develop", "thesis", "evidence", "quotes"],
+                    format: ["thesis", "teel", "structure", "paragraph", "evidence", "analysis", "quotes"],
+                    actionable: ["help", "develop", "find", "suggest", "analyse", "analyze", "guide", "teach"]
+                },
+                examplePrompt: "Act as an English literature tutor. I'm writing a WACE essay analysing the theme of the American Dream in 'The Great Gatsby'. Help me: 1) Develop a strong, specific thesis statement, 2) Identify 3-4 key quotes that support this thesis, 3) Suggest how to analyse these quotes using TEEL paragraph structure. Don't write the essay for me - teach me how to construct the argument.",
+                responseExample: null
+            },
+
+            // WACE STUDY HELP - Maths Methods
+            {
+                title: "Calculus Concept Check",
+                category: "WACE Study",
+                difficulty: "hard",
+                scenario: "You're preparing for a WACE Maths Methods test on integration techniques. You understand basic integration but struggle with substitution and integration by parts. Write a prompt to get targeted help.",
+                hints: [
+                    "Specify which integration techniques you understand vs. struggle with",
+                    "Ask for visual or conceptual explanations, not just formulas",
+                    "Request practice problems with increasing difficulty",
+                    "Mention common mistakes you want to avoid"
+                ],
+                criteria: [
+                    { name: "Specific Gaps", desc: "Identifies what is/isn't understood", weight: 25 },
+                    { name: "Learning Approach", desc: "Asks for conceptual understanding", weight: 25 },
+                    { name: "Graduated Practice", desc: "Requests scaffolded examples", weight: 25 },
+                    { name: "Error Prevention", desc: "Mentions common mistakes", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["integration", "calculus", "substitution", "by parts", "maths methods", "integral"],
+                    context: ["understand basic", "struggle", "confused", "wace", "test", "year 12", "help"],
+                    format: ["explain", "visual", "concept", "why", "practice", "examples", "steps"],
+                    actionable: ["teach", "show", "explain", "help", "understand", "avoid mistakes", "common errors"]
+                },
+                examplePrompt: "Act as a Maths Methods tutor. I understand basic integration (powers, polynomials) but struggle with u-substitution and integration by parts for WACE. Help me understand: 1) When to use each technique (decision process), 2) Step-by-step walkthrough of u-substitution with ∫x·e^(x²)dx, 3) Step-by-step integration by parts with ∫x·sin(x)dx, 4) Two practice problems for each technique. Explain the reasoning behind each step, not just the formulas.",
+                responseExample: null
+            },
+
+            // CREATIVE WRITING
+            {
+                title: "Short Story Brainstorm",
+                category: "Creative Writing",
+                difficulty: "easy",
+                scenario: "You want to write a short story for your English class set in Western Australia. You need AI to help you brainstorm unique plot ideas and interesting characters.",
+                hints: [
+                    "Specify the setting (Western Australia) and any requirements",
+                    "Ask for multiple ideas to choose from",
+                    "Mention what genre or tone you prefer",
+                    "Request character ideas with motivations, not just descriptions"
+                ],
+                criteria: [
+                    { name: "Setting/Context", desc: "Mentions WA setting and constraints", weight: 20 },
+                    { name: "Multiple Options", desc: "Asks for several ideas", weight: 25 },
+                    { name: "Genre/Tone", desc: "Specifies creative direction", weight: 25 },
+                    { name: "Depth Request", desc: "Asks for detailed characters/plot", weight: 30 }
+                ],
+                keywords: {
+                    topic: ["story", "short story", "plot", "narrative", "fiction", "creative writing"],
+                    context: ["western australia", "wa", "perth", "outback", "australian", "english class", "brainstorm"],
+                    format: ["ideas", "multiple", "options", "characters", "plot", "setting", "genre"],
+                    actionable: ["brainstorm", "suggest", "create", "generate", "help", "ideas", "develop"]
+                },
+                examplePrompt: "Act as a creative writing coach. Help me brainstorm ideas for a 1000-word short story set in Western Australia for my Year 12 English class. Genre: contemporary realistic fiction with a twist. Generate 3 plot ideas that incorporate unique WA settings (not just Perth beaches). For the most interesting idea, suggest: a main character with clear motivation, a central conflict, and a potential theme to explore.",
+                responseExample: null
+            },
+
+            // CREATIVE WRITING
+            {
+                title: "Dialogue Improvement",
+                category: "Creative Writing",
+                difficulty: "medium",
+                scenario: "You've written dialogue for your story but it feels stiff and unrealistic. You want AI to help you make it sound more natural and show character personality through speech.",
+                hints: [
+                    "Provide a sample of your current dialogue",
+                    "Ask for specific techniques to improve naturalness",
+                    "Request examples of how different characters can have distinct voices",
+                    "Mention you want to learn the technique, not just get rewritten dialogue"
+                ],
+                criteria: [
+                    { name: "Example Provided", desc: "Includes sample dialogue to improve", weight: 30 },
+                    { name: "Specific Goals", desc: "States what needs improvement", weight: 25 },
+                    { name: "Learning Focus", desc: "Asks for techniques, not just answers", weight: 25 },
+                    { name: "Character Voice", desc: "Mentions distinct character voices", weight: 20 }
+                ],
+                keywords: {
+                    topic: ["dialogue", "conversation", "speech", "character", "voice", "talking"],
+                    context: ["stiff", "unnatural", "unrealistic", "improve", "better", "sounds fake"],
+                    format: ["natural", "realistic", "distinct", "personality", "voice", "technique"],
+                    actionable: ["help", "improve", "teach", "show", "make better", "techniques", "tips"]
+                },
+                examplePrompt: "Act as a creative writing coach. My story dialogue feels stiff. Here's an example: 'Hello, how are you today?' 'I am fine, thank you. How are you?' Teach me techniques to make dialogue more natural and show character personality. Show me: 1) What makes dialogue sound authentic (contractions, interruptions, subtext), 2) How to give characters distinct voices, 3) My example rewritten with more natural speech. I want to learn the skill, not just get a rewrite.",
+                responseExample: {
+                    weak: "Make my dialogue better.",
+                    weakResponse: "To improve dialogue, make it more natural and realistic. Use contractions and vary sentence length...",
+                    strong: "Act as a writing coach. My dialogue feels unnatural: 'Hello, how are you?' 'I am fine.' Teach me how to make it realistic. Show techniques like contractions, interruptions, and subtext, then demonstrate with a rewrite.",
+                    strongResponse: "**DIALOGUE TECHNIQUES FOR NATURAL SPEECH:**\n\n**What Makes Dialogue Feel Stiff:**\n• Too formal ('I am' instead of 'I'm')\n• Complete sentences (people trail off)\n• No personality differences\n\n**Techniques:**\n1. Use contractions\n2. Add filler words ('um', 'like', 'you know')\n3. Include interruptions and overlaps\n4. Show subtext (characters don't always say what they mean)\n\n**Your Example Rewritten:**\n'Hey! How's it going?'\n'Yeah, good, good. You?'\n'Can't complain. Well—actually, I kinda can, but...'"
+                }
+            },
+
+            // CODE DEBUGGING
+            {
+                title: "Python Syntax Error",
+                category: "Code Debugging",
+                difficulty: "easy",
+                scenario: "Your Python program keeps giving you a 'SyntaxError: invalid syntax' message on line 7, but you can't see what's wrong. Write a prompt to get AI to help you debug it.",
+                hints: [
+                    "Include the actual code (or at least the problematic section)",
+                    "Mention the exact error message you're getting",
+                    "Describe what you've already tried",
+                    "Ask for explanation so you can avoid this in future"
+                ],
+                criteria: [
+                    { name: "Code Included", desc: "Provides the code or clear description", weight: 30 },
+                    { name: "Error Details", desc: "Includes exact error message", weight: 25 },
+                    { name: "Attempts Made", desc: "Mentions what's been tried", weight: 20 },
+                    { name: "Learning Goal", desc: "Asks for understanding, not just fix", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["python", "syntax error", "code", "program", "error", "bug", "line 7"],
+                    context: ["can't see", "don't know", "getting error", "message", "debugging", "help"],
+                    format: ["explain", "why", "understand", "avoid", "learn", "fix"],
+                    actionable: ["debug", "help", "find", "explain", "show", "fix", "what's wrong"]
+                },
+                examplePrompt: "Help me debug a Python syntax error. My code gives 'SyntaxError: invalid syntax' on line 7. Here's the code:\n\nif score > 50\n    print('Pass')\nelse:\n    print('Fail')\n\nI've checked the spelling and indentation but can't find the issue. Can you explain what's wrong and why Python requires it, so I understand how to avoid this error in future?",
+                responseExample: {
+                    weak: "My Python code doesn't work, fix it.",
+                    weakResponse: "I'd be happy to help debug your code. Please provide the code and the error message you're seeing...",
+                    strong: "Help debug my Python code. I get 'SyntaxError: invalid syntax' on line 7: 'if score > 50' followed by 'print('Pass')'. I've checked spelling. What's the syntax rule I'm missing?",
+                    strongResponse: "**Found the Issue!**\n\nThe problem is on line 7: `if score > 50`\n\n**What's Wrong:**\nPython requires a colon (`:`) at the end of `if` statements.\n\n**Should be:**\n```python\nif score > 50:\n    print('Pass')\n```\n\n**Why:** The colon tells Python 'here comes the code block that runs if this condition is true.' This applies to all control structures: if, elif, else, for, while, def, class.\n\n**Remember:** if/elif/else/for/while/def/class → always end with `:`"
+                }
+            },
+
+            // CODE DEBUGGING
+            {
+                title: "JavaScript Logic Bug",
+                category: "Code Debugging",
+                difficulty: "medium",
+                scenario: "Your JavaScript function to calculate the average of an array sometimes returns 'NaN' (Not a Number). It works for some arrays but not others. You need help identifying the logic problem.",
+                hints: [
+                    "Describe what the function should do",
+                    "Provide examples of inputs that work vs. don't work",
+                    "Include your code logic or actual code",
+                    "Ask about edge cases and validation"
+                ],
+                criteria: [
+                    { name: "Function Purpose", desc: "Explains what code should do", weight: 20 },
+                    { name: "Test Cases", desc: "Provides working and failing examples", weight: 30 },
+                    { name: "Code Provided", desc: "Includes code or clear logic", weight: 25 },
+                    { name: "Edge Cases", desc: "Asks about validation/edge cases", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["javascript", "function", "array", "average", "nan", "calculate", "logic"],
+                    context: ["sometimes", "works for", "doesn't work", "returns nan", "bug", "problem"],
+                    format: ["why", "identify", "edge case", "validation", "check", "handle"],
+                    actionable: ["help", "debug", "find", "identify", "fix", "explain", "handle empty"]
+                },
+                examplePrompt: "Help me debug a JavaScript logic bug. My function calculates array average but sometimes returns NaN. It works for [10, 20, 30] (returns 20) but fails for [] and [5, 'hello', 10]. Here's my code:\n\nfunction average(arr) {\n  let sum = 0;\n  for(let i = 0; i < arr.length; i++) {\n    sum += arr[i];\n  }\n  return sum / arr.length;\n}\n\nExplain why NaN occurs and how to handle empty arrays and non-numeric values properly.",
+                responseExample: null
+            },
+
+            // CODE EXPLANATION
+            {
+                title: "Algorithm Understanding",
+                category: "Code Debugging",
+                difficulty: "hard",
+                scenario: "You found a bubble sort algorithm online for your Digital Technologies project, but you need to understand how it works so you can explain it in your documentation. The code makes sense line-by-line but you don't get the overall logic.",
+                hints: [
+                    "Include the actual algorithm code",
+                    "Ask for explanation at both detailed and big-picture levels",
+                    "Request a walkthrough with a specific example",
+                    "Mention you need to be able to explain it yourself"
+                ],
+                criteria: [
+                    { name: "Code Provided", desc: "Includes the algorithm code", weight: 25 },
+                    { name: "Dual Understanding", desc: "Asks for both detail and overview", weight: 25 },
+                    { name: "Worked Example", desc: "Requests step-by-step trace", weight: 25 },
+                    { name: "Teaching Goal", desc: "States need to explain to others", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["bubble sort", "sort", "algorithm", "code", "sorting", "understand"],
+                    context: ["how it works", "don't understand", "explain", "documentation", "project", "need to explain"],
+                    format: ["explain", "walkthrough", "example", "step", "trace", "big picture", "overview"],
+                    actionable: ["explain", "help understand", "teach", "show", "walkthrough", "trace", "demonstrate"]
+                },
+                examplePrompt: "Act as a programming tutor. Help me understand this bubble sort algorithm for my Digital Technologies project:\n\nfunction bubbleSort(arr) {\n  for(let i = 0; i < arr.length; i++) {\n    for(let j = 0; j < arr.length - i - 1; j++) {\n      if(arr[j] > arr[j+1]) {\n        let temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n  }\n  return arr;\n}\n\nI need: 1) Big-picture explanation of the sorting strategy, 2) Why there are two loops, 3) Step-by-step trace with array [5,2,8,1], 4) Simple explanation I can use in my documentation.",
+                responseExample: null
+            },
+
+            // RESEARCH & SUMMARISATION
+            {
+                title: "Topic Overview",
+                category: "Research",
+                difficulty: "easy",
+                scenario: "You need to research renewable energy in Australia for a Geography assignment. You want AI to give you a comprehensive overview to start your research.",
+                hints: [
+                    "Specify the focus area (renewable energy in Australia)",
+                    "Ask for structured information covering multiple aspects",
+                    "Request current/recent information",
+                    "Mention this is starting point - you'll research further"
+                ],
+                criteria: [
+                    { name: "Topic Focused", desc: "Specifies renewable energy + Australia", weight: 20 },
+                    { name: "Structured Request", desc: "Asks for organised overview", weight: 25 },
+                    { name: "Currency Requested", desc: "Asks for current/recent info", weight: 25 },
+                    { name: "Research Starting Point", desc: "Frames as initial overview", weight: 30 }
+                ],
+                keywords: {
+                    topic: ["renewable energy", "solar", "wind", "australia", "geography", "energy"],
+                    context: ["research", "assignment", "overview", "start", "need to know", "comprehensive"],
+                    format: ["overview", "summary", "structure", "sections", "aspects", "organised", "organized"],
+                    actionable: ["research", "overview", "summarise", "summarize", "cover", "explain", "current", "recent"]
+                },
+                examplePrompt: "Act as a research assistant. Provide a comprehensive overview of renewable energy in Australia for my Geography assignment. Cover: 1) Main types of renewable energy used in Australia, 2) Current adoption rates and trends, 3) Major projects or initiatives (solar farms, wind farms), 4) Challenges and barriers, 5) Future outlook. Keep each section concise (2-3 sentences) as this is my starting point for deeper research. Focus on information from the last 2-3 years.",
+                responseExample: null
+            },
+
+            // RESEARCH & SUMMARISATION
+            {
+                title: "Source Comparison",
+                category: "Research",
+                difficulty: "medium",
+                scenario: "You're researching the effects of social media on teenage mental health for a Health class debate. You need AI to help you understand different perspectives and identify credible arguments on both sides.",
+                hints: [
+                    "Set up AI as an objective research assistant",
+                    "Ask for balanced perspectives (not biased)",
+                    "Request evidence types or study examples",
+                    "Mention you need to identify credible vs weak arguments"
+                ],
+                criteria: [
+                    { name: "Research Role", desc: "Assigns objective research role", weight: 20 },
+                    { name: "Balance Requested", desc: "Asks for multiple perspectives", weight: 25 },
+                    { name: "Evidence Focus", desc: "Requests studies/data/examples", weight: 30 },
+                    { name: "Critical Thinking", desc: "Asks about credibility/quality", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["social media", "mental health", "teenage", "teen", "adolescent", "wellbeing", "effects"],
+                    context: ["debate", "research", "health class", "perspectives", "both sides", "arguments"],
+                    format: ["balanced", "perspectives", "evidence", "studies", "examples", "credible"],
+                    actionable: ["research", "analyse", "analyze", "compare", "identify", "help understand", "evidence"]
+                },
+                examplePrompt: "Act as an objective research assistant. I'm preparing for a Health class debate on 'Social media has a negative impact on teenage mental health.' Help me understand both sides: 1) Summarise arguments that social media harms teen mental health (with types of evidence like studies or statistics), 2) Summarise arguments that social media can benefit teen mental health, 3) Identify what makes an argument credible vs weak in this topic (sample sizes, correlation vs causation, etc.). Present neutrally - I need to understand all perspectives.",
+                responseExample: null
+            },
+
+            // RESEARCH & SUMMARISATION
+            {
+                title: "Article Summarisation",
+                category: "Research",
+                difficulty: "medium",
+                scenario: "You've found a long, complex journal article about climate change adaptation in Australian cities. You need to extract the key points relevant to your Geography project without reading all 20 pages.",
+                hints: [
+                    "Describe what article is about",
+                    "Specify what information you need from it",
+                    "Ask for structured summary with clear sections",
+                    "Mention your project focus to get relevant points only"
+                ],
+                criteria: [
+                    { name: "Article Context", desc: "Describes the article topic", weight: 20 },
+                    { name: "Targeted Extraction", desc: "Specifies what info is needed", weight: 30 },
+                    { name: "Structure Requested", desc: "Asks for organised summary", weight: 25 },
+                    { name: "Relevance Filter", desc: "Mentions project focus", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["article", "journal", "climate change", "adaptation", "australia", "cities"],
+                    context: ["long", "complex", "extract", "relevant", "geography project", "need to know"],
+                    format: ["summary", "key points", "main", "sections", "structure", "organised", "organized"],
+                    actionable: ["summarise", "summarize", "extract", "key points", "main ideas", "relevant to"]
+                },
+                examplePrompt: "Help me extract key information from a journal article about climate change adaptation strategies in Australian cities. My Geography project focuses on how Perth is preparing for climate change. From the article, I need: 1) Main adaptation strategies mentioned (infrastructure, policy, community), 2) Specific examples from Australian cities (especially Perth if mentioned), 3) Challenges to implementation, 4) Effectiveness or outcomes. Summarise each section in 2-3 bullet points, focusing only on what's relevant to Australian urban adaptation.",
+                responseExample: null
+            },
+
+            // PROFESSIONAL COMMUNICATION
+            {
+                title: "Job Application Email",
+                category: "Professional Communication",
+                difficulty: "easy",
+                scenario: "You're applying for a part-time barista job at a local café in your WA town. You need AI to help write a professional email to the manager expressing interest and highlighting your suitability.",
+                hints: [
+                    "Specify the type of job and setting (casual café position)",
+                    "Mention your situation (Year 12 student, part-time availability)",
+                    "Ask for a professional but friendly tone - it's hospitality!",
+                    "Request specific sections (introduction, skills, availability)"
+                ],
+                criteria: [
+                    { name: "Job Details", desc: "Mentions café/barista role", weight: 20 },
+                    { name: "Personal Context", desc: "Includes student status, availability", weight: 25 },
+                    { name: "Tone Specified", desc: "Mentions professional/friendly tone", weight: 25 },
+                    { name: "Structure Request", desc: "Asks for specific email sections", weight: 30 }
+                ],
+                keywords: {
+                    topic: ["café", "cafe", "coffee", "barista", "hospitality", "part-time", "part time", "casual", "job"],
+                    context: ["student", "year 12", "school", "available", "weekend", "after school", "local", "applying"],
+                    format: ["email", "professional", "friendly", "tone", "sections", "introduction"],
+                    actionable: ["write", "draft", "help", "create", "express interest", "highlight"]
+                },
+                examplePrompt: "Help me write a professional but friendly email applying for a part-time barista position at a local café in Fremantle. I'm a Year 12 student available for weekend and after-school shifts (4-5 hours). Include: 1) Brief introduction expressing genuine interest, 2) Mention I'm reliable, good with customers, and eager to learn (no café experience yet), 3) Availability statement, 4) Professional closing. Keep it under 150 words and appropriate for a casual hospitality setting in Australia.",
+                responseExample: {
+                    weak: "Write me a job email for a café.",
+                    weakResponse: "Dear Hiring Manager,\n\nI am writing to apply for a position at your café. I am a hard worker and would like to work for you.\n\nThank you for your consideration.\n\nSincerely,\n[Name]",
+                    strong: "Help me draft an email applying for a part-time barista role at a local café. I'm a Year 12 student, available weekends. Tone: professional but friendly (hospitality). Include: interest in role, reliability and customer service focus, availability, and enthusiasm to learn. Under 150 words.",
+                    strongResponse: "Subject: Application for Part-Time Barista Position\n\nDear [Café Manager],\n\nI'm writing to express my interest in the part-time barista position at [Café Name]. As a Year 12 student with a genuine passion for coffee culture, I'm keen to join your team and contribute to creating great customer experiences.\n\nWhile I'm new to café work, I'm a quick learner who's reliable and loves working with people. I'm available for weekend shifts and after-school hours (4-5 hours), and I'm excited about the opportunity to develop my skills in a professional hospitality environment.\n\nI'd love the chance to discuss how I can contribute to your team. Thank you for considering my application.\n\nWarm regards,\n[Your Name]\n[Phone] | [Email]"
+                }
+            },
+
+            // PROFESSIONAL COMMUNICATION
+            {
+                title: "Formal Request Email",
+                category: "Professional Communication",
+                difficulty: "medium",
+                scenario: "You need to email a local business owner to request an interview for your Business Management assignment about entrepreneurship in WA. Write a prompt to help you craft a professional, persuasive email.",
+                hints: [
+                    "Explain the context (school assignment, interview request)",
+                    "Mention you need to be respectful of their time",
+                    "Ask for appropriate professional tone",
+                    "Request structure: introduction, purpose, what you're asking, next steps"
+                ],
+                criteria: [
+                    { name: "Purpose Clear", desc: "Explains interview for assignment", weight: 25 },
+                    { name: "Respect/Courtesy", desc: "Acknowledges their time/expertise", weight: 25 },
+                    { name: "Professional Tone", desc: "Specifies formal business tone", weight: 25 },
+                    { name: "Complete Structure", desc: "Asks for all email components", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["interview", "business", "entrepreneur", "business management", "assignment", "request"],
+                    context: ["school", "year 12", "assignment", "project", "local", "wa", "respectful"],
+                    format: ["professional", "formal", "email", "structure", "introduction", "purpose"],
+                    actionable: ["request", "ask", "interview", "help write", "draft", "persuasive"]
+                },
+                examplePrompt: "Help me write a professional email requesting an interview with a local business owner for my Year 12 Business Management assignment on entrepreneurship in WA. The email should: 1) Introduce myself and my school, 2) Explain the assignment purpose (studying successful local entrepreneurs), 3) Request a 20-30 minute interview (in-person or phone), 4) Show respect for their time and expertise, 5) Suggest flexibility and next steps. Tone: professional and courteous but not overly formal. Around 200 words.",
+                responseExample: null
+            },
+
+            // PROBLEM SOLVING
+            {
+                title: "Decision Analysis",
+                category: "Problem Solving",
+                difficulty: "medium",
+                scenario: "You need to decide between three universities for next year: UWA (close to home), Curtin (better for your course), or Murdoch (offers scholarship). You want AI to help you analyse the decision systematically.",
+                hints: [
+                    "List the specific options and key factors",
+                    "Ask for a decision-making framework or method",
+                    "Request pros/cons for each option",
+                    "Mention what matters to you (priorities)"
+                ],
+                criteria: [
+                    { name: "Options Listed", desc: "Provides specific choices", weight: 25 },
+                    { name: "Framework Requested", desc: "Asks for structured analysis method", weight: 25 },
+                    { name: "Factors Identified", desc: "Mentions decision criteria", weight: 25 },
+                    { name: "Priorities Stated", desc: "Indicates what matters most", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["university", "uni", "decision", "choose", "uwa", "curtin", "murdoch", "options"],
+                    context: ["need to decide", "next year", "course", "scholarship", "close to home"],
+                    format: ["analyse", "analyze", "pros", "cons", "framework", "systematic", "compare"],
+                    actionable: ["help decide", "analyse", "analyze", "compare", "weigh", "framework", "systematic"]
+                },
+                examplePrompt: "Help me analyse a university decision using a systematic framework. Options: 1) UWA - close to home, see friends often, 2) Curtin - best program for my course (engineering), more industry connections, 3) Murdoch - offers $5000 scholarship, good facilities. Important factors: course quality (highest priority), cost, lifestyle/social life, career outcomes. Create a pros/cons analysis for each option, then suggest a decision framework (like weighted scoring) to help me compare objectively. I want a method I can apply, not just a recommendation.",
+                responseExample: null
+            },
+
+            // PROBLEM SOLVING
+            {
+                title: "Project Planning",
+                category: "Problem Solving",
+                difficulty: "hard",
+                scenario: "You're organising a fundraising event at school for charity. You have 6 weeks, a budget of $500, and need to coordinate with teachers, students, and local businesses. You need help creating a realistic project plan.",
+                hints: [
+                    "Describe the project scope and constraints (time, budget, people)",
+                    "Ask for a structured planning approach (timeline, tasks, milestones)",
+                    "Request risk identification and mitigation strategies",
+                    "Mention key stakeholders to coordinate with"
+                ],
+                criteria: [
+                    { name: "Scope Defined", desc: "Clear constraints and goals", weight: 25 },
+                    { name: "Structured Plan", desc: "Asks for timeline/tasks/milestones", weight: 25 },
+                    { name: "Risk Management", desc: "Requests risk identification", weight: 25 },
+                    { name: "Stakeholders", desc: "Mentions coordination needs", weight: 25 }
+                ],
+                keywords: {
+                    topic: ["fundraising", "event", "project", "organise", "organize", "school", "charity"],
+                    context: ["6 weeks", "budget", "$500", "coordinate", "teachers", "students", "businesses"],
+                    format: ["plan", "timeline", "tasks", "milestones", "structure", "organised", "organized"],
+                    actionable: ["help plan", "create", "organise", "organize", "timeline", "risks", "coordinate"]
+                },
+                examplePrompt: "Act as a project management advisor. Help me plan a school charity fundraising event with these constraints: 6 weeks timeline, $500 budget, need to coordinate with teachers, students, and local businesses. I need: 1) A week-by-week timeline with key milestones, 2) Main task categories and who's responsible, 3) Budget allocation suggestions, 4) Potential risks and how to handle them (e.g., low turnout, vendor cancellation), 5) Key coordination points with stakeholders. Format as a structured project plan I can follow.",
+                responseExample: null
+            }
+        ];
+
+        // Achievements system
+        const achievements = [
+            { id: 'first_steps', icon: '🎯', name: 'First Steps', desc: 'Complete your first challenge', unlocked: false },
+            { id: 'halfway', icon: '⚡', name: 'Halfway Hero', desc: 'Complete 8 challenges', unlocked: false },
+            { id: 'completionist', icon: '🏆', name: 'Completionist', desc: 'Complete all 15 challenges', unlocked: false },
+            { id: 'perfectionist', icon: '💯', name: 'Perfectionist', desc: 'Score 100 on any challenge', unlocked: false },
+            { id: 'streak_master', icon: '🔥', name: 'Streak Master', desc: 'Get 5 challenges in a row above 80%', unlocked: false },
+            { id: 'speed_demon', icon: '⏱️', name: 'Speed Demon', desc: 'Complete a challenge in under 1 minute', unlocked: false },
+            { id: 'rtcfce_pro', icon: '🛠️', name: 'RTCFCE Pro', desc: 'Use the Prompt Builder 5 times', unlocked: false },
+            { id: 'category_master', icon: '🎓', name: 'Category Master', desc: 'Score 85+ in all 6 categories', unlocked: false }
+        ];
+
+        // Game state
+        let currentMode = 'training';
+        let currentChallenge = 0;
+        let scores = [];
+        let totalPoints = 0;
+        let currentStreak = 0;
+        let maxStreak = 0;
+        let challengeStartTime = null;
+        let timerInterval = null;
+        let builderUseCount = 0;
+        let categoryScores = {
+            'WACE Study': [],
+            'Creative Writing': [],
+            'Code Debugging': [],
+            'Research': [],
+            'Professional Communication': [],
+            'Problem Solving': []
+        };
+
+        // Initialize
+        function init() {
+            renderAchievements();
+        }
+
+        function renderAchievements() {
+            const bar = document.getElementById('achievementsBar');
+            bar.innerHTML = achievements.map(a => `
+                <div class="achievement-badge ${a.unlocked ? 'unlocked' : 'locked'}" data-id="${a.id}">
+                    <span>${a.icon}</span>
+                    <div class="achievement-tooltip">${a.name}: ${a.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        function unlockAchievement(id) {
+            const achievement = achievements.find(a => a.id === id);
+            if (achievement && !achievement.unlocked) {
+                achievement.unlocked = true;
+                renderAchievements();
+                // Could add notification animation here
+            }
+        }
+
+        function checkAchievements() {
+            // First Steps
+            if (scores.length >= 1) unlockAchievement('first_steps');
+
+            // Halfway Hero
+            if (scores.length >= 8) unlockAchievement('halfway');
+
+            // Completionist
+            if (scores.length >= 15) unlockAchievement('completionist');
+
+            // Perfectionist
+            if (scores.some(s => s >= 100)) unlockAchievement('perfectionist');
+
+            // Streak Master
+            if (currentStreak >= 5) unlockAchievement('streak_master');
+
+            // RTCFCE Pro
+            if (builderUseCount >= 5) unlockAchievement('rtcfce_pro');
+
+            // Category Master
+            const allCategoriesGood = Object.values(categoryScores).every(scores =>
+                scores.length > 0 && scores.some(s => s >= 85)
+            );
+            if (allCategoriesGood) unlockAchievement('category_master');
+        }
+
+        function updateStats() {
+            document.getElementById('totalPointsDisplay').textContent = totalPoints;
+            document.getElementById('streakDisplay').textContent = currentStreak;
+            document.getElementById('completedDisplay').textContent = scores.length;
+        }
+
+        function showModeSelection() {
+            document.getElementById('introScreen').classList.add('hidden');
+            document.getElementById('modeScreen').classList.remove('hidden');
+        }
+
+        function backToIntro() {
+            document.getElementById('modeScreen').classList.add('hidden');
+            document.getElementById('introScreen').classList.remove('hidden');
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeScreen').classList.add('hidden');
+            document.getElementById('challengeScreen').classList.remove('hidden');
+            document.getElementById('statsBar').classList.remove('hidden');
+            document.getElementById('achievementsBar').classList.remove('hidden');
+            document.getElementById('progressTracker').classList.remove('hidden');
+
+            // Show/hide mode-specific features
+            if (mode === 'challenge') {
+                document.getElementById('timerDisplay').classList.remove('hidden');
+            }
+
+            if (mode === 'sandbox') {
+                document.getElementById('promptBuilder').classList.remove('hidden');
+            }
+
+            renderProgressDots();
+            loadChallenge();
+        }
+
+        function renderProgressDots() {
+            const tracker = document.getElementById('progressTracker');
+            tracker.innerHTML = challenges.map((_, i) =>
+                `<div class="progress-dot" id="dot-${i}"></div>`
+            ).join('');
+        }
+
+        function updateProgressDots() {
+            challenges.forEach((_, i) => {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.className = 'progress-dot';
+                if (i < currentChallenge) {
+                    dot.classList.add('completed');
+                } else if (i === currentChallenge) {
+                    dot.classList.add('current');
+                }
+            });
+        }
+
+        function loadChallenge() {
+            const challenge = challenges[currentChallenge];
+            updateProgressDots();
+
+            document.getElementById('challengeNumber').textContent = `Challenge ${currentChallenge + 1} of ${challenges.length}`;
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            document.getElementById('challengeCategory').textContent = challenge.category;
+
+            const badge = document.getElementById('difficultyBadge');
+            badge.textContent = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1);
+            badge.className = `difficulty-badge ${challenge.difficulty}`;
+
+            document.getElementById('scenarioText').textContent = challenge.scenario;
+
+            // Show response examples if available
+            if (challenge.responseExample) {
+                document.getElementById('responseExamples').classList.remove('hidden');
+                document.getElementById('weakPromptText').textContent = challenge.responseExample.weak;
+                document.getElementById('weakResponseText').textContent = challenge.responseExample.weakResponse;
+                document.getElementById('strongPromptText').textContent = challenge.responseExample.strong;
+                document.getElementById('strongResponseText').textContent = challenge.responseExample.strongResponse;
+            } else {
+                document.getElementById('responseExamples').classList.add('hidden');
+            }
+
+            // Render hints
+            const hintsContent = document.getElementById('hintsContent');
+            hintsContent.innerHTML = challenge.hints.map(hint => `
+                <div class="hint-item">
+                    <span class="hint-icon">💡</span>
+                    <span>${hint}</span>
+                </div>
+            `).join('');
+            hintsContent.classList.remove('visible');
+            document.getElementById('hintsToggleText').textContent = 'Show Hints';
+
+            // Reset input
+            document.getElementById('promptInput').value = '';
+            document.getElementById('charCount').textContent = '0';
+
+            // Reset feedback
+            document.getElementById('feedbackPanel').classList.remove('visible');
+            document.getElementById('submitBtn').style.display = 'block';
+
+            // Start timer for challenge mode
+            if (currentMode === 'challenge') {
+                startTimer();
+            }
+
+            challengeStartTime = Date.now();
+        }
+
+        function startTimer() {
+            let timeLeft = 180; // 3 minutes in seconds
+            updateTimerDisplay(timeLeft);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft);
+
+                if (timeLeft <= 30) {
+                    document.getElementById('timerDisplay').classList.add('warning');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    evaluatePrompt(); // Auto-submit
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            document.getElementById('timerDisplay').classList.remove('warning');
+        }
+
+        function toggleHints() {
+            const content = document.getElementById('hintsContent');
+            const text = document.getElementById('hintsToggleText');
+            content.classList.toggle('visible');
+            text.textContent = content.classList.contains('visible') ? 'Hide Hints' : 'Show Hints';
+        }
+
+        // Prompt Builder functions
+        function toggleBuilder() {
+            const content = document.querySelector('.builder-content');
+            const btn = document.querySelector('.builder-toggle');
+            content.classList.toggle('visible');
+            btn.textContent = content.classList.contains('visible') ? 'Collapse' : 'Expand';
+        }
+
+        function updateBuilderPreview() {
+            const role = document.getElementById('builderRole').value;
+            const task = document.getElementById('builderTask').value;
+            const context = document.getElementById('builderContext').value;
+            const format = document.getElementById('builderFormat').value;
+            const constraints = document.getElementById('builderConstraints').value;
+            const examples = document.getElementById('builderExamples').value;
+
+            let preview = '';
+            if (role) preview += role + '. ';
+            if (task) preview += task + '. ';
+            if (context) preview += context + '. ';
+            if (format) preview += 'Format: ' + format + '. ';
+            if (constraints) preview += 'Constraints: ' + constraints + '. ';
+            if (examples) preview += 'Examples: ' + examples;
+
+            document.getElementById('builderPreview').textContent =
+                preview || 'Fill in the fields above to build your prompt...';
+        }
+
+        function clearBuilder() {
+            document.getElementById('builderRole').value = '';
+            document.getElementById('builderTask').value = '';
+            document.getElementById('builderContext').value = '';
+            document.getElementById('builderFormat').value = '';
+            document.getElementById('builderConstraints').value = '';
+            document.getElementById('builderExamples').value = '';
+            updateBuilderPreview();
+        }
+
+        function useBuiltPrompt() {
+            const preview = document.getElementById('builderPreview').textContent;
+            if (preview !== 'Fill in the fields above to build your prompt...') {
+                document.getElementById('promptInput').value = preview;
+                document.getElementById('charCount').textContent = preview.length;
+                builderUseCount++;
+                checkAchievements();
+            }
+        }
+
+        // Update character count
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            const input = document.getElementById('promptInput');
+            if (input) {
+                input.addEventListener('input', function() {
+                    document.getElementById('charCount').textContent = this.value.length;
+                });
+            }
+
+            // Add builder input listeners
+            const builderInputs = ['builderRole', 'builderTask', 'builderContext', 'builderFormat', 'builderConstraints', 'builderExamples'];
+            builderInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', updateBuilderPreview);
+                }
+            });
+        });
+
+        function evaluatePrompt() {
+            stopTimer();
+
+            const prompt = document.getElementById('promptInput').value.toLowerCase();
+            const challenge = challenges[currentChallenge];
+
+            if (prompt.trim().length < 20) {
+                alert('Please write a more detailed prompt (at least 20 characters)');
+                if (currentMode === 'challenge') startTimer();
+                return;
+            }
+
+            let score = 0;
+            const criteriaResults = [];
+
+            // Evaluate each criterion based on keywords
+            challenge.criteria.forEach((criterion, index) => {
+                let keywordCategory;
+                if (index === 0) keywordCategory = 'topic';
+                else if (index === 1) keywordCategory = 'context';
+                else if (index === 2) keywordCategory = 'format';
+                else keywordCategory = 'actionable';
+
+                const keywords = challenge.keywords[keywordCategory] || [];
+                const found = keywords.filter(kw => prompt.includes(kw.toLowerCase()));
+                const matchRatio = Math.min(found.length / Math.max(2, keywords.length * 0.3), 1);
+
+                let status, earnedPoints;
+                if (matchRatio >= 0.6) {
+                    status = 'pass';
+                    earnedPoints = criterion.weight;
+                } else if (matchRatio >= 0.3) {
+                    status = 'partial';
+                    earnedPoints = Math.round(criterion.weight * 0.5);
+                } else {
+                    status = 'fail';
+                    earnedPoints = 0;
+                }
+
+                score += earnedPoints;
+                criteriaResults.push({
+                    name: criterion.name,
+                    desc: criterion.desc,
+                    status: status,
+                    points: earnedPoints,
+                    maxPoints: criterion.weight
+                });
+            });
+
+            // Bonus for length (good prompts are usually detailed)
+            if (prompt.length > 150) score = Math.min(score + 5, 100);
+            if (prompt.length > 250) score = Math.min(score + 5, 100);
+
+            // Bonus points for challenge mode based on speed
+            if (currentMode === 'challenge') {
+                const timeElapsed = (Date.now() - challengeStartTime) / 1000; // seconds
+                if (timeElapsed < 60) {
+                    score = Math.min(score + 10, 100);
+                    unlockAchievement('speed_demon');
+                } else if (timeElapsed < 120) {
+                    score = Math.min(score + 5, 100);
+                }
+            }
+
+            // Update streak
+            if (score >= 80) {
+                currentStreak++;
+                maxStreak = Math.max(maxStreak, currentStreak);
+            } else {
+                currentStreak = 0;
+            }
+
+            scores.push(score);
+            totalPoints += score;
+
+            // Track category scores
+            categoryScores[challenge.category].push(score);
+
+            checkAchievements();
+            updateStats();
+
+            // Display results
+            displayFeedback(score, criteriaResults, prompt, challenge.examplePrompt);
+        }
+
+        function displayFeedback(score, criteriaResults, userPrompt, examplePrompt) {
+            const circle = document.getElementById('scoreCircle');
+            const label = document.getElementById('scoreLabel');
+            const sublabel = document.getElementById('scoreSublabel');
+            const pointsEarned = document.getElementById('pointsEarned');
+
+            circle.textContent = score;
+            circle.className = 'score-circle';
+
+            if (score >= 80) {
+                circle.classList.add('excellent');
+                label.textContent = 'Excellent!';
+                sublabel.textContent = 'Your prompt covers all key elements effectively.';
+            } else if (score >= 50) {
+                circle.classList.add('good');
+                label.textContent = 'Good Work!';
+                sublabel.textContent = 'Your prompt is decent but could be more comprehensive.';
+            } else {
+                circle.classList.add('needs-work');
+                label.textContent = 'Needs Improvement';
+                sublabel.textContent = 'Review the hints and try to include more specifics.';
+            }
+
+            pointsEarned.textContent = `+${score} points`;
+
+            // Render criteria
+            const criteriaList = document.getElementById('criteriaList');
+            criteriaList.innerHTML = criteriaResults.map(c => `
+                <div class="criteria-item">
+                    <div class="criteria-name">
+                        <span class="criteria-icon">${c.status === 'pass' ? '✅' : c.status === 'partial' ? '⚡' : '❌'}</span>
+                        <span class="criteria-text">${c.name}</span>
+                    </div>
+                    <span class="criteria-status ${c.status}">${c.points}/${c.maxPoints}</span>
+                </div>
+            `).join('');
+
+            // Show prompts comparison
+            document.getElementById('yourPromptText').textContent = document.getElementById('promptInput').value;
+            document.getElementById('examplePromptText').textContent = examplePrompt;
+
+            // Update next button
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.textContent = currentChallenge < challenges.length - 1 ? 'Next Challenge →' : 'View Results →';
+
+            // Show feedback
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('feedbackPanel').classList.add('visible');
+        }
+
+        function tryAgain() {
+            const lastScore = scores.pop();
+            totalPoints -= lastScore;
+            currentStreak = 0; // Reset streak on retry
+            updateStats();
+
+            document.getElementById('feedbackPanel').classList.remove('visible');
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('promptInput').focus();
+
+            if (currentMode === 'challenge') {
+                startTimer();
+            }
+        }
+
+        function nextChallenge() {
+            currentChallenge++;
+            if (currentChallenge < challenges.length) {
+                loadChallenge();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('challengeScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+            const bestScore = Math.max(...scores);
+
+            document.getElementById('finalScore').textContent = totalPoints;
+            document.getElementById('challengesCompleted').textContent = scores.length;
+            document.getElementById('avgScore').textContent = avgScore + '%';
+            document.getElementById('bestScore').textContent = bestScore + '%';
+            document.getElementById('maxStreak').textContent = maxStreak;
+
+            // Show unlocked achievements
+            const unlockedAchievements = achievements.filter(a => a.unlocked);
+            const achievementsGrid = document.getElementById('unlockedAchievements');
+            achievementsGrid.innerHTML = unlockedAchievements.map(a => `
+                <div class="achievement-item">
+                    <div class="achievement-icon-large">${a.icon}</div>
+                    <div class="achievement-name">${a.name}</div>
+                    <div class="achievement-desc">${a.desc}</div>
+                </div>
+            `).join('') || '<p style="color: var(--text-secondary);">Complete challenges to unlock achievements!</p>';
+        }
+
+        function backToModeSelect() {
+            // Reset game state
+            currentChallenge = 0;
+            scores = [];
+            totalPoints = 0;
+            currentStreak = 0;
+            builderUseCount = 0;
+            categoryScores = {
+                'WACE Study': [],
+                'Creative Writing': [],
+                'Code Debugging': [],
+                'Research': [],
+                'Professional Communication': [],
+                'Problem Solving': []
+            };
+
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('modeScreen').classList.remove('hidden');
+            document.getElementById('statsBar').classList.add('hidden');
+            document.getElementById('achievementsBar').classList.add('hidden');
+            document.getElementById('progressTracker').classList.add('hidden');
+
+            updateStats();
+        }
+
+        function restartTraining() {
+            currentChallenge = 0;
+            scores = [];
+            totalPoints = 0;
+            currentStreak = 0;
+            categoryScores = {
+                'WACE Study': [],
+                'Creative Writing': [],
+                'Code Debugging': [],
+                'Research': [],
+                'Professional Communication': [],
+                'Problem Solving': []
+            };
+
+            updateStats();
+
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('challengeScreen').classList.remove('hidden');
+
+            // Re-enable mode-specific features
+            if (currentMode === 'challenge') {
+                document.getElementById('timerDisplay').classList.remove('hidden');
+            }
+            if (currentMode === 'sandbox') {
+                document.getElementById('promptBuilder').classList.remove('hidden');
+            }
+
+            loadChallenge();
+        }
+    </script>
+</body>
+</html>

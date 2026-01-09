@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot the Scam // Week 9 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1c1c1c;
+            --accent-red: #ff3b3b;
+            --accent-orange: #ff9500;
+            --accent-green: #00d26a;
+            --accent-blue: #007aff;
+            --accent-purple: #af52de;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        /* Slide container */
+        .slides-container {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-orange));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            color: var(--accent-red);
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* Stat slides */
+        .stat-huge {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(6rem, 20vw, 15rem);
+            font-weight: 400;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Story slides */
+        .story-container {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .story-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .story-quote::before {
+            content: '"';
+            font-size: 8rem;
+            position: absolute;
+            top: -3rem;
+            left: -2rem;
+            color: var(--accent-red);
+            opacity: 0.3;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        .story-attribution {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .story-attribution strong {
+            color: var(--text-secondary);
+        }
+
+        .story-context {
+            font-size: 1rem;
+            color: var(--accent-orange);
+            margin-top: 0.5rem;
+        }
+
+        /* Message simulation */
+        .phone-mockup {
+            background: var(--bg-card);
+            border-radius: 40px;
+            padding: 1rem;
+            max-width: 380px;
+            border: 3px solid #333;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .phone-screen {
+            background: #000;
+            border-radius: 30px;
+            padding: 2rem 1rem;
+            min-height: 400px;
+        }
+
+        .phone-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .phone-contact {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .message-bubble {
+            background: #333;
+            border-radius: 18px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            max-width: 85%;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message-bubble.scam {
+            border: 2px solid var(--accent-red);
+        }
+
+        /* Red flags list */
+        .red-flags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .red-flag-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .red-flag-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .red-flag-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .red-flag-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Types grid */
+        .scam-types-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+        }
+
+        .scam-type-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .scam-type-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .scam-type-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .scam-type-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .scam-type-stat {
+            font-size: 0.9rem;
+            color: var(--accent-orange);
+        }
+
+        /* Activity link */
+        .activity-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+            border-radius: 100px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .activity-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 59, 59, 0.4);
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .column-text .highlight {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            text-align: left;
+            max-width: 700px;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .timeline-time {
+            width: 80px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--accent-orange);
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            flex: 1;
+        }
+
+        /* Age demographics */
+        .demographics-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .demo-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .demo-label {
+            width: 80px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .demo-bar {
+            flex: 1;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .demo-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Fullscreen hint */
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Chart styling */
+        .chart-container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-label {
+            width: 180px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .chart-bar-fill {
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Video embed */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide {
+                padding: 2rem;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .scam-types-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .red-flags-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-label {
+                width: 120px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Dark slide variations */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #1a0000 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(255, 59, 59, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(255, 149, 0, 0.1) 0%, transparent 50%);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; opacity: 0; }
+        .delay-2 { animation-delay: 0.4s; opacity: 0; }
+        .delay-3 { animation-delay: 0.6s; opacity: 0; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title animate-in">Spot the <em>Scam</em></h1>
+            <p class="slide-subtitle animate-in delay-1">How Australians are losing billions to digital deception — and how you can protect yourself</p>
+            <p class="stat-source animate-in delay-2">Week 9 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Big Number -->
+        <div class="slide">
+            <div class="stat-huge">$2.03B</div>
+            <p class="stat-label">Lost by Australians to scams in 2024</p>
+            <p class="stat-source">Source: Scamwatch / National Anti-Scam Centre, March 2025</p>
+        </div>
+
+        <!-- Slide 3: Context -->
+        <div class="slide gradient-bg">
+            <div class="story-container">
+                <h2 class="slide-title" style="font-size: 3rem;">That's enough to buy</h2>
+                <div style="display: flex; gap: 3rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem;">🏠</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">2,900 houses</div>
+                        <div style="color: var(--text-muted);">in Perth</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem;">🎓</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">50,000</div>
+                        <div style="color: var(--text-muted);">uni degrees</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem;">🚗</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">40,000 cars</div>
+                        <div style="color: var(--text-muted);">brand new</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Real Story 1 -->
+        <div class="slide">
+            <div class="story-container">
+                <p class="story-quote">"My understanding of being scammed was that it could happen to anybody, but I wouldn't find myself being a victim."</p>
+                <p class="story-attribution">— <strong>Romance scam victim</strong>, Australia 2024</p>
+                <p class="story-context">Matched with "Tara" on a dating app. Every time he suggested meeting, circumstances prevented it. The emotional manipulation created "an emotional whiplash" that reeled him back in.</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Real Story 2 - Employment -->
+        <div class="slide gradient-bg">
+            <div class="story-container">
+                <p class="story-quote">"Now I'm $180,000 out of pocket, which has just made life very difficult and I'm on Centrelink as well."</p>
+                <p class="story-attribution">— <strong>Employment scam victim</strong>, Australia 2024</p>
+                <p class="story-context">Offered an "online app optimisation job" paying $800 USD for 5 days of tasks. Required $100 initial investment. The system scaled up until they were spending $800 per task.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Real Story 3 - Hi Mum -->
+        <div class="slide">
+            <div class="two-column">
+                <div class="column-text">
+                    <h2>The "Hi Mum" Scam</h2>
+                    <p><span class="highlight">1,150+ Australians</span> fell victim to this scam in 2024, losing $2.6 million combined.</p>
+                    <p>Scammers impersonate children, claiming they've broken their phone and urgently need money.</p>
+                    <p><span class="highlight">37.5% increase</span> in reports to IDCARE in 2024.</p>
+                    <p style="color: var(--accent-orange);">Now evolving with AI voice cloning to make phone calls sound like your actual family member.</p>
+                </div>
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-header">
+                            <div class="phone-contact">+61 412 XXX XXX</div>
+                        </div>
+                        <div class="message-bubble scam">
+                            Hi mum, I dropped my phone in the toilet 🚽 This is my new number. Can you save it?
+                        </div>
+                        <div class="message-bubble scam">
+                            I need help paying a bill urgently - can you transfer $850 to this account? BSB: 062-XXX Acc: 1234XXXX
+                        </div>
+                        <div class="message-bubble scam">
+                            Love you xx ❤️
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Who Gets Scammed -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 3rem;">Who gets scammed?</h2>
+            <div class="demographics-bar">
+                <div class="demo-row">
+                    <span class="demo-label">65+</span>
+                    <div class="demo-bar">
+                        <div class="demo-bar-fill" style="width: 100%; background: var(--accent-red);">$99.6M lost</div>
+                    </div>
+                </div>
+                <div class="demo-row">
+                    <span class="demo-label">35-44</span>
+                    <div class="demo-bar">
+                        <div class="demo-bar-fill" style="width: 75%; background: var(--accent-orange);">Most reports with loss</div>
+                    </div>
+                </div>
+                <div class="demo-row">
+                    <span class="demo-label">25-34</span>
+                    <div class="demo-bar">
+                        <div class="demo-bar-fill" style="width: 60%; background: var(--accent-blue);">High online shopping scams</div>
+                    </div>
+                </div>
+                <div class="demo-row">
+                    <span class="demo-label">18-24</span>
+                    <div class="demo-bar">
+                        <div class="demo-bar-fill" style="width: 45%; background: var(--accent-purple);">Employment & investment scams</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">80% of "Hi Mum" scam victims are aged 55+, but young people lose more to employment and investment scams</p>
+        </div>
+
+        <!-- Slide 8: Scam Types -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Big Three</h2>
+            <div class="scam-types-grid">
+                <div class="scam-type-card">
+                    <div class="scam-type-icon">📈</div>
+                    <div class="scam-type-name">Investment Scams</div>
+                    <div class="scam-type-stat">$945M lost in 2024</div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.75rem;">Crypto "opportunities", fake trading platforms, celebrity endorsement scams</p>
+                </div>
+                <div class="scam-type-card">
+                    <div class="scam-type-icon">🎣</div>
+                    <div class="scam-type-name">Phishing Scams</div>
+                    <div class="scam-type-stat">97,831 reports</div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.75rem;">Fake emails/SMS from banks, ATO, Australia Post pretending to be legitimate</p>
+                </div>
+                <div class="scam-type-card">
+                    <div class="scam-type-icon">🛒</div>
+                    <div class="scam-type-name">Shopping Scams</div>
+                    <div class="scam-type-stat">10,022 victims</div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.75rem;">Fake online stores, marketplace scams, products that never arrive</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8.5: Australian Scam Losses by Category -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Where the Money Goes</h2>
+            <div class="chart-container">
+                <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--text-secondary);">Australian Scam Losses by Category (2024)</h3>
+                <div class="chart-bar">
+                    <div class="chart-label">Investment</div>
+                    <div class="chart-bar-fill" style="width: 100%; background: linear-gradient(90deg, var(--accent-red), #d43030);">$945 million</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Romance</div>
+                    <div class="chart-bar-fill" style="width: 25%; background: var(--accent-purple);">$245 million</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Payment redirect</div>
+                    <div class="chart-bar-fill" style="width: 18%; background: var(--accent-orange);">$177 million</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Phishing</div>
+                    <div class="chart-bar-fill" style="width: 12%; background: var(--accent-blue);">$122 million</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Employment</div>
+                    <div class="chart-bar-fill" style="width: 8%; background: var(--accent-green);">$82 million</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Shopping</div>
+                    <div class="chart-bar-fill" style="width: 6%; background: #ff9500);">$56 million</div>
+                </div>
+            </div>
+            <p class="stat-source">Source: ACCC Scamwatch 2024 Annual Report • Investment scams account for 47% of all losses</p>
+        </div>
+
+        <!-- Slide 8.75: Australian Impersonation Scams -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">They Pretend to Be <em>Real</em></h2>
+            <div class="red-flags-grid">
+                <div class="red-flag-card" style="border-color: var(--accent-blue);">
+                    <div class="red-flag-icon">📱</div>
+                    <div class="red-flag-title">Optus / Telstra Scams</div>
+                    <div class="red-flag-desc">"Your account has been suspended" or "Urgent bill payment required." Uses fake sender IDs that look like real telco numbers. Links to fake payment pages.</div>
+                </div>
+                <div class="red-flag-card" style="border-color: var(--accent-green);">
+                    <div class="red-flag-icon">💰</div>
+                    <div class="red-flag-title">ATO Tax Scams</div>
+                    <div class="red-flag-desc">"You owe back taxes" or "Tax refund available." Threatens legal action or arrest. The real ATO never demands immediate payment by gift card or crypto.</div>
+                </div>
+                <div class="red-flag-card" style="border-color: var(--accent-orange);">
+                    <div class="red-flag-icon">📦</div>
+                    <div class="red-flag-title">Australia Post Scams</div>
+                    <div class="red-flag-desc">"Parcel waiting for delivery, pay $2.50 fee." Fake tracking links. Real AusPost uses mypost.com.au domain, not variations.</div>
+                </div>
+                <div class="red-flag-card" style="border-color: var(--accent-purple);">
+                    <div class="red-flag-icon">🏦</div>
+                    <div class="red-flag-title">Bank Impersonation</div>
+                    <div class="red-flag-desc">Commonwealth, NAB, ANZ, Westpac logos in fake emails. "Verify your identity" or "Suspicious activity detected." Banks never ask for passwords via email or SMS.</div>
+                </div>
+            </div>
+            <p class="stat-source">These are the most impersonated brands in Australia • Always verify through official apps or websites</p>
+        </div>
+
+        <!-- Slide 9: ATO Scam Story -->
+        <div class="slide gradient-bg">
+            <div class="story-container">
+                <p class="story-quote">"I prided myself on being tech savvy. I never saw that I was a potential victim."</p>
+                <p class="story-attribution">— <strong>ATO impersonation scam victim</strong></p>
+                <p class="story-context">Targeted during poor mental health when behind on taxes. The caller claimed the ATO would prosecute him and needed money "today to show good faith." Scammers exploited shame, prevented him from hanging up, and demanded gift cards.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: How Scams Work -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Scammer's Playbook</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-time">Step 1</span>
+                    <div class="timeline-content">
+                        <strong>Create Urgency</strong> — "Act now or lose your account/money/package"
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-time">Step 2</span>
+                    <div class="timeline-content">
+                        <strong>Exploit Emotions</strong> — Fear, greed, love, or shame make you act without thinking
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-time">Step 3</span>
+                    <div class="timeline-content">
+                        <strong>Impersonate Trust</strong> — Pretend to be banks, government, family, or companies you know
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-time">Step 4</span>
+                    <div class="timeline-content">
+                        <strong>Isolate You</strong> — Keep you on the phone, tell you not to tell anyone, create pressure
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-time">Step 5</span>
+                    <div class="timeline-content">
+                        <strong>Extract Value</strong> — Bank transfers, gift cards, crypto, or personal information
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Red Flags -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">🚩 Red Flags to Spot</h2>
+            <div class="red-flags-grid">
+                <div class="red-flag-card">
+                    <div class="red-flag-icon">⏰</div>
+                    <div class="red-flag-title">Urgency & Pressure</div>
+                    <div class="red-flag-desc">"Act now", "24 hours only", "Your account will be closed" — legitimate organisations don't pressure you like this</div>
+                </div>
+                <div class="red-flag-card">
+                    <div class="red-flag-icon">🔗</div>
+                    <div class="red-flag-title">Suspicious Links</div>
+                    <div class="red-flag-desc">Links that look almost right: "auspost-delivery.com.au" instead of "auspost.com.au"</div>
+                </div>
+                <div class="red-flag-card">
+                    <div class="red-flag-icon">💳</div>
+                    <div class="red-flag-title">Unusual Payment Methods</div>
+                    <div class="red-flag-desc">Gift cards, crypto, or wire transfers — legitimate companies don't ask for these</div>
+                </div>
+                <div class="red-flag-card">
+                    <div class="red-flag-icon">🤫</div>
+                    <div class="red-flag-title">"Don't Tell Anyone"</div>
+                    <div class="red-flag-desc">Scammers want to isolate you so no one can talk sense into you</div>
+                </div>
+                <div class="red-flag-card">
+                    <div class="red-flag-icon">🎁</div>
+                    <div class="red-flag-title">Too Good To Be True</div>
+                    <div class="red-flag-desc">Free money, guaranteed returns, lottery wins you didn't enter — they're not real</div>
+                </div>
+                <div class="red-flag-card">
+                    <div class="red-flag-icon">📧</div>
+                    <div class="red-flag-title">Generic Greetings</div>
+                    <div class="red-flag-desc">"Dear Customer" instead of your name — real companies know who you are</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: What To Do -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">If Something Feels Off...</h2>
+            <ul class="checklist">
+                <li>
+                    <span class="check-icon">✓</span>
+                    <span><strong>STOP</strong> — Don't click, don't reply, don't transfer money</span>
+                </li>
+                <li>
+                    <span class="check-icon">✓</span>
+                    <span><strong>VERIFY</strong> — Contact the organisation directly using their official website or app (not the contact details in the message)</span>
+                </li>
+                <li>
+                    <span class="check-icon">✓</span>
+                    <span><strong>TALK</strong> — Discuss it with someone you trust before taking action</span>
+                </li>
+                <li>
+                    <span class="check-icon">✓</span>
+                    <span><strong>REPORT</strong> — Report scams to Scamwatch.gov.au even if you didn't lose money</span>
+                </li>
+                <li>
+                    <span class="check-icon">✓</span>
+                    <span><strong>PROTECT</strong> — If you shared details, contact your bank and change passwords immediately</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 13: 2025 Warning -->
+        <div class="slide gradient-bg">
+            <div class="stat-huge" style="font-size: 8rem;">↑26%</div>
+            <p class="stat-label">Increase in scam losses in the first half of 2025 compared to 2024</p>
+            <p class="stat-source">Scams are getting more sophisticated. AI voice cloning can now make scam calls sound like your actual family members.</p>
+        </div>
+
+        <!-- Slide 13.5: Video - Scam Awareness -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">See It In Action</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/VrKW58MS12g" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">ABC News: How scammers target Australians • Real stories and expert advice</p>
+        </div>
+
+        <!-- Slide 14: Activity Intro -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 3rem;">Your Turn</h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Can you spot the scam? Test your skills with real Australian examples.</p>
+            <a href="../../activities/spot-the-scam/index.html" class="activity-link">
+                🕵️ Launch Scam Hunter
+            </a>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">10 scenarios • Australian context • Instant feedback</p>
+        </div>
+
+        <!-- Slide 15: Resources -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Resources</h2>
+            <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+                <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 2rem;">🛡️</span>
+                    <div>
+                        <div style="font-weight: 600;">Scamwatch.gov.au</div>
+                        <div style="color: var(--text-muted); font-size: 0.9rem;">Report scams, check warnings, learn more</div>
+                    </div>
+                </div>
+                <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 2rem;">🔐</span>
+                    <div>
+                        <div style="font-weight: 600;">IDCARE.org</div>
+                        <div style="color: var(--text-muted); font-size: 0.9rem;">Free help if you've been scammed or had identity stolen</div>
+                    </div>
+                </div>
+                <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 2rem;">📱</span>
+                    <div>
+                        <div style="font-weight: 600;">Your Bank's Fraud Line</div>
+                        <div style="color: var(--text-muted); font-size: 0.9rem;">Call immediately if you've transferred money</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Stay <em>Skeptical</em></h1>
+            <p class="slide-subtitle">The best defence against scams is a moment of pause before you act.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 19</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progressBar');
+        const slideCounter = document.getElementById('slideCounter');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>

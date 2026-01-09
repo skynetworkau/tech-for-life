@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOOTPRINT FINDER // Your Digital Shadow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink-dark: #0d0d0d;
+            --ink-medium: #1a1a1a;
+            --ink-light: #2a2a2a;
+            --cream: #f5f0e8;
+            --cream-dark: #e8e0d0;
+            --accent-red: #ff4444;
+            --accent-orange: #ff8c00;
+            --accent-yellow: #ffd700;
+            --accent-green: #00cc66;
+            --accent-blue: #4488ff;
+            --accent-purple: #9b59b6;
+            --text-dark: #1a1a1a;
+            --text-light: #f5f0e8;
+            --text-muted: #888888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Newspaper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+        /* Header - newspaper masthead style */
+        .masthead {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 4px double var(--ink-dark);
+            margin-bottom: 2rem;
+        }
+
+        .masthead-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .masthead-subtitle {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            margin-top: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .edition-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--ink-dark);
+            color: var(--text-muted);
+        }
+
+        /* Main article style panels */
+        .article-panel {
+            background: white;
+            border: 1px solid var(--ink-light);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 5px 5px 0 var(--ink-light);
+            position: relative;
+        }
+
+        .article-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--ink-dark);
+        }
+
+        /* Intro section */
+        .intro-headline {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-text strong {
+            background: linear-gradient(transparent 60%, var(--accent-yellow) 60%);
+        }
+
+        .stat-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--ink-dark);
+            color: var(--text-light);
+            margin: 1.5rem -2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-yellow);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+            opacity: 0.8;
+        }
+
+        .stat-source {
+            font-size: 0.65rem;
+            margin-top: 0.5rem;
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        /* Mode selection */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .mode-card {
+            padding: 1.5rem;
+            border: 2px solid var(--ink-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .mode-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .mode-card.selected {
+            border-color: var(--accent-red);
+            background: var(--cream);
+        }
+
+        .mode-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .mode-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .mode-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .mode-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Start button */
+        .start-btn {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            background: var(--ink-dark);
+            color: var(--text-light);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .start-btn:hover {
+            background: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 var(--ink-dark);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Question sections */
+        .question-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--ink-dark);
+        }
+
+        .section-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            flex: 1;
+        }
+
+        .section-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .question-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .question-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--cream);
+            border-left: 3px solid var(--ink-light);
+            transition: all 0.2s ease;
+        }
+
+        .question-item:hover {
+            border-left-color: var(--accent-blue);
+        }
+
+        .question-checkbox {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--ink-dark);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .question-checkbox.checked {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        .question-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .question-text {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .question-risk {
+            flex-shrink: 0;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 2px;
+        }
+
+        .question-risk.high {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .question-risk.medium {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .question-risk.low {
+            background: var(--accent-yellow);
+            color: var(--text-dark);
+        }
+
+        /* Progress indicator */
+        .progress-bar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--cream-dark);
+            z-index: 100;
+            margin: -2rem -2rem 2rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-red);
+            transition: width 0.3s ease;
+        }
+
+        /* Google Yourself Simulation */
+        .google-sim {
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .google-search-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid #dadce0;
+            border-radius: 24px;
+            margin-bottom: 1.5rem;
+            background: white;
+        }
+
+        .google-icon {
+            font-size: 1.2rem;
+        }
+
+        .google-search-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .google-results {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .google-result {
+            padding: 1rem;
+            border-left: 3px solid;
+            background: var(--cream);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .google-result.positive {
+            border-color: var(--accent-green);
+        }
+
+        .google-result.negative {
+            border-color: var(--accent-red);
+        }
+
+        .google-result.neutral {
+            border-color: var(--accent-blue);
+        }
+
+        .google-result:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .result-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .result-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-snippet {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .result-impact {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .google-result.active .result-impact {
+            display: block;
+        }
+
+        /* Timeline Visualisation */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+            margin: 2rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--ink-light);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 55%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            padding-left: 0;
+            padding-right: 55%;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            border: 3px solid white;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1rem;
+            border: 1px solid var(--ink-light);
+            box-shadow: 3px 3px 0 var(--ink-light);
+        }
+
+        .timeline-year {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-event {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Results panel */
+        .results-panel {
+            background: var(--ink-dark);
+            color: var(--text-light);
+            padding: 2rem;
+        }
+
+        .results-headline {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .privacy-score-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+
+        .score-svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-bg {
+            fill: none;
+            stroke: var(--ink-light);
+            stroke-width: 12;
+        }
+
+        .score-fill {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+        }
+
+        .score-breakdown {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .category-score {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-icon {
+            font-size: 1.5rem;
+            width: 40px;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-bar {
+            height: 8px;
+            background: var(--ink-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .category-bar-fill {
+            height: 100%;
+            transition: width 1s ease;
+            border-radius: 4px;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 2px;
+            letter-spacing: 0.05em;
+        }
+
+        .risk-indicator.low {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .risk-indicator.medium {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .risk-indicator.high {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background: white;
+            color: var(--text-dark);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .recommendations-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .recommendation-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .recommendation-tab {
+            padding: 0.5rem 1rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid var(--ink-light);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .recommendation-tab.active {
+            background: var(--ink-dark);
+            color: white;
+            border-color: var(--ink-dark);
+        }
+
+        .recommendation-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--cream);
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .recommendation-item.urgent {
+            border-color: var(--accent-red);
+        }
+
+        .recommendation-item.important {
+            border-color: var(--accent-orange);
+        }
+
+        .recommendation-item.suggested {
+            border-color: var(--accent-blue);
+        }
+
+        .recommendation-priority {
+            flex-shrink: 0;
+            font-size: 1.5rem;
+        }
+
+        .recommendation-content h4 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-content p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-steps {
+            margin-top: 0.75rem;
+            padding-left: 1.5rem;
+        }
+
+        .recommendation-steps li {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Action Plan Checklist */
+        .action-checklist {
+            background: var(--cream);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .checklist-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--ink-dark);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .checklist-item.completed .checklist-checkbox {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .checklist-item.completed .checklist-checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+        }
+
+        .checklist-item.completed .checklist-text {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .checklist-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        /* Platform Guides */
+        .platform-guides {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .platform-card {
+            background: var(--cream);
+            padding: 1.5rem;
+            border: 1px solid var(--ink-light);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .platform-logo {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .platform-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-tip {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.primary {
+            background: var(--ink-dark);
+            color: var(--text-light);
+            border-color: var(--ink-dark);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        .action-btn.secondary {
+            background: transparent;
+            color: var(--ink-dark);
+            border-color: var(--ink-dark);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--ink-dark);
+            color: var(--text-light);
+        }
+
+        /* Submit button for audit */
+        .submit-audit-btn {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 2rem;
+        }
+
+        .submit-audit-btn:hover {
+            background: var(--ink-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 var(--accent-red);
+        }
+
+        /* Info boxes */
+        .info-box {
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.warning {
+            background: #fff3cd;
+            border-color: var(--accent-orange);
+        }
+
+        .info-box.danger {
+            background: #f8d7da;
+            border-color: var(--accent-red);
+        }
+
+        .info-box.info {
+            background: #d1ecf1;
+            border-color: var(--accent-blue);
+        }
+
+        .info-box.success {
+            background: #d4edda;
+            border-color: var(--accent-green);
+        }
+
+        .info-box-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .slide-in {
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .stat-banner {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
+            }
+
+            .mode-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .question-item {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .question-risk {
+                align-self: flex-start;
+            }
+
+            .privacy-score-display {
+                flex-direction: column;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(odd) {
+                padding-left: 2rem;
+                padding-right: 0;
+            }
+
+            .timeline-line {
+                left: 10px;
+            }
+
+            .timeline-dot {
+                left: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .platform-guides {
+                grid-template-columns: 1fr;
+            }
+
+            .article-panel {
+                padding: 1.5rem;
+            }
+
+            .progress-bar {
+                margin-left: -1.5rem;
+                margin-right: -1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="masthead">
+            <h1 class="masthead-title">Footprint Finder</h1>
+            <p class="masthead-subtitle">Your Digital Shadow Revealed</p>
+            <div class="edition-line">
+                <span>Digital Literacy Edition</span>
+                <span>Year 12 Tech for Life</span>
+                <span id="currentDate"></span>
+            </div>
+        </header>
+
+        <main id="mainContent">
+            <!-- Intro Panel -->
+            <article id="introPanel" class="article-panel animate-in">
+                <h2 class="intro-headline">What Does the Internet Know About You?</h2>
+                <p class="intro-text">Every time you post, like, sign up, or browse online, you leave behind traces of data. This collection of information is called your <strong>digital footprint</strong> — and it can follow you for life.</p>
+                <p class="intro-text">Employers, universities, and even strangers can piece together your digital footprint to form an impression of who you are. In the digital age, your online presence is often the first impression you make. <strong>What story does yours tell?</strong></p>
+
+                <div class="stat-banner">
+                    <div class="stat-item">
+                        <div class="stat-number">77%</div>
+                        <div class="stat-label">of Australian employers search candidates online</div>
+                        <div class="stat-source">Source: CareerBuilder Australia 2023</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">68%</div>
+                        <div class="stat-label">have rejected candidates based on what they found</div>
+                        <div class="stat-source">Source: Seek Employment Survey 2024</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">26%</div>
+                        <div class="stat-label">of Gen Z have lost job opportunities due to social media</div>
+                        <div class="stat-source">Source: Australian Youth Survey 2024</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Online content can exist forever — the "digital tattoo"</div>
+                        <div class="stat-source">eSafety Commissioner</div>
+                    </div>
+                </div>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ The Digital Tattoo Effect</div>
+                    <p>Unlike a social media post you can delete, your digital footprint leaves permanent traces. Screenshots, cached pages, and archived versions mean content can resurface years later — often when you least expect it.</p>
+                </div>
+
+                <p class="intro-text">Complete this comprehensive audit to discover the size of your digital footprint, understand your privacy score, and receive personalised recommendations for protecting your online reputation.</p>
+
+                <h3 class="intro-headline" style="font-size: 1.3rem; margin-top: 2rem;">Choose Your Audit Mode</h3>
+
+                <div class="mode-selector">
+                    <div class="mode-card" onclick="selectMode('quick')">
+                        <div class="mode-icon">⚡</div>
+                        <div class="mode-title">Quick Audit</div>
+                        <div class="mode-time">~5 minutes</div>
+                        <div class="mode-description">Fast assessment covering the essentials. Perfect for a quick check of your most vulnerable areas.</div>
+                    </div>
+                    <div class="mode-card" onclick="selectMode('deep')">
+                        <div class="mode-icon">🔍</div>
+                        <div class="mode-title">Deep Dive</div>
+                        <div class="mode-time">~15 minutes</div>
+                        <div class="mode-description">Comprehensive review of all aspects of your digital presence. Includes Google simulation and detailed analysis.</div>
+                    </div>
+                    <div class="mode-card" onclick="selectMode('action')">
+                        <div class="mode-icon">📋</div>
+                        <div class="mode-title">Action Plan</div>
+                        <div class="mode-time">~20 minutes</div>
+                        <div class="mode-description">Complete audit plus a personalised step-by-step cleanup plan you can follow immediately.</div>
+                    </div>
+                </div>
+
+                <button class="start-btn" id="startButton" onclick="startAudit()" disabled>Select a Mode to Begin →</button>
+            </article>
+
+            <!-- Audit Questions -->
+            <div id="auditPanel" class="article-panel hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+
+                <!-- Social Media Privacy Section -->
+                <div class="question-section" id="section1">
+                    <div class="section-header">
+                        <span class="section-number">01</span>
+                        <span class="section-title">Social Media Privacy Audit</span>
+                    </div>
+                    <p class="section-description">How publicly visible are your social media accounts and what can others see?</p>
+                    <div class="question-grid" id="socialQuestions"></div>
+                </div>
+
+                <!-- Password & Security Section -->
+                <div class="question-section" id="section2">
+                    <div class="section-header">
+                        <span class="section-number">02</span>
+                        <span class="section-title">Password & Account Security</span>
+                    </div>
+                    <p class="section-description">How secure are your accounts from unauthorised access?</p>
+                    <div class="question-grid" id="passwordQuestions"></div>
+                </div>
+
+                <!-- Data Sharing Section -->
+                <div class="question-section" id="section3">
+                    <div class="section-header">
+                        <span class="section-number">03</span>
+                        <span class="section-title">Data Sharing Habits</span>
+                    </div>
+                    <p class="section-description">What information do you willingly share with companies and apps?</p>
+                    <div class="question-grid" id="dataQuestions"></div>
+                </div>
+
+                <!-- Online Reputation Section -->
+                <div class="question-section" id="section4">
+                    <div class="section-header">
+                        <span class="section-number">04</span>
+                        <span class="section-title">Online Reputation Management</span>
+                    </div>
+                    <p class="section-description">How carefully do you curate your online presence?</p>
+                    <div class="question-grid" id="reputationQuestions"></div>
+                </div>
+
+                <!-- Digital Permanence Section -->
+                <div class="question-section" id="section5">
+                    <div class="section-header">
+                        <span class="section-number">05</span>
+                        <span class="section-title">Digital Permanence Awareness</span>
+                    </div>
+                    <p class="section-description">Do you understand how long your content stays online?</p>
+                    <div class="question-grid" id="permanenceQuestions"></div>
+                </div>
+
+                <!-- App Permissions Section -->
+                <div class="question-section" id="section6">
+                    <div class="section-header">
+                        <span class="section-number">06</span>
+                        <span class="section-title">App Permissions Review</span>
+                    </div>
+                    <p class="section-description">What access have you granted to apps on your devices?</p>
+                    <div class="question-grid" id="appQuestions"></div>
+                </div>
+
+                <!-- Employer Perspective Section -->
+                <div class="question-section" id="section7">
+                    <div class="section-header">
+                        <span class="section-number">07</span>
+                        <span class="section-title">Future Employer Perspective</span>
+                    </div>
+                    <p class="section-description">How would a potential employer view your online presence?</p>
+                    <div class="question-grid" id="employerQuestions"></div>
+                </div>
+
+                <button class="submit-audit-btn" onclick="showGoogleSimulation()">Continue to Google Simulation →</button>
+            </div>
+
+            <!-- Google Yourself Simulation -->
+            <div id="googleSimPanel" class="article-panel hidden">
+                <h2 class="intro-headline">Google Yourself: What Do Employers See?</h2>
+                <p class="intro-text">This simulation shows the types of results that might appear when someone searches for you online. Click on each result to see how employers might interpret it.</p>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">💡 Did You Know?</div>
+                    <p>77% of recruiters use Google to research candidates before making hiring decisions. They typically spend only 2-3 minutes reviewing your digital presence — and what they find in that time can make or break your application.</p>
+                </div>
+
+                <div class="google-sim">
+                    <div class="google-search-box">
+                        <span class="google-icon">🔍</span>
+                        <span class="google-search-text" id="googleSearchName">"Your Name"</span>
+                    </div>
+
+                    <div class="google-results" id="googleResults">
+                        <!-- Generated dynamically based on answers -->
+                    </div>
+                </div>
+
+                <div class="info-box info" style="margin-top: 2rem;">
+                    <div class="info-box-title">🕐 The Digital Timeline</div>
+                    <p>Content doesn't just disappear. Here's how long your digital footprint typically lasts:</p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">Today</div>
+                            <div class="timeline-event">You post a photo or comment on social media</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">Within Minutes</div>
+                            <div class="timeline-event">Search engines begin indexing your content. Screenshots may be taken and shared.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">24-48 Hours</div>
+                            <div class="timeline-event">Content is cached by search engines and archival sites like the Wayback Machine.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">1-5 Years Later</div>
+                            <div class="timeline-event">You apply for university or your first job. Recruiters find this content during background checks.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">10+ Years Later</div>
+                            <div class="timeline-event">Even deleted posts can resurface through archives, backups, and screenshots saved by others.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">Forever</div>
+                            <div class="timeline-event">The internet never truly forgets. Your digital tattoo is permanent unless you actively manage it.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="submit-audit-btn" onclick="calculateResults()">Reveal My Privacy Score →</button>
+            </div>
+
+            <!-- Results Panel -->
+            <div id="resultsPanel" class="hidden">
+                <div class="results-panel animate-in">
+                    <h2 class="results-headline">Your Digital Footprint Report</h2>
+
+                    <div class="privacy-score-display">
+                        <div class="score-circle">
+                            <svg class="score-svg" width="180" height="180" viewBox="0 0 180 180">
+                                <circle class="score-bg" cx="90" cy="90" r="80"></circle>
+                                <circle class="score-fill" id="scoreCircle" cx="90" cy="90" r="80"></circle>
+                            </svg>
+                            <div class="score-text">
+                                <div class="score-number" id="privacyScore">0</div>
+                                <div class="score-label">Privacy<br>Score</div>
+                            </div>
+                        </div>
+
+                        <div class="score-breakdown">
+                            <div id="categoryScores">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <div class="risk-indicator" id="overallRisk">Calculating...</div>
+                        <p style="margin-top: 1rem; opacity: 0.8;" id="riskDescription"></p>
+                    </div>
+                </div>
+
+                <div class="recommendations animate-in" id="recommendationsPanel">
+                    <h3 class="recommendations-title">📋 Your Personalised Action Plan</h3>
+
+                    <div class="recommendation-tabs">
+                        <button class="recommendation-tab active" onclick="filterRecommendations('all')">All</button>
+                        <button class="recommendation-tab" onclick="filterRecommendations('urgent')">Urgent</button>
+                        <button class="recommendation-tab" onclick="filterRecommendations('important')">Important</button>
+                        <button class="recommendation-tab" onclick="filterRecommendations('guides')">Platform Guides</button>
+                    </div>
+
+                    <div id="recommendationsList">
+                        <!-- Generated dynamically -->
+                    </div>
+
+                    <div id="platformGuidesSection" class="hidden">
+                        <h4 style="font-family: 'Syne', sans-serif; font-weight: 700; margin: 2rem 0 1rem;">Step-by-Step Privacy Setting Guides</h4>
+                        <div class="platform-guides">
+                            <div class="platform-card" onclick="alert('Instagram Privacy Guide:\n\n1. Go to Settings → Privacy\n2. Change account to Private\n3. Turn off Activity Status\n4. Disable location services\n5. Review tagged photos\n6. Remove followers you don\'t know')">
+                                <div class="platform-logo">📸</div>
+                                <div class="platform-name">Instagram</div>
+                                <div class="platform-tip">Make your account private and control who can see your posts and stories.</div>
+                            </div>
+                            <div class="platform-card" onclick="alert('Facebook Privacy Guide:\n\n1. Settings → Privacy\n2. Limit who can see future posts to Friends\n3. Review past posts visibility\n4. Turn off face recognition\n5. Limit app permissions\n6. Remove old posts/tags')">
+                                <div class="platform-logo">👤</div>
+                                <div class="platform-name">Facebook</div>
+                                <div class="platform-tip">Lock down who can see your posts, photos, and personal information.</div>
+                            </div>
+                            <div class="platform-card" onclick="alert('TikTok Privacy Guide:\n\n1. Settings → Privacy\n2. Set account to Private\n3. Disable Suggest your account\n4. Turn off location services\n5. Review video comments\n6. Disable duets/stitches from non-friends')">
+                                <div class="platform-logo">🎵</div>
+                                <div class="platform-name">TikTok</div>
+                                <div class="platform-tip">Control who can view, duet, and interact with your videos.</div>
+                            </div>
+                            <div class="platform-card" onclick="alert('Snapchat Privacy Guide:\n\n1. Settings → Privacy Control\n2. Set Who Can... to Friends only\n3. Turn off Snap Map or Ghost Mode\n4. Disable Quick Add\n5. Review story privacy\n6. Block unknown contacts')">
+                                <div class="platform-logo">👻</div>
+                                <div class="platform-name">Snapchat</div>
+                                <div class="platform-tip">Hide your location and limit who can contact you or see your stories.</div>
+                            </div>
+                            <div class="platform-card" onclick="alert('X (Twitter) Privacy Guide:\n\n1. Settings → Privacy and safety\n2. Protect your posts (private account)\n3. Disable photo tagging\n4. Remove location from tweets\n5. Limit who can find you\n6. Review connected apps')">
+                                <div class="platform-logo">𝕏</div>
+                                <div class="platform-name">X (Twitter)</div>
+                                <div class="platform-tip">Control tweet visibility and manage who can interact with you.</div>
+                            </div>
+                            <div class="platform-card" onclick="alert('LinkedIn Privacy Guide:\n\n1. Settings → Visibility\n2. Control profile visibility\n3. Turn off activity broadcasts\n4. Manage who can see connections\n5. Review endorsements\n6. Keep LinkedIn professional!')">
+                                <div class="platform-logo">💼</div>
+                                <div class="platform-name">LinkedIn</div>
+                                <div class="platform-tip">Keep it professional — this is the profile employers WANT to see.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cleanupChecklistSection">
+                        <div class="action-checklist">
+                            <div class="checklist-title">🧹 Your Digital Cleanup Checklist</div>
+                            <div id="checklistItems">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn secondary" onclick="restartAudit()">Take Again</button>
+                    <button class="action-btn secondary" onclick="downloadReport()">Download Report</button>
+                    <button class="action-btn primary" onclick="printResults()">Print Results</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Question data - expanded categories
+        const questions = {
+            social: [
+                { text: "I have a public Instagram account that anyone can view", risk: "high", points: 15, category: "social" },
+                { text: "I have posted photos that show my school, workplace, or home location", risk: "high", points: 12, category: "social" },
+                { text: "I use TikTok and have posted videos publicly", risk: "medium", points: 8, category: "social" },
+                { text: "I have a public Snapchat profile or share my Snap Map location", risk: "high", points: 12, category: "social" },
+                { text: "I have tagged my location in social media posts", risk: "medium", points: 8, category: "social" },
+                { text: "I have posted content I might not want a future employer to see", risk: "high", points: 15, category: "social" },
+                { text: "I accept friend/follow requests from people I don't know in real life", risk: "medium", points: 10, category: "social" },
+                { text: "My social media bios contain personal information (phone, email, age)", risk: "high", points: 10, category: "social" },
+                { text: "I have multiple social media accounts with the same username", risk: "low", points: 5, category: "social" }
+            ],
+            password: [
+                { text: "I use the same password across multiple platforms", risk: "high", points: 15, category: "password" },
+                { text: "I don't use two-factor authentication on most accounts", risk: "high", points: 12, category: "password" },
+                { text: "My passwords are based on personal information (birthdate, pet names, etc.)", risk: "high", points: 10, category: "password" },
+                { text: "I share my passwords with friends or family members", risk: "medium", points: 8, category: "password" },
+                { text: "I haven't changed my main passwords in over a year", risk: "medium", points: 7, category: "password" },
+                { text: "I save passwords in my browser without a master password", risk: "medium", points: 8, category: "password" },
+                { text: "I don't use a password manager", risk: "low", points: 5, category: "password" }
+            ],
+            data: [
+                { text: "I sign up for websites/apps using 'Sign in with Google/Facebook'", risk: "medium", points: 8, category: "data" },
+                { text: "I click 'Accept All Cookies' without reading what I'm accepting", risk: "low", points: 5, category: "data" },
+                { text: "I have signed up to mailing lists or competitions with my main email", risk: "low", points: 4, category: "data" },
+                { text: "I have taken online quizzes that ask personal questions (personality tests, etc.)", risk: "medium", points: 8, category: "data" },
+                { text: "I don't regularly clear my browser history and cookies", risk: "low", points: 4, category: "data" },
+                { text: "I have accounts on websites I no longer use but haven't deleted", risk: "medium", points: 8, category: "data" },
+                { text: "I provide my real phone number when signing up for services", risk: "medium", points: 6, category: "data" },
+                { text: "I have shared personal information in online forums or comment sections", risk: "high", points: 10, category: "data" }
+            ],
+            reputation: [
+                { text: "I haven't Googled myself in the last 6 months", risk: "medium", points: 10, category: "reputation" },
+                { text: "I have posted opinions on controversial topics publicly", risk: "high", points: 12, category: "reputation" },
+                { text: "I have photos/videos online from parties or events with alcohol/inappropriate behaviour", risk: "high", points: 15, category: "reputation" },
+                { text: "I use inappropriate language or make offensive jokes online", risk: "high", points: 15, category: "reputation" },
+                { text: "I don't have a LinkedIn profile", risk: "medium", points: 8, category: "reputation" },
+                { text: "My email address is unprofessional (e.g., coolgamer99@...)", risk: "medium", points: 6, category: "reputation" },
+                { text: "I have argued or got into conflicts in comment sections", risk: "medium", points: 8, category: "reputation" }
+            ],
+            permanence: [
+                { text: "I believe deleting a post removes it completely from the internet", risk: "high", points: 12, category: "permanence" },
+                { text: "I don't think about how my posts might be viewed 5-10 years from now", risk: "medium", points: 10, category: "permanence" },
+                { text: "I have shared content that I later regretted but couldn't completely remove", risk: "high", points: 10, category: "permanence" },
+                { text: "I wasn't aware that the Wayback Machine archives public web pages", risk: "medium", points: 8, category: "permanence" },
+                { text: "I don't consider how screenshots could make my 'temporary' content permanent", risk: "medium", points: 8, category: "permanence" },
+                { text: "I post things in the moment without considering long-term consequences", risk: "high", points: 10, category: "permanence" }
+            ],
+            app: [
+                { text: "I usually grant apps permission to access my camera without thinking", risk: "medium", points: 8, category: "app" },
+                { text: "I allow apps to access my contacts and photos", risk: "medium", points: 8, category: "app" },
+                { text: "I haven't reviewed app permissions on my phone in the last 6 months", risk: "medium", points: 7, category: "app" },
+                { text: "I allow apps to access my location even when not using the app", risk: "high", points: 10, category: "app" },
+                { text: "I have apps installed that I no longer use but haven't deleted", risk: "low", points: 5, category: "app" },
+                { text: "I allow apps to send me notifications with personal information", risk: "low", points: 4, category: "app" },
+                { text: "I don't read privacy policies before accepting app permissions", risk: "low", points: 5, category: "app" }
+            ],
+            employer: [
+                { text: "I haven't reviewed my social media from an employer's perspective", risk: "high", points: 12, category: "employer" },
+                { text: "My profiles show me complaining about school/work/teachers", risk: "high", points: 15, category: "employer" },
+                { text: "I have publicly listed my current school/workplace on social media", risk: "medium", points: 6, category: "employer" },
+                { text: "My profiles contain political or religious views that could be polarising", risk: "medium", points: 8, category: "employer" },
+                { text: "I have visible evidence of poor judgement or risky behaviour online", risk: "high", points: 15, category: "employer" },
+                { text: "My professional and personal accounts are easily linkable", risk: "medium", points: 7, category: "employer" }
+            ]
+        };
+
+        // Mode configurations
+        const modeConfig = {
+            quick: ['social', 'password', 'reputation'],
+            deep: ['social', 'password', 'data', 'reputation', 'permanence', 'app', 'employer'],
+            action: ['social', 'password', 'data', 'reputation', 'permanence', 'app', 'employer']
+        };
+
+        // State
+        let selectedMode = null;
+        let checkedItems = {};
+        let currentRecommendations = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-AU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Initialize checked items for all categories
+            Object.keys(questions).forEach(cat => {
+                checkedItems[cat] = [];
+            });
+        });
+
+        function selectMode(mode) {
+            selectedMode = mode;
+
+            // Update UI
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.mode-card').classList.add('selected');
+
+            document.getElementById('startButton').disabled = false;
+        }
+
+        function startAudit() {
+            if (!selectedMode) return;
+
+            document.getElementById('introPanel').classList.add('hidden');
+            document.getElementById('auditPanel').classList.remove('hidden');
+            renderQuestions();
+            window.scrollTo(0, 0);
+        }
+
+        function renderQuestions() {
+            const categories = modeConfig[selectedMode];
+
+            // Hide all sections first
+            document.querySelectorAll('.question-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show and render only selected categories
+            const categoryMap = {
+                social: { id: 'section1', container: 'socialQuestions' },
+                password: { id: 'section2', container: 'passwordQuestions' },
+                data: { id: 'section3', container: 'dataQuestions' },
+                reputation: { id: 'section4', container: 'reputationQuestions' },
+                permanence: { id: 'section5', container: 'permanenceQuestions' },
+                app: { id: 'section6', container: 'appQuestions' },
+                employer: { id: 'section7', container: 'employerQuestions' }
+            };
+
+            categories.forEach(category => {
+                const config = categoryMap[category];
+                document.getElementById(config.id).style.display = 'block';
+
+                const container = document.getElementById(config.container);
+                container.innerHTML = questions[category].map((q, i) => `
+                    <div class="question-item" onclick="toggleQuestion('${category}', ${i})">
+                        <div class="question-checkbox ${checkedItems[category].includes(i) ? 'checked' : ''}" id="check-${category}-${i}"></div>
+                        <div class="question-text">${q.text}</div>
+                        <span class="question-risk ${q.risk}">${q.risk}</span>
+                    </div>
+                `).join('');
+            });
+
+            updateProgress();
+        }
+
+        function toggleQuestion(category, index) {
+            const checkbox = document.getElementById(`check-${category}-${index}`);
+
+            if (checkedItems[category].includes(index)) {
+                checkedItems[category] = checkedItems[category].filter(i => i !== index);
+                checkbox.classList.remove('checked');
+            } else {
+                checkedItems[category].push(index);
+                checkbox.classList.add('checked');
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const categories = modeConfig[selectedMode];
+            const totalQuestions = categories.reduce((sum, cat) => sum + questions[cat].length, 0);
+            const answered = categories.reduce((sum, cat) => sum + checkedItems[cat].length, 0);
+            const percentage = (answered / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+        }
+
+        function showGoogleSimulation() {
+            document.getElementById('auditPanel').classList.add('hidden');
+            document.getElementById('googleSimPanel').classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            // Generate Google results based on answers
+            generateGoogleResults();
+        }
+
+        function generateGoogleResults() {
+            const results = [];
+
+            // LinkedIn (positive if they have one)
+            if (!checkedItems.reputation || !checkedItems.reputation.includes(4)) {
+                results.push({
+                    type: 'positive',
+                    url: 'linkedin.com/in/your-name',
+                    title: 'Your Name - Student at Your School | LinkedIn',
+                    snippet: 'View professional profile with education, skills, and achievements. Currently studying Year 12 Digital Technologies...',
+                    impact: '✅ POSITIVE IMPACT: A professional LinkedIn profile shows maturity and career readiness. This is exactly what employers want to see.'
+                });
+            }
+
+            // Public social media with concerning content
+            if (checkedItems.social && checkedItems.social.includes(5)) {
+                results.push({
+                    type: 'negative',
+                    url: 'instagram.com/yourname',
+                    title: 'Your Name (@yourname) • Instagram photos and videos',
+                    snippet: 'Public account with 487 posts. Recent posts include party photos, controversial comments, and inappropriate content...',
+                    impact: '❌ NEGATIVE IMPACT: 68% of employers have rejected candidates due to inappropriate social media content. This could cost you job opportunities.'
+                });
+            }
+
+            // School/location data
+            if (checkedItems.social && (checkedItems.social.includes(1) || checkedItems.social.includes(4))) {
+                results.push({
+                    type: 'negative',
+                    url: 'instagram.com/yourname/tagged',
+                    title: 'Photos and videos tagged at Your School Location',
+                    snippet: 'Multiple posts showing your school location, daily routines, and frequently visited places. Location data visible...',
+                    impact: '⚠️ SAFETY CONCERN: Sharing location data can pose personal safety risks. Stalkers and criminals can use this information to track your movements.'
+                });
+            }
+
+            // Controversial opinions
+            if (checkedItems.reputation && checkedItems.reputation.includes(1)) {
+                results.push({
+                    type: 'negative',
+                    url: 'twitter.com/yourname',
+                    title: 'Your Name (@yourname) / X',
+                    snippet: 'Tweets about controversial political topics, arguments in comment sections, strong opinions that may be polarising...',
+                    impact: '❌ NEGATIVE IMPACT: Employers avoid candidates who might create workplace conflicts. Controversial public opinions can suggest poor judgement.'
+                });
+            }
+
+            // Old cached content
+            if (checkedItems.permanence && checkedItems.permanence.includes(2)) {
+                results.push({
+                    type: 'negative',
+                    url: 'web.archive.org/web/*/yourname',
+                    title: '[Archived] Your Name - Old Posts and Content',
+                    snippet: 'Cached versions of deleted posts, old profiles, and content you thought was removed. Archived since 2019...',
+                    impact: '⚠️ DIGITAL PERMANENCE: Even deleted content can resurface. The internet never truly forgets, which is why it\'s crucial to think before you post.'
+                });
+            }
+
+            // News article or achievement (positive)
+            results.push({
+                type: 'positive',
+                url: 'yourschool.wa.edu.au/news',
+                title: 'Student Achievements - Your School News',
+                snippet: 'Your Name recognised for academic excellence in Digital Technologies. School representative at state competition...',
+                impact: '✅ POSITIVE IMPACT: Public achievements and positive news articles enhance your reputation. These results push negative content down in search rankings.'
+            });
+
+            // Forum/comment with personal info
+            if (checkedItems.data && checkedItems.data.includes(7)) {
+                results.push({
+                    type: 'negative',
+                    url: 'reddit.com/user/yourname',
+                    title: 'Your Name - Reddit User Profile',
+                    snippet: 'Comment history revealing personal details, location, age, school name, and opinions on various topics...',
+                    impact: '⚠️ PRIVACY RISK: Personal information shared in forums creates a detailed profile that anyone can access. This data can be used for identity theft or social engineering.'
+                });
+            }
+
+            // Unprofessional email
+            if (checkedItems.reputation && checkedItems.reputation.includes(5)) {
+                results.push({
+                    type: 'neutral',
+                    url: 'various-sites.com',
+                    title: 'coolgamer99@email.com - Public Profile Mentions',
+                    snippet: 'Email address found on various sites and registrations. Unprofessional email associated with multiple accounts...',
+                    impact: '⚠️ PROFESSIONALISM CONCERN: An unprofessional email address suggests immaturity. Create a professional email (firstname.lastname@...) for job applications.'
+                });
+            }
+
+            // Render results
+            const container = document.getElementById('googleResults');
+            container.innerHTML = results.map((result, index) => `
+                <div class="google-result ${result.type}" onclick="toggleResultImpact(${index})">
+                    <div class="result-url">${result.url}</div>
+                    <div class="result-title">${result.title}</div>
+                    <div class="result-snippet">${result.snippet}</div>
+                    <div class="result-impact">${result.impact}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleResultImpact(index) {
+            const results = document.querySelectorAll('.google-result');
+            results[index].classList.toggle('active');
+        }
+
+        function calculateResults() {
+            const scores = {};
+            const categoryDetails = {};
+            let totalScore = 0;
+            let maxPossibleScore = 0;
+
+            const categories = modeConfig[selectedMode];
+
+            categories.forEach(category => {
+                let categoryScore = 0;
+                let categoryMax = 0;
+
+                questions[category].forEach((question, index) => {
+                    categoryMax += question.points;
+                    if (checkedItems[category].includes(index)) {
+                        categoryScore += question.points;
+                    }
+                });
+
+                scores[category] = categoryScore;
+                categoryDetails[category] = {
+                    score: categoryScore,
+                    max: categoryMax,
+                    percentage: categoryMax > 0 ? (categoryScore / categoryMax) * 100 : 0
+                };
+                totalScore += categoryScore;
+                maxPossibleScore += categoryMax;
+            });
+
+            // Calculate privacy score (inverse - higher exposure = lower privacy score)
+            const exposurePercentage = (totalScore / maxPossibleScore) * 100;
+            const privacyScore = Math.round(100 - exposurePercentage);
+
+            // Show results
+            document.getElementById('googleSimPanel').classList.add('hidden');
+            document.getElementById('resultsPanel').classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            // Animate privacy score
+            animateScore(privacyScore);
+
+            // Render category scores
+            renderCategoryScores(categoryDetails);
+
+            // Generate recommendations
+            generateRecommendations(scores, categoryDetails);
+
+            // Generate cleanup checklist if in action mode
+            if (selectedMode === 'action') {
+                generateCleanupChecklist(scores);
+            } else {
+                document.getElementById('cleanupChecklistSection').style.display = 'none';
+            }
+        }
+
+        function animateScore(targetScore) {
+            const scoreElement = document.getElementById('privacyScore');
+            const circleElement = document.getElementById('scoreCircle');
+            const riskElement = document.getElementById('overallRisk');
+            const descElement = document.getElementById('riskDescription');
+
+            // Calculate circle properties
+            const radius = 80;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (targetScore / 100) * circumference;
+
+            // Set circle attributes
+            circleElement.style.strokeDasharray = circumference;
+            circleElement.style.strokeDashoffset = circumference;
+
+            // Determine color based on score
+            let color, riskLevel, riskText, description;
+            if (targetScore >= 70) {
+                color = '#00cc66';
+                riskLevel = 'low';
+                riskText = 'Low Risk - Good Privacy';
+                description = 'You have strong privacy practices. Keep maintaining these good habits!';
+            } else if (targetScore >= 40) {
+                color = '#ff8c00';
+                riskLevel = 'medium';
+                riskText = 'Medium Risk - Needs Improvement';
+                description = 'Your digital footprint has some vulnerabilities. Follow the recommendations below to improve.';
+            } else {
+                color = '#ff4444';
+                riskLevel = 'high';
+                riskText = 'High Risk - Urgent Action Needed';
+                description = 'Your online presence poses significant risks. Take immediate action to protect your privacy and reputation.';
+            }
+
+            circleElement.style.stroke = color;
+            scoreElement.style.color = color;
+
+            // Animate number
+            let current = 0;
+            const increment = targetScore / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= targetScore) {
+                    current = targetScore;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = Math.round(current);
+            }, 16);
+
+            // Animate circle
+            setTimeout(() => {
+                circleElement.style.strokeDashoffset = offset;
+            }, 100);
+
+            // Set risk indicator
+            setTimeout(() => {
+                riskElement.className = `risk-indicator ${riskLevel}`;
+                riskElement.textContent = riskText;
+                descElement.textContent = description;
+            }, 800);
+        }
+
+        function renderCategoryScores(categoryDetails) {
+            const categoryMap = {
+                social: { name: 'Social Media Privacy', icon: '📱', color: '#4488ff' },
+                password: { name: 'Password Security', icon: '🔒', color: '#ff4444' },
+                data: { name: 'Data Sharing', icon: '📊', color: '#ff8c00' },
+                reputation: { name: 'Online Reputation', icon: '⭐', color: '#ffd700' },
+                permanence: { name: 'Digital Permanence', icon: '⏰', color: '#9b59b6' },
+                app: { name: 'App Permissions', icon: '📱', color: '#00cc66' },
+                employer: { name: 'Employer View', icon: '💼', color: '#4488ff' }
+            };
+
+            const container = document.getElementById('categoryScores');
+            const categories = modeConfig[selectedMode];
+
+            container.innerHTML = categories.map(cat => {
+                const details = categoryDetails[cat];
+                const info = categoryMap[cat];
+                const privacyScore = 100 - details.percentage;
+
+                let riskLevel = 'low';
+                if (privacyScore < 40) riskLevel = 'high';
+                else if (privacyScore < 70) riskLevel = 'medium';
+
+                return `
+                    <div class="category-score slide-in">
+                        <div class="category-icon">${info.icon}</div>
+                        <div class="category-info">
+                            <div class="category-name">
+                                <span>${info.name}</span>
+                                <span class="risk-indicator ${riskLevel}" style="font-size: 0.7rem;">${Math.round(privacyScore)}%</span>
+                            </div>
+                            <div class="category-bar">
+                                <div class="category-bar-fill" style="width: ${privacyScore}%; background: ${info.color};"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function generateRecommendations(scores, categoryDetails) {
+            const recommendations = [];
+
+            // Critical security issues
+            if (checkedItems.password && checkedItems.password.includes(0)) {
+                recommendations.push({
+                    priority: 'urgent',
+                    icon: '🚨',
+                    title: 'CRITICAL: Stop Reusing Passwords Immediately',
+                    text: 'Using the same password across multiple accounts is extremely dangerous. If one account is breached, hackers can access all your accounts.',
+                    steps: [
+                        'Download a password manager (Bitwarden is free and open-source)',
+                        'Generate unique passwords for each account (at least 12 characters)',
+                        'Update your most important accounts first (email, banking, social media)',
+                        'Never share your master password with anyone'
+                    ]
+                });
+            }
+
+            if (checkedItems.password && checkedItems.password.includes(1)) {
+                recommendations.push({
+                    priority: 'urgent',
+                    icon: '🔐',
+                    title: 'Enable Two-Factor Authentication (2FA)',
+                    text: '2FA adds an extra layer of security. Even if someone steals your password, they cannot access your account without the second factor.',
+                    steps: [
+                        'Go to account security settings on each platform',
+                        'Choose authenticator app over SMS when possible (more secure)',
+                        'Download Google Authenticator or Authy',
+                        'Enable 2FA on email, banking, and social media first',
+                        'Save backup codes in a secure location'
+                    ]
+                });
+            }
+
+            // Social media privacy
+            if (scores.social >= 20) {
+                recommendations.push({
+                    priority: 'urgent',
+                    icon: '🔒',
+                    title: 'Lock Down Your Social Media Privacy',
+                    text: 'Your social media accounts are too public. Employers, strangers, and potential threats can see your personal information.',
+                    steps: [
+                        'Set all social media accounts to Private',
+                        'Review and remove followers/friends you don\'t know',
+                        'Turn off location services and remove location tags',
+                        'Disable "Suggest my account to others" features',
+                        'Review tagged photos and untag yourself from inappropriate content'
+                    ]
+                });
+            }
+
+            // Employer perspective issues
+            if (checkedItems.reputation && checkedItems.reputation.includes(2)) {
+                recommendations.push({
+                    priority: 'urgent',
+                    icon: '🗑️',
+                    title: 'Remove Inappropriate Content Immediately',
+                    text: '68% of employers reject candidates based on inappropriate social media. Content showing partying, alcohol, or poor judgement can cost you opportunities.',
+                    steps: [
+                        'Go through all your posts and delete anything unprofessional',
+                        'Remove photos/videos from parties, especially with alcohol',
+                        'Delete posts with inappropriate language or jokes',
+                        'Ask friends to untag you from their inappropriate posts',
+                        'Set up Google Alerts for your name to monitor new content'
+                    ]
+                });
+            }
+
+            // Professional presence
+            if (checkedItems.reputation && checkedItems.reputation.includes(4)) {
+                recommendations.push({
+                    priority: 'important',
+                    icon: '💼',
+                    title: 'Create a Professional LinkedIn Profile',
+                    text: 'LinkedIn gives you control over your professional narrative. It\'s often the first result when employers Google you.',
+                    steps: [
+                        'Create a LinkedIn account with your professional email',
+                        'Use a professional headshot photo',
+                        'Add your education, skills, and any work experience',
+                        'Get recommendations from teachers or employers',
+                        'Connect with professionals in your industry of interest',
+                        'Post or share relevant industry content occasionally'
+                    ]
+                });
+            }
+
+            if (checkedItems.reputation && checkedItems.reputation.includes(5)) {
+                recommendations.push({
+                    priority: 'important',
+                    icon: '📧',
+                    title: 'Create a Professional Email Address',
+                    text: 'An email like "coolgamer99@email.com" gives a poor first impression. Create a professional alternative.',
+                    steps: [
+                        'Create new email: firstname.lastname@gmail.com or similar',
+                        'Use this email for all job applications and professional contacts',
+                        'Add professional signature with your name and phone',
+                        'Update your LinkedIn and professional accounts',
+                        'Keep your old email for personal/informal use'
+                    ]
+                });
+            }
+
+            // Data sharing
+            if (scores.data >= 15) {
+                recommendations.push({
+                    priority: 'important',
+                    icon: '🧹',
+                    title: 'Clean Up Your Digital Data Trail',
+                    text: 'You\'ve shared data with many services. Reduce your attack surface by removing unnecessary accounts.',
+                    steps: [
+                        'Search your email for "welcome" or "verify" to find old signups',
+                        'Use JustDeleteMe.com for deletion instructions',
+                        'Delete accounts you don\'t use anymore',
+                        'Unsubscribe from mailing lists',
+                        'Use disposable email addresses for one-time signups (10minutemail.com)'
+                    ]
+                });
+            }
+
+            // App permissions
+            if (scores.app >= 15) {
+                recommendations.push({
+                    priority: 'important',
+                    icon: '📱',
+                    title: 'Review and Revoke App Permissions',
+                    text: 'Many apps have access to your camera, location, contacts, and photos. Revoke unnecessary permissions.',
+                    steps: [
+                        'iPhone: Settings → Privacy & Security → review each category',
+                        'Android: Settings → Privacy → Permission manager',
+                        'Revoke camera/microphone access for apps that don\'t need it',
+                        'Change location access to "While Using" instead of "Always"',
+                        'Delete apps you no longer use',
+                        'Review which apps can access your photos'
+                    ]
+                });
+            }
+
+            // Digital permanence awareness
+            if (scores.permanence >= 15) {
+                recommendations.push({
+                    priority: 'suggested',
+                    icon: '⏰',
+                    title: 'Understand Digital Permanence',
+                    text: 'The internet never forgets. Even deleted content can resurface through archives and screenshots.',
+                    steps: [
+                        'Google yourself regularly (use quotes: "Your Name")',
+                        'Set up Google Alerts for your name',
+                        'Think before posting: "Would I want this on a billboard?"',
+                        'Request removal of content from Wayback Machine if needed',
+                        'Be aware that screenshots are forever',
+                        'Consider the 5-year rule: will this matter in 5 years?'
+                    ]
+                });
+            }
+
+            // Location data
+            if (checkedItems.social && (checkedItems.social.includes(1) || checkedItems.social.includes(4))) {
+                recommendations.push({
+                    priority: 'important',
+                    icon: '📍',
+                    title: 'Remove Location Data from Posts',
+                    text: 'Location data poses safety risks. Stalkers and criminals can track your movements and routines.',
+                    steps: [
+                        'Go through your Instagram/Facebook posts and remove location tags',
+                        'Turn off location services for social media apps',
+                        'Disable Snap Map on Snapchat (Ghost Mode)',
+                        'Remove location from Twitter/X posts',
+                        'Don\'t post in real-time from locations you frequent',
+                        'Turn off photo location metadata in camera settings'
+                    ]
+                });
+            }
+
+            // Google yourself
+            recommendations.push({
+                priority: 'suggested',
+                icon: '🔍',
+                title: 'Google Yourself Regularly',
+                text: 'Monitor your online presence by searching for yourself. See what employers will find.',
+                steps: [
+                    'Search "Your Full Name" in quotes on Google',
+                    'Try variations: with city, school, nickname',
+                    'Check Images tab for photos of you',
+                    'Search your email address and username',
+                    'Set up Google Alerts to be notified of new content',
+                    'Work to push down negative results by creating positive content'
+                ]
+            });
+
+            // Controversial content
+            if (checkedItems.reputation && checkedItems.reputation.includes(1)) {
+                recommendations.push({
+                    priority: 'important',
+                    icon: '🤐',
+                    title: 'Be Cautious with Controversial Topics',
+                    text: 'Public opinions on polarising topics can make you seem difficult to work with or controversial.',
+                    steps: [
+                        'Delete old posts about controversial political/religious topics',
+                        'Keep strong opinions to private conversations',
+                        'Remember: social media is public, permanent, and searchable',
+                        'Ask yourself: could this alienate a future employer?',
+                        'Consider using a finsta (fake/private Instagram) for close friends only'
+                    ]
+                });
+            }
+
+            currentRecommendations = recommendations;
+            renderRecommendations('all');
+        }
+
+        function filterRecommendations(filter) {
+            // Update active tab
+            document.querySelectorAll('.recommendation-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (filter === 'guides') {
+                document.getElementById('recommendationsList').classList.add('hidden');
+                document.getElementById('platformGuidesSection').classList.remove('hidden');
+            } else {
+                document.getElementById('recommendationsList').classList.remove('hidden');
+                document.getElementById('platformGuidesSection').classList.add('hidden');
+                renderRecommendations(filter);
+            }
+        }
+
+        function renderRecommendations(filter) {
+            let filtered = currentRecommendations;
+
+            if (filter !== 'all') {
+                filtered = currentRecommendations.filter(rec => rec.priority === filter);
+            }
+
+            const container = document.getElementById('recommendationsList');
+            container.innerHTML = filtered.map(rec => `
+                <div class="recommendation-item ${rec.priority}">
+                    <span class="recommendation-priority">${rec.icon}</span>
+                    <div class="recommendation-content">
+                        <h4>${rec.title}</h4>
+                        <p>${rec.text}</p>
+                        ${rec.steps ? `
+                            <ul class="recommendation-steps">
+                                ${rec.steps.map(step => `<li>${step}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateCleanupChecklist(scores) {
+            const checklist = [];
+
+            if (scores.social >= 20) {
+                checklist.push('Set all social media accounts to Private');
+                checklist.push('Remove location tags from all posts');
+                checklist.push('Review and remove inappropriate photos/videos');
+            }
+
+            if (scores.password >= 20) {
+                checklist.push('Install a password manager');
+                checklist.push('Change passwords on all major accounts');
+                checklist.push('Enable 2FA on email and social media');
+            }
+
+            if (scores.data >= 15) {
+                checklist.push('Delete unused online accounts');
+                checklist.push('Clear browser history and cookies');
+                checklist.push('Unsubscribe from unnecessary mailing lists');
+            }
+
+            if (scores.app >= 15) {
+                checklist.push('Review app permissions on phone');
+                checklist.push('Delete unused apps');
+                checklist.push('Disable location tracking for non-essential apps');
+            }
+
+            if (scores.reputation >= 20) {
+                checklist.push('Google yourself and review results');
+                checklist.push('Create a professional LinkedIn profile');
+                checklist.push('Create a professional email address');
+            }
+
+            checklist.push('Set up Google Alerts for your name');
+            checklist.push('Review this report with a parent or teacher');
+
+            const container = document.getElementById('checklistItems');
+            container.innerHTML = checklist.map((item, index) => `
+                <div class="checklist-item" onclick="toggleChecklistItem(${index})">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text">${item}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleChecklistItem(index) {
+            event.currentTarget.classList.toggle('completed');
+        }
+
+        function restartAudit() {
+            // Reset state
+            selectedMode = null;
+            Object.keys(checkedItems).forEach(cat => {
+                checkedItems[cat] = [];
+            });
+
+            // Reset UI
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('startButton').disabled = true;
+
+            // Show intro
+            document.getElementById('resultsPanel').classList.add('hidden');
+            document.getElementById('introPanel').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function downloadReport() {
+            alert('Download Report functionality would generate a PDF of your results and recommendations. This feature requires backend implementation.');
+        }
+
+        function printResults() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

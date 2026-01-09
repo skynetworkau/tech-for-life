@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your AI Policy // Week 6 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card:nth-child(1) { border-color: var(--accent-violet); }
+        .stat-card:nth-child(2) { border-color: var(--accent-cyan); }
+        .stat-card:nth-child(3) { border-color: var(--accent-emerald); }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card:nth-child(1) .stat-number { color: var(--accent-violet); }
+        .stat-card:nth-child(2) .stat-number { color: var(--accent-cyan); }
+        .stat-card:nth-child(3) .stat-number { color: var(--accent-emerald); }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Policy cards */
+        .policy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .policy-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .policy-card:nth-child(1) { border-color: var(--accent-violet); }
+        .policy-card:nth-child(2) { border-color: var(--accent-blue); }
+        .policy-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .policy-card:nth-child(4) { border-color: var(--accent-emerald); }
+
+        .policy-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .policy-icon {
+            font-size: 2rem;
+        }
+
+        .policy-org {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .policy-content {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .policy-highlight {
+            background: rgba(139, 92, 246, 0.15);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .column-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2.5rem;
+        }
+
+        .column-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .column-content li:last-child {
+            border-bottom: none;
+        }
+
+        .column-content li::before {
+            content: "→";
+            margin-right: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Decision framework */
+        .decision-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .decision-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .decision-card.use { border-color: var(--accent-emerald); }
+        .decision-card.avoid { border-color: var(--accent-rose); }
+
+        .decision-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .decision-card.use .decision-header { color: var(--accent-emerald); }
+        .decision-card.avoid .decision-header { color: var(--accent-rose); }
+
+        .decision-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .decision-list li {
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .decision-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Tips list */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            align-items: flex-start;
+        }
+
+        .tip-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .tip-content p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Skills grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 3px solid;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .skill-card:nth-child(1) { border-color: var(--accent-violet); }
+        .skill-card:nth-child(2) { border-color: var(--accent-blue); }
+        .skill-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .skill-card:nth-child(4) { border-color: var(--accent-emerald); }
+        .skill-card:nth-child(5) { border-color: var(--accent-amber); }
+        .skill-card:nth-child(6) { border-color: var(--accent-rose); }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .skill-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Checklist */
+        .checklist {
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .checklist-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .checklist-check {
+            font-size: 1.5rem;
+            color: var(--accent-emerald);
+            flex-shrink: 0;
+        }
+
+        .checklist-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .checklist-text strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Workplace examples */
+        .workplace-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .workplace-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .workplace-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .workplace-icon {
+            font-size: 2rem;
+        }
+
+        .workplace-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .workplace-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .workplace-example {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        /* Pie chart */
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .pie-chart {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--accent-emerald) 0deg 252deg,
+                var(--accent-amber) 252deg 360deg
+            );
+            margin: 0 auto 2.5rem;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .pie-legend {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .pie-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pie-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+
+        .pie-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .pie-percent {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        /* Video embed */
+        .video-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-caption {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Disclosure examples */
+        .disclosure-grid {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .disclosure-example {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .disclosure-example:nth-child(1) { border-color: var(--accent-violet); }
+        .disclosure-example:nth-child(2) { border-color: var(--accent-blue); }
+        .disclosure-example:nth-child(3) { border-color: var(--accent-emerald); }
+
+        .disclosure-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .disclosure-icon {
+            font-size: 1.8rem;
+        }
+
+        .disclosure-type {
+            font-weight: 600;
+            font-size: 1.15rem;
+        }
+
+        .disclosure-text {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1.25rem;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        /* Australian Ethics Framework */
+        .ethics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .ethics-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-top: 4px solid;
+        }
+
+        .ethics-card:nth-child(1) { border-color: var(--accent-violet); }
+        .ethics-card:nth-child(2) { border-color: var(--accent-blue); }
+        .ethics-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .ethics-card:nth-child(4) { border-color: var(--accent-emerald); }
+        .ethics-card:nth-child(5) { border-color: var(--accent-amber); }
+        .ethics-card:nth-child(6) { border-color: var(--accent-rose); }
+
+        .ethics-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        .ethics-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .ethics-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .policy-grid { grid-template-columns: 1fr; }
+            .decision-grid { grid-template-columns: 1fr; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .workplace-grid { grid-template-columns: 1fr; }
+            .ethics-grid { grid-template-columns: 1fr; }
+            .pie-chart { width: 240px; height: 240px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Your <em>AI Policy</em></h1>
+            <p class="slide-subtitle">Navigating AI at work, uni, and in life — what you need to know before you graduate</p>
+            <p class="stat-source">Week 6 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why This Matters -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why You Need Your Own Policy</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">75%</div>
+                    <div class="stat-label">of Australian employers expect AI skills by 2025</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">of WA universities have AI policies you'll need to follow</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">65%</div>
+                    <div class="stat-label">of today's Year 12s will work in jobs that use AI daily</div>
+                </div>
+            </div>
+            <p class="stat-source">Sources: LinkedIn Australia Workforce Report 2024, Universities Australia 2024</p>
+        </div>
+
+        <!-- Slide 3: Workplace Reality -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Workplaces Are Using AI <em>Now</em></h2>
+            <div class="workplace-grid">
+                <div class="workplace-card">
+                    <div class="workplace-header">
+                        <span class="workplace-icon">💼</span>
+                        <span class="workplace-name">Corporate & Business</span>
+                    </div>
+                    <div class="workplace-content">
+                        AI for drafting emails, reports, and presentations. Customer service chatbots. Data analysis and forecasting.
+                        <div class="workplace-example">"We use Copilot for meeting summaries and action items. All staff must disclose AI use in client-facing documents."</div>
+                    </div>
+                </div>
+                <div class="workplace-card">
+                    <div class="workplace-header">
+                        <span class="workplace-icon">⚕️</span>
+                        <span class="workplace-name">Healthcare</span>
+                    </div>
+                    <div class="workplace-content">
+                        AI assists with diagnosis, medical imaging, and patient record analysis. Strict privacy rules apply.
+                        <div class="workplace-example">"AI suggestions must always be verified by qualified professionals. Patient data never leaves approved systems."</div>
+                    </div>
+                </div>
+                <div class="workplace-card">
+                    <div class="workplace-header">
+                        <span class="workplace-icon">💻</span>
+                        <span class="workplace-name">Tech & Development</span>
+                    </div>
+                    <div class="workplace-content">
+                        GitHub Copilot for coding. AI-powered testing and debugging. Design assistance and prototyping.
+                        <div class="workplace-example">"Code generated by AI must be reviewed and understood. You're responsible for what you commit."</div>
+                    </div>
+                </div>
+                <div class="workplace-card">
+                    <div class="workplace-header">
+                        <span class="workplace-icon">📚</span>
+                        <span class="workplace-name">Education</span>
+                    </div>
+                    <div class="workplace-content">
+                        Teachers use AI for lesson planning and feedback. AI tutoring systems. Administrative automation.
+                        <div class="workplace-example">"AI can help create resources but all student-facing materials must be teacher-reviewed for accuracy."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Workplace Policies -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Employers <em>Expect</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🔒</span>
+                    <div class="tip-content">
+                        <h4>Confidentiality First</h4>
+                        <p>Never input company secrets, client data, or personal information into public AI tools. Many companies provide approved, secure AI systems for sensitive work.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">✓</span>
+                    <div class="tip-content">
+                        <h4>Verify Everything</h4>
+                        <p>AI can hallucinate facts and make confident mistakes. Employers expect you to check AI output before using it, especially in professional documents or communications.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📝</span>
+                    <div class="tip-content">
+                        <h4>Disclosure and Transparency</h4>
+                        <p>Most workplaces require you to document when and how AI was used, especially for client-facing work, legal documents, or decision-making.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Human Accountability</h4>
+                        <p>You're responsible for the work you submit, even if AI helped create it. "The AI made a mistake" isn't a valid excuse.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: University Policies -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">University Policies in <em>WA</em></h2>
+            <div class="policy-grid">
+                <div class="policy-card">
+                    <div class="policy-header">
+                        <span class="policy-icon">🎓</span>
+                        <span class="policy-org">UWA</span>
+                    </div>
+                    <div class="policy-content">
+                        AI tools allowed for brainstorming and drafting, but final work must be your own. Cite AI assistance in acknowledgements.
+                        <div class="policy-highlight">Discipline-specific guidelines vary. Engineering and IT encourage AI tool use; some humanities units restrict it.</div>
+                    </div>
+                </div>
+                <div class="policy-card">
+                    <div class="policy-header">
+                        <span class="policy-icon">🎓</span>
+                        <span class="policy-org">Curtin</span>
+                    </div>
+                    <div class="policy-content">
+                        Students must understand and be able to explain any AI-generated content they submit. Requires declaration of AI use.
+                        <div class="policy-highlight">Academic misconduct if you can't explain or defend AI-assisted work in follow-up discussions.</div>
+                    </div>
+                </div>
+                <div class="policy-card">
+                    <div class="policy-header">
+                        <span class="policy-icon">🎓</span>
+                        <span class="policy-org">ECU</span>
+                    </div>
+                    <div class="policy-content">
+                        AI permitted for research and study support. Not allowed for assignments unless explicitly stated by unit coordinator.
+                        <div class="policy-highlight">Assessment tasks now include AI-specific instructions indicating permitted and prohibited uses.</div>
+                    </div>
+                </div>
+                <div class="policy-card">
+                    <div class="policy-header">
+                        <span class="policy-icon">🎓</span>
+                        <span class="policy-org">Murdoch</span>
+                    </div>
+                    <div class="policy-content">
+                        AI tools can support learning but not replace it. Direct copying from AI is plagiarism. Must acknowledge assistance.
+                        <div class="policy-highlight">Some courses integrate AI literacy training. Science and tech programs encourage ethical experimentation.</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Policies current as of 2025. Always check specific unit requirements.</p>
+        </div>
+
+        <!-- Slide 6: Jobs Changing -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Jobs and AI — What's <em>Changing</em></h2>
+            <div class="two-column">
+                <div class="column-content" style="border-left: 4px solid var(--accent-rose);">
+                    <h3><span style="color: var(--accent-rose);">↓</span> Declining Demand</h3>
+                    <ul>
+                        <li>Basic data entry and processing</li>
+                        <li>Simple customer service roles</li>
+                        <li>Routine translation work</li>
+                        <li>Basic bookkeeping</li>
+                        <li>Simple graphic design tasks</li>
+                        <li>Transcription services</li>
+                    </ul>
+                </div>
+                <div class="column-content" style="border-left: 4px solid var(--accent-emerald);">
+                    <h3><span style="color: var(--accent-emerald);">↑</span> Growing Demand</h3>
+                    <ul>
+                        <li>AI prompt engineers and specialists</li>
+                        <li>Data scientists and analysts</li>
+                        <li>AI ethics and governance roles</li>
+                        <li>Complex problem-solving positions</li>
+                        <li>Creative strategy and direction</li>
+                        <li>Human-AI collaboration roles</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">AI won't replace jobs—it'll change what skills matter most</p>
+        </div>
+
+        <!-- Slide 7: Skills That Matter -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Skills That Will <em>Always Matter</em></h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-icon">🧠</div>
+                    <div class="skill-title">Critical Thinking</div>
+                    <div class="skill-desc">Evaluating AI outputs, spotting errors, asking the right questions</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">💡</div>
+                    <div class="skill-title">Creativity</div>
+                    <div class="skill-desc">Original ideas, connecting concepts in new ways, innovation</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🤝</div>
+                    <div class="skill-title">Collaboration</div>
+                    <div class="skill-desc">Working with diverse teams, empathy, communication</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🔧</div>
+                    <div class="skill-title">Adaptability</div>
+                    <div class="skill-desc">Learning new tools, pivoting when needed, staying curious</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">⚖️</div>
+                    <div class="skill-title">Ethical Judgement</div>
+                    <div class="skill-desc">Knowing when AI is appropriate, considering impact, fairness</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🎯</div>
+                    <div class="skill-title">Domain Expertise</div>
+                    <div class="skill-desc">Deep knowledge in your field that AI can't replicate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: When to Use AI -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">When to Use AI</h2>
+            <div class="decision-grid">
+                <div class="decision-card use">
+                    <div class="decision-header">✓ Good Use Cases</div>
+                    <ul class="decision-list">
+                        <li>Brainstorming and idea generation</li>
+                        <li>Explaining complex concepts you're learning</li>
+                        <li>Getting first drafts or outlines</li>
+                        <li>Checking grammar and improving clarity</li>
+                        <li>Researching multiple perspectives quickly</li>
+                        <li>Debugging code or finding errors</li>
+                        <li>Creating practice questions for study</li>
+                        <li>Summarising long documents</li>
+                    </ul>
+                </div>
+                <div class="decision-card avoid">
+                    <div class="decision-header">✗ When to Avoid AI</div>
+                    <ul class="decision-list">
+                        <li>Assessment explicitly prohibits it</li>
+                        <li>Work involves personal information</li>
+                        <li>You need to demonstrate YOUR learning</li>
+                        <li>Medical, legal, or safety-critical decisions</li>
+                        <li>When you can't verify the information</li>
+                        <li>Creating content you don't understand</li>
+                        <li>Situations requiring genuine human empathy</li>
+                        <li>When using company/client confidential data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Your Personal Guidelines -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Creating Your <em>Personal</em> AI Policy</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <span class="checklist-check">1</span>
+                    <div class="checklist-text">
+                        <strong>Define your integrity line</strong> — What feels like cheating to you? Where's the line between helpful tool and doing the work for you?
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">2</span>
+                    <div class="checklist-text">
+                        <strong>Set disclosure rules</strong> — When will you tell others you used AI? In schoolwork? Job applications? Creative projects?
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">3</span>
+                    <div class="checklist-text">
+                        <strong>Commit to verification</strong> — AI makes mistakes. How will you check facts, especially for important decisions or submissions?
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">4</span>
+                    <div class="checklist-text">
+                        <strong>Protect privacy</strong> — What information will you never put into AI? Yours, friends', family's, employers'?
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">5</span>
+                    <div class="checklist-text">
+                        <strong>Keep learning</strong> — Don't let AI replace skill development. If AI can do it easily, make sure you understand how and why.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Disclosure Guidelines -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Disclosure and <em>Transparency</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🎓</span>
+                    <div class="tip-content">
+                        <h4>For University Assignments</h4>
+                        <p>"AI tools (ChatGPT, Claude) were used to brainstorm initial ideas and check grammar. All final content is my own work and understanding."</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💼</span>
+                    <div class="tip-content">
+                        <h4>For Work Documents</h4>
+                        <p>Check your workplace policy. Many require a note like: "Draft assistance provided by [AI tool]. Content reviewed and verified by [Your Name]."</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎨</span>
+                    <div class="tip-content">
+                        <h4>For Creative Work</h4>
+                        <p>If submitting portfolios or competitions: "This image was created using AI tools (Midjourney/DALL-E) with prompts and curation by [Your Name]."</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💬</span>
+                    <div class="tip-content">
+                        <h4>When to Always Disclose</h4>
+                        <p>Anytime someone might reasonably assume the work is entirely your own creation or when assessment/workplace policies require it. When in doubt, disclose.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10A: Disclosure Statement Examples -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Disclosure Statement <em>Examples</em></h2>
+            <div class="disclosure-grid">
+                <div class="disclosure-example">
+                    <div class="disclosure-header">
+                        <span class="disclosure-icon">📝</span>
+                        <span class="disclosure-type">Academic Assignment</span>
+                    </div>
+                    <div class="disclosure-text">
+                        AI Use Acknowledgement: ChatGPT (GPT-4) was used to assist with initial research and to refine the structure of this essay. All arguments, analysis, and conclusions are my own. I verified all factual claims against primary sources and can explain all content submitted.
+                    </div>
+                </div>
+                <div class="disclosure-example">
+                    <div class="disclosure-header">
+                        <span class="disclosure-icon">💻</span>
+                        <span class="disclosure-type">Code Project</span>
+                    </div>
+                    <div class="disclosure-text">
+                        AI Assistance: GitHub Copilot was used to generate boilerplate code and suggest optimizations. All code was reviewed, tested, and modified to meet project requirements. I understand the logic and functionality of all submitted code.
+                    </div>
+                </div>
+                <div class="disclosure-example">
+                    <div class="disclosure-header">
+                        <span class="disclosure-icon">🎨</span>
+                        <span class="disclosure-type">Creative Portfolio</span>
+                    </div>
+                    <div class="disclosure-text">
+                        Creative Process: Initial concept sketches were created using Midjourney AI based on prompts I designed. Final compositions were curated, edited, and refined in Photoshop. AI-generated elements constitute approximately 30% of the final work.
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">These examples show transparency while demonstrating your active role in the work.</p>
+        </div>
+
+        <!-- Slide 10B: Australian AI Ethics Framework -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Australian AI <em>Ethics Framework</em></h2>
+            <div class="ethics-grid">
+                <div class="ethics-card">
+                    <div class="ethics-number">1</div>
+                    <div class="ethics-title">Human-Centred Values</div>
+                    <div class="ethics-desc">AI systems should respect human rights, diversity, and individual autonomy. People, not technology, remain in control.</div>
+                </div>
+                <div class="ethics-card">
+                    <div class="ethics-number">2</div>
+                    <div class="ethics-title">Fairness</div>
+                    <div class="ethics-desc">AI must not create unfair bias or discrimination. Systems should be inclusive and accessible to all Australians.</div>
+                </div>
+                <div class="ethics-card">
+                    <div class="ethics-number">3</div>
+                    <div class="ethics-title">Privacy & Security</div>
+                    <div class="ethics-desc">Personal information must be protected. AI systems should have strong data governance and cybersecurity.</div>
+                </div>
+                <div class="ethics-card">
+                    <div class="ethics-number">4</div>
+                    <div class="ethics-title">Reliability & Safety</div>
+                    <div class="ethics-desc">AI should operate safely and as intended. Systems must be tested and monitored for risks and failures.</div>
+                </div>
+                <div class="ethics-card">
+                    <div class="ethics-number">5</div>
+                    <div class="ethics-title">Transparency</div>
+                    <div class="ethics-desc">People should know when they're interacting with AI and understand how decisions affecting them are made.</div>
+                </div>
+                <div class="ethics-card">
+                    <div class="ethics-number">6</div>
+                    <div class="ethics-title">Contestability</div>
+                    <div class="ethics-desc">People can challenge AI decisions that affect them. There must be human oversight and accountability.</div>
+                </div>
+            </div>
+            <p class="stat-source">Australian Government AI Ethics Framework • Department of Industry, Science and Resources, 2024</p>
+        </div>
+
+        <!-- Slide 10C: School AI Policies in Australia -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Australian Schools & <em>AI Policies</em></h2>
+            <div class="chart-container">
+                <div class="chart-title">Schools with Formal AI Use Policies (2025)</div>
+                <div class="pie-chart"></div>
+                <div class="pie-legend">
+                    <div class="pie-legend-item">
+                        <div class="pie-color" style="background: var(--accent-emerald);"></div>
+                        <div class="pie-label">Have AI Policy: <span class="pie-percent">70%</span></div>
+                    </div>
+                    <div class="pie-legend-item">
+                        <div class="pie-color" style="background: var(--accent-amber);"></div>
+                        <div class="pie-label">No Formal Policy: <span class="pie-percent">30%</span></div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Most schools now have guidelines. Common themes: disclosure required, AI as learning tool not replacement, teacher discretion per assessment. Source: Australian Education Union Survey 2025</p>
+        </div>
+
+        <!-- Slide 10D: Responsible AI Use Video -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Learning with AI <em>Responsibly</em></h2>
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/gPfriiHBBek" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <p class="video-caption">
+                    A practical guide to using AI ethically in education. Learn how to leverage AI tools while maintaining academic integrity and developing genuine skills.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Red Flags -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Warning Signs You've Gone <em>Too Far</em></h2>
+            <div class="two-column" style="max-width: 1100px;">
+                <div style="background: var(--bg-card); padding: 2.5rem; border-radius: 20px; border-left: 4px solid var(--accent-amber);">
+                    <h3 style="color: var(--accent-amber); font-size: 1.2rem; margin-bottom: 1.5rem;">🚨 Red Flags</h3>
+                    <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem; list-style: none;">
+                        <li style="margin-bottom: 0.75rem;">✗ You can't explain the work you're submitting</li>
+                        <li style="margin-bottom: 0.75rem;">✗ You're uncomfortable if asked about your process</li>
+                        <li style="margin-bottom: 0.75rem;">✗ You're hiding AI use when you should disclose</li>
+                        <li style="margin-bottom: 0.75rem;">✗ The AI is doing 100% of the thinking</li>
+                        <li style="margin-bottom: 0.75rem;">✗ You've stopped learning to save time</li>
+                        <li style="margin-bottom: 0.75rem;">✗ You'd be embarrassed if people knew how much AI helped</li>
+                    </ul>
+                </div>
+                <div style="background: var(--bg-card); padding: 2.5rem; border-radius: 20px; border-left: 4px solid var(--accent-emerald);">
+                    <h3 style="color: var(--accent-emerald); font-size: 1.2rem; margin-bottom: 1.5rem;">✓ Healthy AI Use</h3>
+                    <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem; list-style: none;">
+                        <li style="margin-bottom: 0.75rem;">✓ You could recreate the work without AI (just slower)</li>
+                        <li style="margin-bottom: 0.75rem;">✓ You can defend and explain every part</li>
+                        <li style="margin-bottom: 0.75rem;">✓ You're comfortable discussing your AI use</li>
+                        <li style="margin-bottom: 0.75rem;">✓ AI speeds you up but doesn't replace your thinking</li>
+                        <li style="margin-bottom: 0.75rem;">✓ You're still building skills and knowledge</li>
+                        <li style="margin-bottom: 0.75rem;">✓ You follow disclosure rules without hesitation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Future-Proofing -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Future-Proofing Your <em>Skills</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">📚</span>
+                    <div class="tip-content">
+                        <h4>Don't Skip the Fundamentals</h4>
+                        <p>AI can write code, but you need to understand programming logic. It can draft essays, but you need writing skills. Master the basics so you can direct AI effectively.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Develop Your Unique Perspective</h4>
+                        <p>AI generates average, generic content. Your experiences, insights, and creative combinations are what make you valuable. Cultivate originality.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔄</span>
+                    <div class="tip-content">
+                        <h4>Stay Adaptable</h4>
+                        <p>AI tools change monthly. Focus on learning how to learn, not memorising specific tools. Today's ChatGPT will be replaced by something else.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤔</span>
+                    <div class="tip-content">
+                        <h4>Build Your Bullshit Detector</h4>
+                        <p>AI confidently states incorrect information. Develop strong fact-checking habits and domain knowledge so you can spot when AI is wrong.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Real Consequences -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real <em>Consequences</em></h2>
+            <div class="workplace-grid" style="grid-template-columns: 1fr;">
+                <div class="workplace-card" style="max-width: 900px; margin: 0 auto;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.3rem; color: var(--accent-rose); margin-bottom: 1rem;">📰 Recent Cases in Australia</h3>
+                    </div>
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="padding: 1.25rem; background: rgba(244, 63, 94, 0.1); border-radius: 12px; border-left: 3px solid var(--accent-rose);">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">University Student — Suspended</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                                Engineering student submitted AI-generated assignment without disclosure. Couldn't explain the methodology when questioned by lecturer. Two-semester suspension + mark of zero.
+                            </p>
+                        </div>
+                        <div style="padding: 1.25rem; background: rgba(244, 63, 94, 0.1); border-radius: 12px; border-left: 3px solid var(--accent-rose);">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Graduate Employee — Terminated</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                                Junior lawyer used ChatGPT for legal memo without checking. AI cited fake cases that don't exist. Client lost their case. Employee fired, firm reputation damaged.
+                            </p>
+                        </div>
+                        <div style="padding: 1.25rem; background: rgba(244, 63, 94, 0.1); border-radius: 12px; border-left: 3px solid var(--accent-rose);">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Professional — Privacy Breach Fine</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                                Healthcare administrator input patient records into ChatGPT to generate reports. Major OAIC privacy breach investigation. Personal fine + loss of professional registration.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">These are real consequences. Take AI policies seriously.</p>
+        </div>
+
+        <!-- Slide 14: Action Steps -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Action Plan</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <span class="checklist-check">1</span>
+                    <div class="checklist-text">
+                        <strong>Research your future institution</strong> — Look up AI policies for universities or TAFEs you're considering. Understand expectations before you start.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">2</span>
+                    <div class="checklist-text">
+                        <strong>Write your personal AI policy</strong> — One page. What are your rules for AI use in school, work, and personal projects? Review it yearly.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">3</span>
+                    <div class="checklist-text">
+                        <strong>Practice ethical AI use now</strong> — In your remaining WACE work, experiment with responsible AI use. Disclose usage. Build good habits.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">4</span>
+                    <div class="checklist-text">
+                        <strong>Develop AI-resistant skills</strong> — Focus on critical thinking, creativity, and domain expertise. These are your competitive advantage.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">5</span>
+                    <div class="checklist-text">
+                        <strong>Stay informed</strong> — AI policies are evolving. Subscribe to updates from universities or employers. Join relevant communities.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Discussion Questions -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Discussion <em>Questions</em></h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 20px;">
+                    <h4 style="color: var(--accent-cyan); margin-bottom: 1.5rem; font-size: 1.1rem;">Think about it...</h4>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                        <li style="margin-bottom: 1rem;">💭 Where's your personal line between "helpful tool" and "doing the work for you"?</li>
+                        <li style="margin-bottom: 1rem;">💭 Should all AI use be disclosed, or only in certain situations?</li>
+                        <li style="margin-bottom: 1rem;">💭 How do you balance efficiency with learning?</li>
+                    </ul>
+                </div>
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 20px;">
+                    <h4 style="color: var(--accent-violet); margin-bottom: 1.5rem; font-size: 1.1rem;">Discuss with a partner...</h4>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                        <li style="margin-bottom: 1rem;">🗣️ What skills are you developing that AI can't easily replicate?</li>
+                        <li style="margin-bottom: 1rem;">🗣️ How would your dream job change with AI integration?</li>
+                        <li style="margin-bottom: 1rem;">🗣️ What would your personal AI policy look like?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Your <em>AI Policy</em> Starts Now</h1>
+            <p class="slide-subtitle">
+                The choices you make today about AI use will define your professional reputation tomorrow. Be intentional. Be ethical. Be prepared.
+            </p>
+            <p class="stat-source" style="margin-top: 3rem;">
+                Next Week: AI Prompt Engineering — How to talk to AI like a pro
+            </p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 20</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools Directory // Tech for Life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f12;
+            --bg-card: #1a1a20;
+            --bg-hover: #22222a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #f472b6;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --accent-purple: #a78bfa;
+            --accent-yellow: #fbbf24;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border: #27272a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-primary);
+            background: var(--bg-card);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .updated {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Search and Filter Controls */
+        .controls {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* Category Sections */
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .category-icon {
+            font-size: 2rem;
+        }
+
+        .category-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .category-count {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        /* Tool Cards */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tool-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tool-logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .tool-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tool-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-name a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .tool-name a:hover {
+            color: var(--accent-primary);
+        }
+
+        .external-icon {
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .tool-company {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .tool-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tool-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .price-badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .price-badge.free {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--accent-green);
+        }
+
+        .price-badge.freemium {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        .price-badge.paid {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            background: var(--bg-dark);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+            border: 1px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tips-section h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tips-section ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .tips-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tips-section li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Hidden state for filtering */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../../index.html" class="back-link">← Back to Course Hub</a>
+            <h1 class="logo">AI Tools Directory</h1>
+            <p class="subtitle">Comprehensive guide to AI tools for students and creators</p>
+            <p class="updated">Last Updated: January 2026</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-tools">38</div>
+                <div class="stat-label">AI Tools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="free-tools">16</div>
+                <div class="stat-label">Free Options</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="freemium-tools">18</div>
+                <div class="stat-label">Freemium</div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search tools by name, description, or tag...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">All Tools</button>
+                <button class="filter-btn" data-category="chatbots">💬 Chatbots</button>
+                <button class="filter-btn" data-category="image">🎨 Image</button>
+                <button class="filter-btn" data-category="writing">✍️ Writing</button>
+                <button class="filter-btn" data-category="video">🎬 Video</button>
+                <button class="filter-btn" data-category="research">🔬 Research</button>
+                <button class="filter-btn" data-category="development">💻 Development</button>
+                <button class="filter-btn" data-category="education">🇦🇺 Education</button>
+            </div>
+        </div>
+
+        <!-- AI Chatbots & Assistants -->
+        <section class="category-section" data-category="chatbots">
+            <div class="category-header">
+                <span class="category-icon">💬</span>
+                <h2 class="category-title">AI Chatbots & Assistants</h2>
+                <span class="category-count">5 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- ChatGPT -->
+                <div class="tool-card" data-tags="chatbot conversation general coding writing">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="ChatGPT">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://chat.openai.com" target="_blank" rel="noopener">ChatGPT <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">OpenAI</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">The most popular AI chatbot for general-purpose use. Features conversation memory, web browsing, and image generation with DALL-E 3.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">General Purpose</span>
+                            <span class="tag">Memory</span>
+                            <span class="tag">Popular</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Claude -->
+                <div class="tool-card" data-tags="chatbot conversation writing coding analysis">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://claude.ai" target="_blank" rel="noopener">Claude <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Anthropic</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Excels at long-form writing, coding, and detailed analysis. Known for thoughtful, nuanced responses and strong reasoning capabilities.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Writing</span>
+                            <span class="tag">Coding</span>
+                            <span class="tag">Analysis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gemini -->
+                <div class="tool-card" data-tags="chatbot conversation research google integration">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Google</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Google's AI assistant with deep integration into Google services. Excellent for research, accessing Google tools, and real-time information.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Research</span>
+                            <span class="tag">Google Integration</span>
+                            <span class="tag">Real-time</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Copilot -->
+                <div class="tool-card" data-tags="chatbot conversation microsoft office productivity">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=microsoft.com&sz=64" alt="Copilot">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://copilot.microsoft.com" target="_blank" rel="noopener">Copilot <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Microsoft</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Microsoft's AI assistant integrated into Windows, Edge, and Microsoft 365. Perfect for productivity tasks and Office document creation.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Microsoft 365</span>
+                            <span class="tag">Productivity</span>
+                            <span class="tag">Office</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Perplexity -->
+                <div class="tool-card" data-tags="chatbot research citations sources real-time">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="Perplexity">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://perplexity.ai" target="_blank" rel="noopener">Perplexity <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Perplexity AI</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI-powered search engine that provides answers with real-time web sources and citations. Ideal for research and fact-checking.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Research</span>
+                            <span class="tag">Citations</span>
+                            <span class="tag">Real-time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Image Generators -->
+        <section class="category-section" data-category="image">
+            <div class="category-header">
+                <span class="category-icon">🎨</span>
+                <h2 class="category-title">AI Image Generators</h2>
+                <span class="category-count">8 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- DALL-E 3 -->
+                <div class="tool-card" data-tags="image generation art design beginner">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="DALL-E 3">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://chat.openai.com" target="_blank" rel="noopener">DALL-E 3 <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">OpenAI (via ChatGPT)</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Beginner-friendly image generator integrated into ChatGPT. Creates high-quality images from text descriptions with excellent prompt understanding.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Beginner Friendly</span>
+                            <span class="tag">Creative</span>
+                            <span class="tag">ChatGPT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Midjourney -->
+                <div class="tool-card" data-tags="image generation art artistic quality premium">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=midjourney.com&sz=64" alt="Midjourney">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://midjourney.com" target="_blank" rel="noopener">Midjourney <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Midjourney</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Industry-leading artistic quality and aesthetic appeal. Used by professional designers and artists. Accessed through Discord or web interface.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge paid">Paid</span>
+                        <div class="tool-tags">
+                            <span class="tag">Best Quality</span>
+                            <span class="tag">Artistic</span>
+                            <span class="tag">Professional</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adobe Firefly -->
+                <div class="tool-card" data-tags="image generation design commercial adobe safe">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=adobe.com&sz=64" alt="Adobe Firefly">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://firefly.adobe.com" target="_blank" rel="noopener">Adobe Firefly <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Adobe</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Designed for commercial use with training on licensed Adobe Stock content. Seamlessly integrates with Photoshop, Illustrator, and Express.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Commercial Safe</span>
+                            <span class="tag">Adobe Integration</span>
+                            <span class="tag">Professional</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canva Magic -->
+                <div class="tool-card" data-tags="image generation design beginner templates easy">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=canva.com&sz=64" alt="Canva Magic">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://canva.com" target="_blank" rel="noopener">Canva Magic <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Canva</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI features built into Canva's design platform. Perfect for quick social media graphics, presentations, and marketing materials.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Design Platform</span>
+                            <span class="tag">Templates</span>
+                            <span class="tag">Easy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leonardo.ai -->
+                <div class="tool-card" data-tags="image generation game assets art free">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=leonardo.ai&sz=64" alt="Leonardo.ai">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://leonardo.ai" target="_blank" rel="noopener">Leonardo.ai <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Leonardo.ai</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Excellent free tier with focus on game assets, character design, and concept art. Offers fine-tuned models for specific art styles.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Game Assets</span>
+                            <span class="tag">Free Tier</span>
+                            <span class="tag">Concept Art</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ideogram -->
+                <div class="tool-card" data-tags="image generation text typography design">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=ideogram.ai&sz=64" alt="Ideogram">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://ideogram.ai" target="_blank" rel="noopener">Ideogram <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Ideogram</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Best-in-class for generating images with readable text and typography. Ideal for posters, logos, and designs requiring text integration.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Text in Images</span>
+                            <span class="tag">Typography</span>
+                            <span class="tag">Logos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recraft -->
+                <div class="tool-card" data-tags="image generation vector design icons svg">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=recraft.ai&sz=64" alt="Recraft">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://recraft.ai" target="_blank" rel="noopener">Recraft <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Recraft</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Specialises in vector graphics, icons, and illustrations. Creates scalable SVG files perfect for web design, logos, and UI elements.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Vector Graphics</span>
+                            <span class="tag">Icons</span>
+                            <span class="tag">SVG Export</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Writing & Study -->
+        <section class="category-section" data-category="writing">
+            <div class="category-header">
+                <span class="category-icon">✍️</span>
+                <h2 class="category-title">AI Writing & Study Tools</h2>
+                <span class="category-count">4 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- Grammarly -->
+                <div class="tool-card" data-tags="writing grammar spelling editing style">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=grammarly.com&sz=64" alt="Grammarly">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://grammarly.com" target="_blank" rel="noopener">Grammarly <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Grammarly</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Real-time grammar, spelling, and style suggestions as you write. Works across websites, apps, and documents with browser extension.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Grammar</span>
+                            <span class="tag">Editing</span>
+                            <span class="tag">Browser Extension</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QuillBot -->
+                <div class="tool-card" data-tags="writing paraphrasing summarising rewriting student">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=quillbot.com&sz=64" alt="QuillBot">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://quillbot.com" target="_blank" rel="noopener">QuillBot <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">QuillBot</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI-powered paraphrasing and summarising tool. Helps rewrite content in different styles while maintaining meaning. Popular with students.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Paraphrasing</span>
+                            <span class="tag">Summarising</span>
+                            <span class="tag">Student Friendly</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notion AI -->
+                <div class="tool-card" data-tags="writing notes organisation productivity study">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="Notion AI">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://notion.so" target="_blank" rel="noopener">Notion AI <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Notion</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI features integrated into Notion's note-taking and organisation platform. Generate summaries, drafts, and organise information efficiently.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Note-taking</span>
+                            <span class="tag">Organisation</span>
+                            <span class="tag">Productivity</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Otter.ai -->
+                <div class="tool-card" data-tags="writing transcription audio notes meetings">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=otter.ai&sz=64" alt="Otter.ai">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://otter.ai" target="_blank" rel="noopener">Otter.ai <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Otter.ai</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Real-time transcription of meetings, lectures, and conversations. Automatically generates searchable notes with speaker identification.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Transcription</span>
+                            <span class="tag">Meetings</span>
+                            <span class="tag">Audio Notes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Video Tools -->
+        <section class="category-section" data-category="video">
+            <div class="category-header">
+                <span class="category-icon">🎬</span>
+                <h2 class="category-title">AI Video Tools</h2>
+                <span class="category-count">3 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- CapCut -->
+                <div class="tool-card" data-tags="video editing social media tiktok beginner">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=capcut.com&sz=64" alt="CapCut">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://capcut.com" target="_blank" rel="noopener">CapCut <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">ByteDance</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Free video editor with AI-powered features like auto-captions, background removal, and text-to-speech. Perfect for social media content.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge free">Free</span>
+                        <div class="tool-tags">
+                            <span class="tag">Video Editing</span>
+                            <span class="tag">Auto-Captions</span>
+                            <span class="tag">Social Media</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Runway -->
+                <div class="tool-card" data-tags="video generation editing advanced creative">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=runway.com&sz=64" alt="Runway">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://runway.com" target="_blank" rel="noopener">Runway <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Runway</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Advanced AI video generation and editing tools. Create videos from text, extend clips, remove backgrounds, and apply AI effects.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Video Generation</span>
+                            <span class="tag">Advanced</span>
+                            <span class="tag">Creative</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descript -->
+                <div class="tool-card" data-tags="video editing podcast transcription audio">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=descript.com&sz=64" alt="Descript">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://descript.com" target="_blank" rel="noopener">Descript <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Descript</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Edit videos and podcasts by editing text transcripts. Remove filler words, create AI voices, and produce professional content easily.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Video Editing</span>
+                            <span class="tag">Podcasts</span>
+                            <span class="tag">Transcription</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Research Tools -->
+        <section class="category-section" data-category="research">
+            <div class="category-header">
+                <span class="category-icon">🔬</span>
+                <h2 class="category-title">AI Research Tools</h2>
+                <span class="category-count">4 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- Elicit -->
+                <div class="tool-card" data-tags="research academic papers literature review student">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=elicit.com&sz=64" alt="Elicit">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://elicit.com" target="_blank" rel="noopener">Elicit <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Elicit</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI research assistant for academic papers. Quickly find relevant studies, extract key information, and summarise research papers efficiently.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Academic</span>
+                            <span class="tag">Research Papers</span>
+                            <span class="tag">Literature Review</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consensus -->
+                <div class="tool-card" data-tags="research academic scientific papers evidence">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=consensus.app&sz=64" alt="Consensus">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://consensus.app" target="_blank" rel="noopener">Consensus <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Consensus</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI-powered search engine for scientific research papers. Get instant answers with evidence from peer-reviewed studies and academic sources.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Scientific</span>
+                            <span class="tag">Research Papers</span>
+                            <span class="tag">Evidence-based</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scite.ai -->
+                <div class="tool-card" data-tags="research academic citations papers analysis">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=scite.ai&sz=64" alt="Scite.ai">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://scite.ai" target="_blank" rel="noopener">Scite.ai <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Scite</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Smart citations tool that shows how research papers have been cited. Identifies supporting and contrasting evidence across scientific literature.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Citations</span>
+                            <span class="tag">Research Papers</span>
+                            <span class="tag">Analysis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NotebookLM -->
+                <div class="tool-card" data-tags="research study notes google assistant learning">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&sz=64" alt="NotebookLM">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://notebooklm.google.com" target="_blank" rel="noopener">NotebookLM <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Google</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Google's AI-powered research assistant. Upload documents, PDFs, or notes and chat with them. Creates study guides, summaries, and audio podcasts from your sources.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge free">Free</span>
+                        <div class="tool-tags">
+                            <span class="tag">Google</span>
+                            <span class="tag">Study Assistant</span>
+                            <span class="tag">Document Chat</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Development Tools -->
+        <section class="category-section" data-category="development">
+            <div class="category-header">
+                <span class="category-icon">💻</span>
+                <h2 class="category-title">AI Development Tools</h2>
+                <span class="category-count">4 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- Claude Code -->
+                <div class="tool-card" data-tags="coding development programming ai assistant terminal">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude Code">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://claude.ai" target="_blank" rel="noopener">Claude Code <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Anthropic</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Anthropic's AI coding assistant that runs in your terminal. Can read, write, and edit code files directly. Excellent for building web apps and automating tasks.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Coding</span>
+                            <span class="tag">Terminal</span>
+                            <span class="tag">Automation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cursor -->
+                <div class="tool-card" data-tags="coding development ide programming ai editor">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=cursor.com&sz=64" alt="Cursor">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://cursor.com" target="_blank" rel="noopener">Cursor <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Cursor</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI-powered code editor built on VS Code. Features intelligent autocomplete, code generation, and refactoring. Chat with AI about your codebase directly.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Code Editor</span>
+                            <span class="tag">VS Code Based</span>
+                            <span class="tag">Autocomplete</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Replicate -->
+                <div class="tool-card" data-tags="development ai models hosting api machine learning">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=replicate.com&sz=64" alt="Replicate">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://replicate.com" target="_blank" rel="noopener">Replicate <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Replicate</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Run open-source AI models via API. Access thousands of image, video, audio, and language models without managing infrastructure. Pay per use.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">API Access</span>
+                            <span class="tag">Open Source Models</span>
+                            <span class="tag">Pay Per Use</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GitHub Copilot -->
+                <div class="tool-card" data-tags="coding development ide programming ai autocomplete">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=github.com&sz=64" alt="GitHub Copilot">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">GitHub / Microsoft</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI pair programmer that suggests code in real-time. Works inside VS Code, JetBrains, and other editors. Free for verified students via GitHub Education.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Autocomplete</span>
+                            <span class="tag">Free for Students</span>
+                            <span class="tag">Multi-IDE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Australian Education Tools -->
+        <section class="category-section" data-category="education">
+            <div class="category-header">
+                <span class="category-icon">🇦🇺</span>
+                <h2 class="category-title">Australian Education Tools</h2>
+                <span class="category-count">2 tools</span>
+            </div>
+            <div class="tools-grid">
+                <!-- TeacherScreen -->
+                <div class="tool-card" data-tags="education australian teaching classroom teacher">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=teacherscreen.com.au&sz=64" alt="TeacherScreen">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://teacherscreen.com.au" target="_blank" rel="noopener">TeacherScreen <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">TeacherScreen Australia</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">Australian-made AI teaching assistant designed for Australian curriculum. Helps teachers and students with lesson planning, explanations, and educational content.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge freemium">Freemium</span>
+                        <div class="tool-tags">
+                            <span class="tag">Australian</span>
+                            <span class="tag">Education</span>
+                            <span class="tag">Curriculum Aligned</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Perfect -->
+                <div class="tool-card" data-tags="education australian learning platform school">
+                    <div class="tool-header">
+                        <div class="tool-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=educationperfect.com&sz=64" alt="Education Perfect">
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">
+                                <a href="https://educationperfect.com" target="_blank" rel="noopener">Education Perfect <span class="external-icon">↗</span></a>
+                            </div>
+                            <div class="tool-company">Education Perfect</div>
+                        </div>
+                    </div>
+                    <p class="tool-description">AI-enhanced learning platform used by many Australian schools. Adaptive learning paths, instant feedback, and curriculum-aligned content for Years 7-12.</p>
+                    <div class="tool-meta">
+                        <span class="price-badge paid">School License</span>
+                        <div class="tool-tags">
+                            <span class="tag">Australian Schools</span>
+                            <span class="tag">Adaptive Learning</span>
+                            <span class="tag">Years 7-12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tips Section -->
+        <div class="tips-section">
+            <h3>💡 Tips for Using AI Tools</h3>
+            <ul>
+                <li><strong>Start Free:</strong> Most tools offer free tiers — test before committing to paid plans</li>
+                <li><strong>Compare Outputs:</strong> Try the same prompt in different tools to see which works best for your needs</li>
+                <li><strong>Check Usage Policies:</strong> Understand commercial use rights, especially for student projects</li>
+                <li><strong>Practice Prompting:</strong> Better prompts = better results. Be specific and descriptive</li>
+                <li><strong>Verify AI Information:</strong> Always fact-check AI-generated content, especially for academic work</li>
+                <li><strong>Understand Limitations:</strong> AI can make mistakes, show bias, or generate outdated information</li>
+                <li><strong>Combine Tools:</strong> Use multiple AI tools together for best results (e.g., ChatGPT + Grammarly)</li>
+                <li><strong>Stay Updated:</strong> AI tools improve rapidly — check for new features regularly</li>
+                <li><strong>Academic Integrity:</strong> Follow your school/university policies on AI tool usage</li>
+                <li><strong>Data Privacy:</strong> Be careful what personal information you share with AI tools</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Tech for Life — Denmark Senior High School — 2026</p>
+            <p>AI Tools Directory compiled for Year 12 Digital Literacy students</p>
+            <p style="margin-top: 1rem; font-size: 0.8rem;">Tool information accurate as of January 2026 — prices and features may change</p>
+        </footer>
+    </div>
+
+    <script>
+        // Search and Filter functionality
+        const searchInput = document.getElementById('search-input');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const categoryAections = document.querySelectorAll('.category-section');
+        const toolCards = document.querySelectorAll('.tool-card');
+
+        let currentCategory = 'all';
+        let currentSearchTerm = '';
+
+        // Filter by category
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active button
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                currentCategory = btn.dataset.category;
+                applyFilters();
+            });
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            currentSearchTerm = e.target.value.toLowerCase();
+            applyFilters();
+        });
+
+        function applyFilters() {
+            let visibleCount = 0;
+
+            // Handle category sections
+            categoryAections.forEach(section => {
+                const sectionCategory = section.dataset.category;
+
+                if (currentCategory === 'all' || currentCategory === sectionCategory) {
+                    section.classList.remove('hidden');
+
+                    // Filter tools within visible sections
+                    const cardsInSection = section.querySelectorAll('.tool-card');
+                    let visibleInSection = 0;
+
+                    cardsInSection.forEach(card => {
+                        const cardText = card.textContent.toLowerCase();
+                        const cardTags = card.dataset.tags.toLowerCase();
+                        const searchMatch = currentSearchTerm === '' ||
+                                          cardText.includes(currentSearchTerm) ||
+                                          cardTags.includes(currentSearchTerm);
+
+                        if (searchMatch) {
+                            card.classList.remove('hidden');
+                            visibleInSection++;
+                            visibleCount++;
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+
+                    // Hide section if no visible cards
+                    if (visibleInSection === 0) {
+                        section.classList.add('hidden');
+                    }
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Show empty state if no results
+            showEmptyState(visibleCount === 0);
+
+            // Update stats
+            updateStats();
+        }
+
+        function showEmptyState(show) {
+            let emptyState = document.getElementById('empty-state');
+
+            if (show && !emptyState) {
+                emptyState = document.createElement('div');
+                emptyState.id = 'empty-state';
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = `
+                    <div class="empty-state-icon">🔍</div>
+                    <h3>No tools found</h3>
+                    <p>Try adjusting your search or filter</p>
+                `;
+                document.querySelector('.container').appendChild(emptyState);
+            } else if (!show && emptyState) {
+                emptyState.remove();
+            }
+        }
+
+        function updateStats() {
+            // Count visible tools
+            const visibleCards = document.querySelectorAll('.tool-card:not(.hidden)');
+            const totalVisible = visibleCards.length;
+
+            // Count by price type among visible cards
+            let freeCount = 0;
+            let freemiumCount = 0;
+            let paidCount = 0;
+
+            visibleCards.forEach(card => {
+                const priceBadge = card.querySelector('.price-badge');
+                if (priceBadge.classList.contains('free')) freeCount++;
+                if (pricebadge.classList.contains('freemium')) freemiumCount++;
+                if (pricebage.classList.contains('paid')) paidCount++;
+            });
+
+            // Update stat displays
+            document.getElementById('total-tools').textContent = totalVisible;
+            document.getElementById('free-tools').textContent = freeCount;
+            document.getElementById('freemium-tools').textContent = freemiumCount;
+        }
+
+        // Initial stats update
+        updateStats();
+
+        // Add keyboard shortcut for search (Ctrl/Cmd + K)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Privacy Settings // Week 13 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card:nth-child(1) { border-color: var(--accent-rose); }
+        .stat-card:nth-child(2) { border-color: var(--accent-amber); }
+        .stat-card:nth-child(3) { border-color: var(--accent-emerald); }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card:nth-child(1) .stat-number { color: var(--accent-rose); }
+        .stat-card:nth-child(2) .stat-number { color: var(--accent-amber); }
+        .stat-card:nth-child(3) .stat-number { color: var(--accent-emerald); }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Step-by-step instructions */
+        .steps-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .step-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .step-content .path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        /* Platform cards */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .platform-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-violet);
+        }
+
+        .platform-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .column-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .column-content h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .column-content li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Warning boxes */
+        .warning-box {
+            background: rgba(244, 63, 94, 0.1);
+            border: 2px solid var(--accent-rose);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        .warning-box h3 {
+            color: var(--accent-rose);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .info-box h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .info-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .info-box li::before {
+            content: "✓";
+            color: var(--accent-emerald);
+            font-weight: bold;
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 700px;
+        }
+
+        .checklist-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-violet);
+            border-radius: 6px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Data visualization */
+        .data-viz {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .viz-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--accent-cyan);
+        }
+
+        .platform-comparison {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .platform-item {
+            text-align: center;
+        }
+
+        .platform-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 0.75rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .platform-stat {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.25rem;
+        }
+
+        .platform-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .video-wrapper {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .video-intro {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .platform-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: 1fr; }
+            .steps-container { padding: 0 1rem; }
+            .platform-comparison { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Lock Down Your <em>Privacy</em></h1>
+            <p class="slide-subtitle">A practical guide to protecting your personal information online — platform by platform</p>
+            <p class="stat-source">Week 13 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why Privacy Matters -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why Privacy Settings <em>Matter</em></h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">87%</div>
+                    <div class="stat-label">of Australians are concerned about online privacy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">52%</div>
+                    <div class="stat-label">have experienced unwanted contact from strangers online</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">70%</div>
+                    <div class="stat-label">of apps track your location even when not in use</div>
+                </div>
+            </div>
+            <p class="stat-source">Sources: OAIC Australian Privacy Awareness Survey 2024 • eSafety Commissioner</p>
+        </div>
+
+        <!-- Slide 3: What's at Stake -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What's at <em>Stake</em>?</h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>🎯 Your Data is Valuable</h3>
+                    <ul>
+                        <li>Companies sell your behaviour patterns</li>
+                        <li>Location data reveals daily routines</li>
+                        <li>Photos contain metadata (time, place)</li>
+                        <li>Messages and search history build profiles</li>
+                        <li>All of this = targeted ads, tracking, profiling</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>⚠️ Real Risks</h3>
+                    <ul>
+                        <li>Stalking and harassment</li>
+                        <li>Identity theft</li>
+                        <li>Account takeovers</li>
+                        <li>Doxing (publishing personal info)</li>
+                        <li>Future employers seeing old posts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3.5: Data Collection Comparison -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Data Do Apps <em>Actually Collect</em>?</h2>
+            <div class="data-viz">
+                <div class="viz-title">Data Points Collected Per Platform (Average)</div>
+                <div class="platform-comparison">
+                    <div class="platform-item">
+                        <div class="platform-logo">📘</div>
+                        <div class="platform-stat" style="color: var(--accent-blue);">52</div>
+                        <div class="platform-label">Facebook/Meta</div>
+                    </div>
+                    <div class="platform-item">
+                        <div class="platform-logo">📷</div>
+                        <div class="platform-stat" style="color: var(--accent-rose);">37</div>
+                        <div class="platform-label">Instagram</div>
+                    </div>
+                    <div class="platform-item">
+                        <div class="platform-logo">🎵</div>
+                        <div class="platform-stat" style="color: var(--accent-cyan);">33</div>
+                        <div class="platform-label">TikTok</div>
+                    </div>
+                    <div class="platform-item">
+                        <div class="platform-logo">👻</div>
+                        <div class="platform-stat" style="color: var(--accent-amber);">24</div>
+                        <div class="platform-label">Snapchat</div>
+                    </div>
+                </div>
+                <p style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem; text-align: center;">Includes: Location history, contacts, search history, app usage, device info, browsing activity, biometric data</p>
+            </div>
+            <p class="stat-source">Based on Apple Privacy Labels & Australian Privacy Foundation research 2025</p>
+        </div>
+
+        <!-- Slide 3.6: Privacy Settings Tutorial Video -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Complete Privacy Settings <em>Walkthrough</em></h2>
+            <div class="video-wrapper">
+                <p class="video-intro">Follow along with this comprehensive guide to locking down your social media privacy</p>
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px;">
+                    <iframe src="https://www.youtube.com/embed/R7vKsLYCcqQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            <p class="stat-source">Video covers Instagram, TikTok, Snapchat & Facebook privacy settings</p>
+        </div>
+
+        <!-- Slide 4: Follow Along -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem; margin-bottom: 2rem;">Get Your Phone <em>Ready</em></h2>
+            <div class="warning-box">
+                <h3>📱 This is a hands-on session</h3>
+                <p style="margin-bottom: 1rem;">You'll be changing settings on your actual devices. Have your phone unlocked and ready.</p>
+                <p style="margin-bottom: 1rem;">We'll go through each platform step-by-step. Follow along as we cover:</p>
+                <p style="color: var(--text-primary); font-weight: 600;">Instagram • TikTok • Snapchat • Facebook • Google • iPhone/Android</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Instagram Privacy Settings -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">📷 <em>Instagram</em> Privacy</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Make Your Account Private</h4>
+                        <p>Only approved followers can see your posts and stories</p>
+                        <span class="path">Profile → ☰ → Settings → Privacy → Private account (toggle ON)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Hide Your Activity Status</h4>
+                        <p>Stop showing when you're online</p>
+                        <span class="path">Settings → Privacy → Activity status (toggle OFF)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Control Who Can Message You</h4>
+                        <p>Limit DMs to people you follow</p>
+                        <span class="path">Settings → Privacy → Messages → Message controls</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Disable Location Services</h4>
+                        <p>Remove location tags from posts</p>
+                        <span class="path">Settings → Privacy → Location → Location services (OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Instagram - More Settings -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">📷 Instagram <em>Continued</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Restrict Who Can Comment</h4>
+                        <p>Filter offensive comments automatically</p>
+                        <span class="path">Settings → Privacy → Comments → Block comments from</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>Control Story Sharing</h4>
+                        <p>Prevent people from sharing your stories</p>
+                        <span class="path">Settings → Privacy → Story → Allow sharing to messages (OFF)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <h4>Hide Your Tagged Photos</h4>
+                        <p>Manually approve tags before they appear on your profile</p>
+                        <span class="path">Settings → Privacy → Tags → Manually approve tags (ON)</span>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Take 2 minutes now to check these settings on your Instagram account</p>
+        </div>
+
+        <!-- Slide 7: TikTok Privacy Settings -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">🎵 <em>TikTok</em> Privacy</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Switch to Private Account</h4>
+                        <p>Only approved followers can view your videos</p>
+                        <span class="path">Profile → ☰ → Settings & privacy → Privacy → Private account (ON)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Control Who Can Duet/Stitch Your Videos</h4>
+                        <p>Prevent others from remixing your content</p>
+                        <span class="path">Settings → Privacy → Duet & Stitch → Only you</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Limit Comments</h4>
+                        <p>Control who can comment on your videos</p>
+                        <span class="path">Settings → Privacy → Comments → Friends only</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Turn Off Activity Status</h4>
+                        <p>Hide when you were last online</p>
+                        <span class="path">Settings → Privacy → Activity status (OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Snapchat Privacy Settings -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">👻 <em>Snapchat</em> Privacy</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Turn Off Snap Map (IMPORTANT)</h4>
+                        <p>Stop broadcasting your live location to everyone</p>
+                        <span class="path">Pinch to open Map → Settings ⚙️ → Ghost Mode (ON)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Control Who Can Contact You</h4>
+                        <p>Limit messages to friends only</p>
+                        <span class="path">Profile → ⚙️ → Privacy → Contact Me → Friends only</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Restrict Story Viewing</h4>
+                        <p>Choose who sees your stories</p>
+                        <span class="path">Profile → ⚙️ → Privacy → View My Story → Friends only</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Disable Quick Add</h4>
+                        <p>Don't let strangers find you easily</p>
+                        <span class="path">Settings → Privacy → See Me in Quick Add (OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Snap Map Warning -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Snap Map <em>Warning</em></h2>
+            <div class="warning-box">
+                <h3>⚠️ Snap Map broadcasts your exact location in real-time</h3>
+                <p style="margin-bottom: 1rem;">If Ghost Mode is off, anyone who can see your story knows exactly where you are, right now. This includes:</p>
+                <ul style="list-style: none; margin-top: 1rem;">
+                    <li style="padding: 0.5rem 0; color: var(--text-secondary);">📍 Your home address (when you're at home)</li>
+                    <li style="padding: 0.5rem 0; color: var(--text-secondary);">🏫 Your school location</li>
+                    <li style="padding: 0.5rem 0; color: var(--text-secondary);">💼 Your work location</li>
+                    <li style="padding: 0.5rem 0; color: var(--text-secondary);">🏃 When you're alone vs. with others</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--text-primary);">Check your Snap Map NOW. Enable Ghost Mode.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Facebook/Messenger Privacy -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">📘 <em>Facebook</em> & Messenger</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Lock Down Who Sees Your Posts</h4>
+                        <p>Change future posts to Friends only</p>
+                        <span class="path">☰ → Settings → Privacy → Who can see your future posts? → Friends</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Limit Past Posts</h4>
+                        <p>Make all old public posts Friends-only</p>
+                        <span class="path">Settings → Privacy → Limit past posts → Limit old posts</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Control Friend Requests</h4>
+                        <p>Limit who can send you friend requests</p>
+                        <span class="path">Settings → Privacy → Who can send you friend requests? → Friends of friends</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Hide Active Status</h4>
+                        <p>Don't show when you're online</p>
+                        <span class="path">Messenger → Profile → Active status (OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Google Account Privacy -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">🔍 <em>Google</em> Account Privacy</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Turn Off Location History</h4>
+                        <p>Stop Google tracking everywhere you go</p>
+                        <span class="path">Google Account → Data & privacy → Location history → Turn off</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Pause Web & App Activity</h4>
+                        <p>Stop Google saving your searches and browsing</p>
+                        <span class="path">Data & privacy → Web & App Activity → Turn off</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Disable Ad Personalisation</h4>
+                        <p>Stop targeted ads based on your activity</p>
+                        <span class="path">Data & privacy → Ad settings → Ad personalisation → Turn off</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Review & Delete Old Activity</h4>
+                        <p>Clear your Google history periodically</p>
+                        <span class="path">Data & privacy → My Activity → Delete activity by</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: iPhone Privacy Settings -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">📱 <em>iPhone</em> Privacy Settings</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Review App Location Permissions</h4>
+                        <p>Set most apps to "While Using App" or "Never"</p>
+                        <span class="path">Settings → Privacy & Security → Location Services</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Disable App Tracking</h4>
+                        <p>Stop apps from tracking you across other apps/websites</p>
+                        <span class="path">Settings → Privacy & Security → Tracking → Allow Apps to Request to Track (OFF)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Turn Off Precise Location</h4>
+                        <p>Give apps approximate location instead of exact</p>
+                        <span class="path">Location Services → [App Name] → Precise Location (OFF)</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Disable Personalised Ads</h4>
+                        <p>Stop Apple from targeting you with ads</p>
+                        <span class="path">Settings → Privacy & Security → Apple Advertising → Personalised Ads (OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Android Privacy Settings -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">🤖 <em>Android</em> Privacy Settings</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Check App Permissions</h4>
+                        <p>Review which apps have access to camera, mic, location</p>
+                        <span class="path">Settings → Privacy → Permission manager</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Set Location to "While in Use"</h4>
+                        <p>Don't give apps constant location access</p>
+                        <span class="path">Permission manager → Location → [App] → Allow only while using app</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Disable Microphone/Camera for Unnecessary Apps</h4>
+                        <p>Games don't need your microphone!</p>
+                        <span class="path">Permission manager → Microphone/Camera → Review & disable</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Turn Off Google Location History</h4>
+                        <p>Same as Google Account settings above</p>
+                        <span class="path">Settings → Location → Location services → Google Location History (OFF)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: App Permissions Guide -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">App Permissions <em>Guide</em></h2>
+            <div class="two-column">
+                <div class="column-content" style="border-left: 4px solid var(--accent-emerald);">
+                    <h3>✓ Usually Safe to Allow</h3>
+                    <ul>
+                        <li>Camera app → Camera access</li>
+                        <li>Maps app → Location (while using)</li>
+                        <li>Music app → Storage</li>
+                        <li>Phone app → Contacts</li>
+                        <li>Banking app → Notifications</li>
+                    </ul>
+                </div>
+                <div class="column-content" style="border-left: 4px solid var(--accent-rose);">
+                    <h3>✗ Usually Should Deny</h3>
+                    <ul>
+                        <li>Games → Location access</li>
+                        <li>Flashlight app → Contacts</li>
+                        <li>Social media → Microphone (when not posting)</li>
+                        <li>Any app → "Always" location</li>
+                        <li>Free VPNs → Network activity</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Ask yourself: "Does this app actually NEED this permission to work?"</p>
+        </div>
+
+        <!-- Slide 15: Location Data Warning -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Location Data <em>Tells Stories</em></h2>
+            <div class="info-box">
+                <h3>📍 Your location reveals more than you think</h3>
+                <p>Even if you don't post photos, location metadata shows:</p>
+                <ul>
+                    <li>Where you live (every night 10pm-7am, same location)</li>
+                    <li>Where you work or go to school (weekday patterns)</li>
+                    <li>Your daily routine (coffee shop, gym, friend's house)</li>
+                    <li>When you're home alone vs. away</li>
+                    <li>Who you spend time with (overlapping locations)</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-amber);">This data is sold to advertisers, insurance companies, and data brokers. It never goes away.</p>
+            </div>
+        </div>
+
+        <!-- Slide 16: Browser Privacy -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">🌐 Browser <em>Privacy</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Incognito/Private Mode</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">What it DOES:</p>
+                    <ul style="list-style: none; font-size: 0.9rem;">
+                        <li style="color: var(--accent-emerald);">✓ Doesn't save browsing history</li>
+                        <li style="color: var(--accent-emerald);">✓ Deletes cookies after session</li>
+                        <li style="color: var(--accent-emerald);">✓ Doesn't save form data</li>
+                    </ul>
+                    <p style="color: var(--text-secondary); margin: 1.5rem 0 1rem 0;">What it DOESN'T do:</p>
+                    <ul style="list-style: none; font-size: 0.9rem;">
+                        <li style="color: var(--accent-rose);">✗ Hide from your ISP</li>
+                        <li style="color: var(--accent-rose);">✗ Hide from websites you visit</li>
+                        <li style="color: var(--accent-rose);">✗ Make you anonymous</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Better Privacy Tools</h3>
+                    <ul>
+                        <li>Use Firefox or Brave browser (better privacy defaults)</li>
+                        <li>Install uBlock Origin (blocks trackers)</li>
+                        <li>Clear cookies regularly</li>
+                        <li>Disable third-party cookies</li>
+                        <li>Use DuckDuckGo for searches (doesn't track)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Cookies Explained -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">🍪 What Are <em>Cookies</em>?</h2>
+            <div class="info-box">
+                <h3>Cookies = Small files websites store on your device</h3>
+                <p><strong>First-party cookies:</strong> Set by the website you're visiting. Usually necessary (login status, shopping cart, preferences).</p>
+                <p><strong>Third-party cookies:</strong> Set by OTHER companies (ads, trackers). They follow you across websites to build a profile of your browsing habits.</p>
+                <p style="margin-top: 1.5rem;"><strong>What to do:</strong></p>
+                <ul>
+                    <li>Block third-party cookies in browser settings</li>
+                    <li>Clear cookies every few weeks</li>
+                    <li>Don't click "Accept All" on cookie popups — choose "Necessary only"</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 18: VPNs Explained -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">🔒 What is a <em>VPN</em>?</h2>
+            <div class="info-box">
+                <h3>VPN = Virtual Private Network</h3>
+                <p>A VPN encrypts your internet connection and routes it through a server in another location. This makes it harder for others to see what you're doing online.</p>
+                <p style="margin-top: 1.5rem;"><strong>When to use a VPN:</strong></p>
+                <ul>
+                    <li>On public Wi-Fi (cafés, airports, libraries)</li>
+                    <li>When accessing sensitive information (banking)</li>
+                    <li>When travelling overseas to access Australian content</li>
+                    <li>To prevent ISP tracking of browsing habits</li>
+                </ul>
+                <p style="margin-top: 1.5rem; color: var(--accent-rose); font-weight: 600;">⚠️ Never use a free VPN — they often sell your data. Paid options: NordVPN, ProtonVPN, Mullvad.</p>
+            </div>
+        </div>
+
+        <!-- Slide 19: Two-Factor Authentication -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">🔐 Two-Factor Authentication <em>(2FA)</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>What is 2FA?</h4>
+                        <p>A second verification step after your password — usually a code sent to your phone or generated by an app</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Why Use It?</h4>
+                        <p>Even if someone steals your password, they can't access your account without your phone</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Where to Enable It</h4>
+                        <p>Instagram, TikTok, Snapchat, Facebook, Google, banking apps, email — basically everything important</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Best Method: Authenticator Apps</h4>
+                        <p>Google Authenticator or Authy (better than SMS codes which can be intercepted)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Setting Up 2FA -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Setting Up <em>2FA</em> (Instagram Example)</h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Open Instagram Settings</h4>
+                        <span class="path">Profile → ☰ → Settings → Security</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Select Two-Factor Authentication</h4>
+                        <span class="path">Security → Two-factor authentication → Get Started</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Choose Your Method</h4>
+                        <p>Select "Authentication App" (preferred) or "Text Message"</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Scan QR Code with Authenticator App</h4>
+                        <p>Use Google Authenticator or Authy to scan the code</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Enter Code & Confirm</h4>
+                        <p>Type in the 6-digit code from the app to finish setup</p>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Follow the same process for other platforms — look for "Security" or "2FA" in settings</p>
+        </div>
+
+        <!-- Slide 21: Privacy Checklist -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your <em>Privacy</em> Checklist</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Instagram account set to private</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">TikTok account set to private</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Snapchat Ghost Mode enabled</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Facebook posts limited to Friends only</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Google Location History turned off</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Phone app permissions reviewed</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Third-party cookies blocked in browser</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">2FA enabled on all major accounts</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Ongoing Habits -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Make Privacy a <em>Habit</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>🔄 Monthly Tasks</h3>
+                    <ul>
+                        <li>Review app permissions</li>
+                        <li>Clear browser cookies</li>
+                        <li>Check new followers/friends</li>
+                        <li>Delete unused apps</li>
+                        <li>Review old posts for oversharing</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>🎯 Every Time You Post</h3>
+                    <ul>
+                        <li>Remove location tags</li>
+                        <li>Check who can see it</li>
+                        <li>Think: would I want a stranger seeing this?</li>
+                        <li>Don't share real-time locations</li>
+                        <li>Be careful with identifiable details</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Quick Wins -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Quick Privacy <em>Wins</em></h2>
+            <div class="stats-grid">
+                <div class="stat-card" style="border-color: var(--accent-violet);">
+                    <div class="stat-number" style="color: var(--accent-violet); font-size: 2.5rem;">5 min</div>
+                    <div class="stat-label"><strong>Enable 2FA</strong> on your most important accounts (email, banking, social media)</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--accent-blue);">
+                    <div class="stat-number" style="color: var(--accent-blue); font-size: 2.5rem;">3 min</div>
+                    <div class="stat-label"><strong>Turn on Ghost Mode</strong> in Snapchat to stop broadcasting your location</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--accent-cyan);">
+                    <div class="stat-number" style="color: var(--accent-cyan); font-size: 2.5rem;">10 min</div>
+                    <div class="stat-label"><strong>Review app permissions</strong> on your phone and disable unnecessary access</div>
+                </div>
+            </div>
+            <p class="stat-source">These three actions alone will significantly improve your privacy</p>
+        </div>
+
+        <!-- Slide 24: When Privacy Goes Wrong -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real <em>Examples</em></h2>
+            <div class="two-column">
+                <div class="column-content" style="border-left: 4px solid var(--accent-rose);">
+                    <h3>⚠️ Location Stalking</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                        A Perth teenager posted Instagram stories with location tags. A stranger used these to figure out her school, regular routes, and home address. Police intervened after the person showed up at her school.
+                    </p>
+                </div>
+                <div class="column-content" style="border-left: 4px solid var(--accent-rose);">
+                    <h3>⚠️ Job Application Rejected</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                        A Year 12 student applied for a scholarship. The selection panel found public Facebook posts with inappropriate content from years earlier. Application rejected.
+                    </p>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">What you post publicly can follow you for years. Make it private or don't post it.</p>
+        </div>
+
+        <!-- Slide 25: Final Thoughts -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Privacy is <em>Ongoing</em></h2>
+            <div class="info-box">
+                <h3>Remember:</h3>
+                <ul>
+                    <li>Apps change their settings and interfaces — review every few months</li>
+                    <li>New apps = new privacy settings to check</li>
+                    <li>Default settings are almost always the LEAST private</li>
+                    <li>If a service is free, you're the product (they sell your data)</li>
+                    <li>You can't control what others post about you, but you can control what YOU share</li>
+                </ul>
+                <p style="margin-top: 2rem; font-weight: 600; color: var(--accent-cyan);">
+                    Privacy isn't about hiding. It's about control — deciding who gets access to your information and when.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 26: Resources -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Additional <em>Resources</em></h2>
+            <div class="info-box">
+                <h3>Learn More About Privacy</h3>
+                <ul style="font-size: 1rem;">
+                    <li><strong>eSafety Commissioner:</strong> esafety.gov.au/key-topics/staying-safe/privacy</li>
+                    <li><strong>Australian Privacy Principles:</strong> oaic.gov.au</li>
+                    <li><strong>Privacy settings guides:</strong> Each platform has a Help Centre with privacy guides</li>
+                    <li><strong>ToS;DR (Terms of Service; Didn't Read):</strong> tosdr.org — explains privacy policies in plain language</li>
+                </ul>
+                <p style="margin-top: 2rem; color: var(--text-secondary);">
+                    If you experience online harassment or privacy violations, report to the eSafety Commissioner or contact local police.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 27: Action Time -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem; margin-bottom: 2rem;">Take Action <em>Now</em></h2>
+            <div class="warning-box" style="background: rgba(139, 92, 246, 0.1); border-color: var(--accent-violet);">
+                <h3 style="color: var(--accent-violet);">📱 Your Task for the Rest of This Session</h3>
+                <p style="margin-bottom: 1.5rem;">Work through the privacy checklist. Go platform by platform and change your settings.</p>
+                <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Priority order:</p>
+                <ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Snapchat Ghost Mode (if you use Snap Map)</li>
+                    <li>Enable 2FA on email and main social accounts</li>
+                    <li>Set Instagram/TikTok to private</li>
+                    <li>Review phone app permissions</li>
+                    <li>Google Location History off</li>
+                </ol>
+                <p style="margin-top: 1.5rem; color: var(--text-primary);">Questions? Ask now.</p>
+            </div>
+        </div>
+
+        <!-- Slide 28: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Your Data, Your <em>Control</em></h1>
+            <p class="slide-subtitle">Privacy settings aren't perfect, but they're your first line of defence. Check them regularly.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 30</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

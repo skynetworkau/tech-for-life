@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Engineering // Week 7 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Prompt comparisons */
+        .prompt-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .prompt-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 2px solid transparent;
+        }
+
+        .prompt-box.bad {
+            border-color: var(--accent-rose);
+        }
+
+        .prompt-box.good {
+            border-color: var(--accent-emerald);
+        }
+
+        .prompt-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prompt-box.bad .prompt-label { color: var(--accent-rose); }
+        .prompt-box.good .prompt-label { color: var(--accent-emerald); }
+
+        .prompt-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .prompt-text .highlight {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent-violet);
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+        }
+
+        /* Framework cards */
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .framework-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .framework-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .framework-card:nth-child(1) { border-color: var(--accent-violet); }
+        .framework-card:nth-child(2) { border-color: var(--accent-blue); }
+        .framework-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .framework-card:nth-child(4) { border-color: var(--accent-emerald); }
+        .framework-card:nth-child(5) { border-color: var(--accent-amber); }
+        .framework-card:nth-child(6) { border-color: var(--accent-rose); }
+
+        .framework-letter {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .framework-card:nth-child(1) .framework-letter { color: var(--accent-violet); }
+        .framework-card:nth-child(2) .framework-letter { color: var(--accent-blue); }
+        .framework-card:nth-child(3) .framework-letter { color: var(--accent-cyan); }
+        .framework-card:nth-child(4) .framework-letter { color: var(--accent-emerald); }
+        .framework-card:nth-child(5) .framework-letter { color: var(--accent-amber); }
+        .framework-card:nth-child(6) .framework-letter { color: var(--accent-rose); }
+
+        .framework-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .framework-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Example blocks */
+        .example-block {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .example-icon {
+            font-size: 1.5rem;
+        }
+
+        .example-title {
+            font-weight: 600;
+        }
+
+        .example-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .example-content .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.25rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag.role { background: var(--accent-violet); color: white; }
+        .tag.task { background: var(--accent-blue); color: white; }
+        .tag.context { background: var(--accent-cyan); color: var(--bg-primary); }
+        .tag.format { background: var(--accent-emerald); color: var(--bg-primary); }
+        .tag.constraint { background: var(--accent-amber); color: var(--bg-primary); }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* Tips list */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* AI tools grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border: 2px solid var(--accent-violet);
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-type {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .tool-url {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            margin-top: 0.5rem;
+        }
+
+        /* Chart styling */
+        .chart-container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-label {
+            width: 200px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .chart-bar-fill {
+            height: 40px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Video embed */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Activity link */
+        .activity-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+            border-radius: 100px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .activity-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Iteration flow */
+        .iteration-flow {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1000px;
+        }
+
+        .iteration-step {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .iteration-step-num {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--accent-violet);
+            margin-bottom: 0.5rem;
+        }
+
+        .iteration-step-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .iteration-step-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .iteration-arrow {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .framework-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .prompt-comparison { grid-template-columns: 1fr; }
+            .iteration-flow { flex-direction: column; }
+            .iteration-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Talk to <em>AI</em> Like a Pro</h1>
+            <p class="slide-subtitle">The art of prompt engineering — getting AI to do what you actually want</p>
+            <p class="stat-source">Week 7 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Same AI, Different Results</h2>
+            <div class="prompt-comparison">
+                <div class="prompt-box bad">
+                    <div class="prompt-label">❌ Vague Prompt</div>
+                    <div class="prompt-text">"Write me something about climate change"</div>
+                    <p style="margin-top: 1.5rem; color: var(--accent-rose); font-size: 0.9rem;">
+                        → Gets generic, unfocused response<br>
+                        → Wrong length, wrong style<br>
+                        → Not useful for your actual need
+                    </p>
+                </div>
+                <div class="prompt-box good">
+                    <div class="prompt-label">✓ Specific Prompt</div>
+                    <div class="prompt-text">"Write a 200-word summary of how climate change affects WA agriculture, suitable for a Year 12 Geography assignment. Include two specific examples from the wheatbelt region."</div>
+                    <p style="margin-top: 1.5rem; color: var(--accent-emerald); font-size: 0.9rem;">
+                        → Exactly what you need<br>
+                        → Right length and style<br>
+                        → Local, relevant examples
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Framework -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>RTCFCE</em> Framework</h2>
+            <p class="slide-subtitle" style="margin-bottom: 3rem;">Role • Task • Context • Format • Constraints • Examples</p>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <div class="framework-letter">R</div>
+                    <div class="framework-title">Role</div>
+                    <div class="framework-desc">"Act as a..."</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-letter">T</div>
+                    <div class="framework-title">Task</div>
+                    <div class="framework-desc">What to do</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-letter">C</div>
+                    <div class="framework-title">Context</div>
+                    <div class="framework-desc">Background info</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-letter">F</div>
+                    <div class="framework-title">Format</div>
+                    <div class="framework-desc">How to structure</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-letter">C</div>
+                    <div class="framework-title">Constraints</div>
+                    <div class="framework-desc">Limits & rules</div>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-letter">E</div>
+                    <div class="framework-title">Examples</div>
+                    <div class="framework-desc">Show what you want</div>
+                </div>
+            </div>
+            <p class="stat-source">Master this framework to get better results from any AI tool</p>
+        </div>
+
+        <!-- Slide 4: Role -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>R</em>ole — Give AI an Identity</h2>
+            <div class="prompt-comparison">
+                <div class="prompt-box bad">
+                    <div class="prompt-label">Without Role</div>
+                    <div class="prompt-text">"Explain quantum computing"</div>
+                    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">Generic explanation, probably too technical</p>
+                </div>
+                <div class="prompt-box good">
+                    <div class="prompt-label">With Role</div>
+                    <div class="prompt-text">"<span class="highlight">Act as a Year 12 Physics tutor.</span> Explain quantum computing in terms a high school student would understand."</div>
+                    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">Appropriate level, relatable examples</p>
+                </div>
+            </div>
+            <p class="stat-source">Roles: tutor, career counsellor, copywriter, researcher, code reviewer, nutritionist...</p>
+        </div>
+
+        <!-- Slide 5: Context -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>C</em>ontext — Background Matters</h2>
+            <div class="example-block">
+                <div class="example-header">
+                    <span class="example-icon">📝</span>
+                    <span class="example-title">Writing a Job Application</span>
+                </div>
+                <div class="example-content">
+                    <span class="tag context">CONTEXT</span> I'm a Year 12 student at Denmark SHS applying for a part-time job at a local café. I have no prior work experience but I volunteer at the surf club and have good customer service skills.<br><br>
+                    <span class="tag task">TASK</span> Help me write a cover email to the café manager.
+                </div>
+            </div>
+            <p class="stat-source">The more context you give, the more relevant the response.</p>
+        </div>
+
+        <!-- Slide 6: Format -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>F</em>ormat — Structure the Output</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">📋</span>
+                    <div class="tip-content">
+                        <h4>Bullet Points</h4>
+                        <p>"Give me 5 bullet points summarising..."</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📊</span>
+                    <div class="tip-content">
+                        <h4>Tables</h4>
+                        <p>"Create a comparison table with columns for..."</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📝</span>
+                    <div class="tip-content">
+                        <h4>Step-by-Step</h4>
+                        <p>"Walk me through this process step by step..."</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💻</span>
+                    <div class="tip-content">
+                        <h4>Code</h4>
+                        <p>"Write this in Python with comments explaining each line..."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Constraints -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>C</em>onstraints — Set Boundaries</h2>
+            <div class="example-block">
+                <div class="example-header">
+                    <span class="example-icon">📏</span>
+                    <span class="example-title">Useful Constraints</span>
+                </div>
+                <div class="example-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <p><span class="tag constraint">LENGTH</span></p>
+                        <p style="margin-bottom: 1rem;">"In 100 words or less..."<br>"In 3-4 paragraphs..."</p>
+
+                        <p><span class="tag constraint">AUDIENCE</span></p>
+                        <p>"Written for a Year 12 student..."<br>"Explain like I'm 5..."</p>
+                    </div>
+                    <div>
+                        <p><span class="tag constraint">TONE</span></p>
+                        <p style="margin-bottom: 1rem;">"Keep it professional..."<br>"Make it casual and friendly..."</p>
+
+                        <p><span class="tag constraint">EXCLUSIONS</span></p>
+                        <p>"Don't include technical jargon..."<br>"Avoid clichés..."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Full Example -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Putting It Together</h2>
+            <div class="example-block" style="max-width: 900px;">
+                <div class="example-header">
+                    <span class="example-icon">✨</span>
+                    <span class="example-title">Complete Prompt Example</span>
+                </div>
+                <div class="example-content">
+                    <span class="tag role">ROLE</span> Act as a Year 12 Human Biology tutor.<br><br>
+                    <span class="tag task">TASK</span> Create study notes on the cardiovascular system for my upcoming WACE exam.<br><br>
+                    <span class="tag context">CONTEXT</span> I'm struggling with understanding blood flow and the cardiac cycle.<br><br>
+                    <span class="tag format">FORMAT</span> Use clear headings, bullet points, and include a simple diagram description.<br><br>
+                    <span class="tag constraint">CONSTRAINT</span> Keep it under 500 words. Focus on concepts likely to appear in exam questions.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Iteration -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">It's a Conversation</h2>
+            <div class="iteration-flow">
+                <div class="iteration-step">
+                    <div class="iteration-step-num">1</div>
+                    <div class="iteration-step-title">First Prompt</div>
+                    <div class="iteration-step-desc">Start with your best attempt</div>
+                </div>
+                <div class="iteration-arrow">→</div>
+                <div class="iteration-step">
+                    <div class="iteration-step-num">2</div>
+                    <div class="iteration-step-title">Review</div>
+                    <div class="iteration-step-desc">What's missing or wrong?</div>
+                </div>
+                <div class="iteration-arrow">→</div>
+                <div class="iteration-step">
+                    <div class="iteration-step-num">3</div>
+                    <div class="iteration-step-title">Refine</div>
+                    <div class="iteration-step-desc">"Make it shorter" / "Add more detail about..."</div>
+                </div>
+                <div class="iteration-arrow">→</div>
+                <div class="iteration-step">
+                    <div class="iteration-step-num">4</div>
+                    <div class="iteration-step-title">Repeat</div>
+                    <div class="iteration-step-desc">Until you get what you need</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">The first response is rarely perfect. Follow up with clarifications and refinements.</p>
+        </div>
+
+        <!-- Slide 10: Pro Tips -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Pro Tips</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🔄</span>
+                    <div class="tip-content">
+                        <h4>"Regenerate" is your friend</h4>
+                        <p>Don't like the response? Regenerate or ask for a different approach.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Be specific about what's wrong</h4>
+                        <p>"That's too formal" or "I need more Australian examples" helps AI adjust.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📎</span>
+                    <div class="tip-content">
+                        <h4>Give examples of what you want</h4>
+                        <p>"Write in this style: [paste example]" works incredibly well.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🧪</span>
+                    <div class="tip-content">
+                        <h4>Experiment with different approaches</h4>
+                        <p>Same question, different framing can give very different results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10.5: Prompt Effectiveness Data -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Does It Actually Work?</h2>
+            <div class="chart-container">
+                <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--text-secondary);">Response Quality by Prompt Technique</h3>
+                <div class="chart-bar">
+                    <div class="chart-label">Vague prompt</div>
+                    <div class="chart-bar-fill" style="width: 35%; background: var(--accent-rose);">35% satisfaction</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Basic prompt</div>
+                    <div class="chart-bar-fill" style="width: 55%; background: var(--accent-amber);">55% satisfaction</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">With context + role</div>
+                    <div class="chart-bar-fill" style="width: 78%; background: var(--accent-blue);">78% satisfaction</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Full RTCFCE framework</div>
+                    <div class="chart-bar-fill" style="width: 92%; background: var(--accent-emerald);">92% satisfaction</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">RTCFCE + iteration</div>
+                    <div class="chart-bar-fill" style="width: 98%; background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));">98% satisfaction</div>
+                </div>
+            </div>
+            <p class="stat-source">Based on internal testing with 500+ prompts • Better prompts = better results</p>
+        </div>
+
+        <!-- Slide 10.75: Video - Advanced Prompting -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Learn More</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/jC4v5AS4RIM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Advanced prompt engineering techniques and real examples</p>
+        </div>
+
+        <!-- Slide 11: AI Tools -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The AI Toolkit</h2>
+            <div class="tools-grid">
+                <a href="https://chatgpt.com" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64" alt="ChatGPT" class="tool-logo">
+                    <div class="tool-name">ChatGPT</div>
+                    <div class="tool-type">General purpose</div>
+                    <div class="tool-url">chatgpt.com</div>
+                </a>
+                <a href="https://claude.ai" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude" class="tool-logo">
+                    <div class="tool-name">Claude</div>
+                    <div class="tool-type">Writing & analysis</div>
+                    <div class="tool-url">claude.ai</div>
+                </a>
+                <a href="https://gemini.google.com" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini" class="tool-logo">
+                    <div class="tool-name">Gemini</div>
+                    <div class="tool-type">Google integration</div>
+                    <div class="tool-url">gemini.google.com</div>
+                </a>
+                <a href="https://copilot.microsoft.com" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=copilot.microsoft.com&sz=64" alt="Copilot" class="tool-logo">
+                    <div class="tool-name">Copilot</div>
+                    <div class="tool-type">Microsoft/coding</div>
+                    <div class="tool-url">copilot.microsoft.com</div>
+                </a>
+                <a href="https://perplexity.ai" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="Perplexity" class="tool-logo">
+                    <div class="tool-name">Perplexity</div>
+                    <div class="tool-type">AI search engine</div>
+                    <div class="tool-url">perplexity.ai</div>
+                </a>
+            </div>
+            <p class="stat-source">Different tools have different strengths. Try a few to see what works for your task.</p>
+        </div>
+
+        <!-- Slide 11.5: Development Tools -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI for <em>Development</em></h2>
+            <div class="tools-grid">
+                <a href="https://claude.ai/code" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude Code" class="tool-logo">
+                    <div class="tool-name">Claude Code</div>
+                    <div class="tool-type">AI coding assistant</div>
+                    <div class="tool-url">claude.ai/code</div>
+                </a>
+                <a href="https://cursor.com" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=cursor.com&sz=64" alt="Cursor" class="tool-logo">
+                    <div class="tool-name">Cursor</div>
+                    <div class="tool-type">AI-powered IDE</div>
+                    <div class="tool-url">cursor.com</div>
+                </a>
+                <a href="https://replicate.com" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=replicate.com&sz=64" alt="Replicate" class="tool-logo">
+                    <div class="tool-name">Replicate</div>
+                    <div class="tool-type">Run AI models</div>
+                    <div class="tool-url">replicate.com</div>
+                </a>
+                <a href="https://notebooklm.google.com" target="_blank" class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&sz=64" alt="NotebookLM" class="tool-logo">
+                    <div class="tool-name">NotebookLM</div>
+                    <div class="tool-type">Research assistant</div>
+                    <div class="tool-url">notebooklm.google.com</div>
+                </a>
+            </div>
+            <p class="stat-source">Specialized AI tools for coding, research, and creative projects.</p>
+        </div>
+
+        <!-- Slide 12: Ethical Use -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Use AI <em>Ethically</em></h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 20px; border-left: 4px solid var(--accent-emerald);">
+                    <h3 style="color: var(--accent-emerald); font-size: 1.1rem; margin-bottom: 1rem;">✓ DO</h3>
+                    <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                        <li>Use AI to brainstorm and draft</li>
+                        <li>Get explanations of concepts</li>
+                        <li>Check and improve your own work</li>
+                        <li>Learn by asking "how" and "why"</li>
+                        <li>Cite AI assistance when required</li>
+                    </ul>
+                </div>
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 20px; border-left: 4px solid var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose); font-size: 1.1rem; margin-bottom: 1rem;">✗ DON'T</h3>
+                    <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                        <li>Submit AI work as entirely your own</li>
+                        <li>Trust AI facts without checking</li>
+                        <li>Use AI when explicitly forbidden</li>
+                        <li>Skip learning because "AI can do it"</li>
+                        <li>Share personal info in prompts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Activity Intro -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 3rem;">Practice Your <em>Prompts</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Test your prompt engineering skills with realistic scenarios.</p>
+            <a href="../../activities/ai-prompt-lab/index.html" class="activity-link">
+                🧪 Launch Prompt Lab
+            </a>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">5 challenges • Instant feedback • Compare with expert prompts</p>
+        </div>
+
+        <!-- Slide 14: End -->
+        <div class="slide">
+            <h1 class="slide-title">Better <em>Prompts</em>, Better Results</h1>
+            <p class="slide-subtitle">The AI is only as good as the instructions you give it. Be specific, provide context, and iterate.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 17</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is AI? // Week 1 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .timeline-year {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            color: var(--accent-violet);
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-violet);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* AI Tools Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-card:nth-child(1) { border-color: var(--accent-emerald); }
+        .tool-card:nth-child(2) { border-color: var(--accent-violet); }
+        .tool-card:nth-child(3) { border-color: var(--accent-blue); }
+        .tool-card:nth-child(4) { border-color: var(--accent-cyan); }
+        .tool-card:nth-child(5) { border-color: var(--accent-amber); }
+        .tool-card:nth-child(6) { border-color: var(--accent-rose); }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-type {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* How AI Works */
+        .process-flow {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .process-step {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .process-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            color: var(--accent-violet);
+            margin-bottom: 1rem;
+        }
+
+        .process-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .process-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .process-arrow {
+            font-size: 2rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Examples Grid */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .example-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .example-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Stats */
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2.5rem 3rem;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1100px;
+            width: 100%;
+            align-items: start;
+        }
+
+        .content-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .content-box h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-violet);
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .content-box li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .content-box li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Activity Section */
+        .activity-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .activity-section h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-violet);
+        }
+
+        .activity-number {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-violet);
+            min-width: 40px;
+        }
+
+        .activity-text {
+            color: var(--text-secondary);
+        }
+
+        /* Australian Context */
+        .aussie-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 800px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .aussie-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .aussie-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .aussie-content {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .bar-label-text {
+            font-weight: 500;
+        }
+
+        .bar-label-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .bar {
+            height: 32px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+        }
+
+        /* Tool Logo */
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+        }
+
+        .tool-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .process-flow { flex-direction: column; }
+            .process-arrow { transform: rotate(90deg); }
+            .examples-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">What is <em>AI?</em></h1>
+            <p class="slide-subtitle">Artificial Intelligence isn't magic — it's maths, patterns, and really big datasets</p>
+            <p class="stat-source">Week 1 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Quick Poll -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 3rem;">Quick Poll</h2>
+            <div class="stat-card">
+                <div class="stat-number">🙋</div>
+                <div class="stat-label" style="font-size: 1.3rem; line-height: 1.6;">
+                    Who here has used AI in the last 24 hours?<br><br>
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">(Spoiler: You all have)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Definition -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">So... What <em>is</em> AI?</h2>
+            <div class="content-box" style="max-width: 800px;">
+                <p style="font-size: 1.3rem; color: var(--text-secondary); line-height: 1.8; text-align: center;">
+                    <strong style="color: var(--text-primary);">Artificial Intelligence</strong> is when computers perform tasks that typically require human intelligence —
+                    like understanding language, recognising images, making decisions, or learning from experience.
+                </p>
+            </div>
+            <p class="stat-source">It's not sentient. It's not alive. But it can seem pretty clever.</p>
+        </div>
+
+        <!-- Slide 4: History Timeline -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">A Brief History</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">1956</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Birth of AI</div>
+                        <div class="timeline-desc">Term "Artificial Intelligence" coined at Dartmouth College. Researchers believe human-level AI is 20 years away.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">1997</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Deep Blue beats Kasparov</div>
+                        <div class="timeline-desc">IBM's chess computer defeats world champion. First major AI victory in a highly complex game.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2012</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Deep Learning Revolution</div>
+                        <div class="timeline-desc">Neural networks can finally see — image recognition accuracy skyrockets. Modern AI era begins.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2022</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">ChatGPT Goes Viral</div>
+                        <div class="timeline-desc">AI becomes mainstream. 100 million users in 2 months — fastest growing app in history.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2025</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">AI Everywhere</div>
+                        <div class="timeline-desc">You're here. AI is in your phone, your school, your workplace, and your pocket.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: AI Tools You Use -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Tools You <em>Actually</em> Use</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=chat.openai.com&sz=64" alt="ChatGPT">
+                    </div>
+                    <div class="tool-name">ChatGPT</div>
+                    <div class="tool-type">OpenAI • Chat & writing</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude">
+                    </div>
+                    <div class="tool-name">Claude</div>
+                    <div class="tool-type">Anthropic • Analysis & code</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini">
+                    </div>
+                    <div class="tool-name">Gemini</div>
+                    <div class="tool-type">Google • Search & multimodal</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&sz=64" alt="NotebookLM">
+                    </div>
+                    <div class="tool-name">NotebookLM</div>
+                    <div class="tool-type">Google • AI study assistant</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=ideogram.ai&sz=64" alt="Ideogram">
+                    </div>
+                    <div class="tool-name">Ideogram</div>
+                    <div class="tool-type">AI image generation</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=midjourney.com&sz=64" alt="Midjourney">
+                    </div>
+                    <div class="tool-name">Midjourney</div>
+                    <div class="tool-type">Image generation</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=canva.com&sz=64" alt="Canva AI">
+                    </div>
+                    <div class="tool-name">Canva AI</div>
+                    <div class="tool-type">Design & image tools</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=recraft.ai&sz=64" alt="Recraft">
+                    </div>
+                    <div class="tool-name">Recraft</div>
+                    <div class="tool-type">AI design tool</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=teacherscreen.com.au&sz=64" alt="TeacherScreen">
+                    </div>
+                    <div class="tool-name">TeacherScreen</div>
+                    <div class="tool-type">Australian AI teaching</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=replicate.com&sz=64" alt="Replicate">
+                    </div>
+                    <div class="tool-name">Replicate</div>
+                    <div class="tool-type">AI model hosting</div>
+                </div>
+            </div>
+            <p class="stat-source">Over 85% of Australian students have used generative AI tools for schoolwork (2026 Monash University Study)</p>
+        </div>
+
+        <!-- Slide 6: How AI Works - Simple -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Does AI <em>Actually</em> Work?</h2>
+            <div class="process-flow">
+                <div class="process-step">
+                    <div class="process-number">1</div>
+                    <div class="process-title">Training Data</div>
+                    <div class="process-desc">Feed AI massive amounts of examples — millions of images, texts, conversations</div>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="process-number">2</div>
+                    <div class="process-title">Find Patterns</div>
+                    <div class="process-desc">AI looks for patterns, connections, and relationships in the data</div>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="process-number">3</div>
+                    <div class="process-title">Make Predictions</div>
+                    <div class="process-desc">When you ask a question, AI uses those patterns to predict the best answer</div>
+                </div>
+            </div>
+            <p class="stat-source">ChatGPT was trained on hundreds of billions of words from books, websites, and articles</p>
+        </div>
+
+        <!-- Slide 6.5: Video - How AI Works -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Watch: <em>How AI Learns</em></h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/aircAruvnKk" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">But what IS a neural network? • 3Blue1Brown • 19 minutes</p>
+        </div>
+
+        <!-- Slide 7: Real Example -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Example: Photo Recognition</h2>
+            <div class="two-column" style="max-width: 900px;">
+                <div class="content-box">
+                    <h3>Training Phase</h3>
+                    <ul>
+                        <li>Show AI 10,000 photos labelled "dog"</li>
+                        <li>Show AI 10,000 photos labelled "cat"</li>
+                        <li>AI learns patterns: pointy ears vs floppy, whiskers vs snouts, sizes, shapes</li>
+                        <li>Builds a mathematical model of "dog-ness" and "cat-ness"</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Prediction Phase</h3>
+                    <ul>
+                        <li>You show AI a new photo</li>
+                        <li>AI compares it to patterns it learned</li>
+                        <li>Calculates probability: 92% dog, 8% cat</li>
+                        <li>Returns answer: "It's a dog!"</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Modern AI can identify thousands of objects with 95%+ accuracy</p>
+        </div>
+
+        <!-- Slide 8: AI in Everyday Life -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI in Your <em>Daily</em> Life</h2>
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="example-icon">🎵</div>
+                    <div class="example-title">Spotify Recommendations</div>
+                    <div class="example-desc">AI analyses your listening history, compares it to millions of other users, predicts what you'll like next</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">📱</div>
+                    <div class="example-title">Phone Autocomplete</div>
+                    <div class="example-desc">Predicts your next word based on what you usually type and what makes sense in context</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">📺</div>
+                    <div class="example-title">Netflix Suggestions</div>
+                    <div class="example-desc">Recommends shows based on what you've watched, what similar viewers liked, and current trends</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">🗺️</div>
+                    <div class="example-title">Google Maps Routes</div>
+                    <div class="example-desc">Predicts traffic, calculates fastest route, adjusts in real-time using data from millions of drivers</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">🔍</div>
+                    <div class="example-title">Google Search</div>
+                    <div class="example-desc">Understands your query intent, ranks billions of pages, shows you what you're actually looking for</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">📧</div>
+                    <div class="example-title">Email Spam Filter</div>
+                    <div class="example-desc">Identifies spam by recognising patterns in subject lines, sender addresses, and message content</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Statistics -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">By The Numbers</h2>
+            <div class="bar-chart">
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-label-text">Australian students using AI tools for schoolwork</span>
+                        <span class="bar-label-value">85%</span>
+                    </div>
+                    <div class="bar" style="width: 85%;"></div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-label-text">Australian businesses using AI in operations</span>
+                        <span class="bar-label-value">64%</span>
+                    </div>
+                    <div class="bar" style="width: 64%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-emerald));"></div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-label-text">Global AI market growth projection (2025-2030)</span>
+                        <span class="bar-label-value">37% CAGR</span>
+                    </div>
+                    <div class="bar" style="width: 92%; background: linear-gradient(90deg, var(--accent-amber), var(--accent-rose));"></div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 700px; margin-top: 3rem;">
+                <div class="stat-card">
+                    <div class="stat-number">200M+</div>
+                    <div class="stat-label">Weekly active users of ChatGPT worldwide (January 2026)</div>
+                </div>
+            </div>
+            <p class="stat-source">Sources: OpenAI (Jan 2026), Australian Computer Society (2025), Monash University Research (2025), McKinsey Global AI Survey (2025)</p>
+        </div>
+
+        <!-- Slide 10: Australian Context -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI in <em>Australia</em></h2>
+            <div class="aussie-card">
+                <div class="aussie-icon">🇦🇺</div>
+                <div class="aussie-title">We're AI Leaders in the Region</div>
+                <div class="aussie-content">
+                    <p style="margin-bottom: 1rem;">Australia ranks in the top 10 globally for AI adoption and research. Here in WA:</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            Mining companies use AI to analyse ore samples and predict equipment failures
+                        </li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            Perth hospitals use AI to detect diseases in medical scans earlier
+                        </li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            WA farmers use AI-powered drones to monitor crop health across massive properties
+                        </li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            UWA and Curtin University are leading AI research in marine biology and astronomy
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: What AI Can't Do -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What AI <em>Can't</em> Do</h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div class="content-box" style="border: 2px solid var(--accent-rose); background: rgba(244, 63, 94, 0.05);">
+                    <h3 style="color: var(--accent-rose);">AI is NOT</h3>
+                    <ul>
+                        <li>Truly creative (it remixes patterns)</li>
+                        <li>Conscious or self-aware</li>
+                        <li>Capable of genuine empathy</li>
+                        <li>Able to truly understand meaning</li>
+                        <li>Always accurate (it hallucinates)</li>
+                        <li>Unbiased (reflects training data biases)</li>
+                    </ul>
+                </div>
+                <div class="content-box" style="border: 2px solid var(--accent-emerald); background: rgba(16, 185, 129, 0.05);">
+                    <h3 style="color: var(--accent-emerald);">AI is GOOD at</h3>
+                    <ul>
+                        <li>Pattern recognition at scale</li>
+                        <li>Processing huge datasets quickly</li>
+                        <li>Making predictions from data</li>
+                        <li>Automating repetitive tasks</li>
+                        <li>Assisting human creativity</li>
+                        <li>Analysing text, images, and code</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">AI is a powerful tool, but humans are still needed for judgment, creativity, and ethics</p>
+        </div>
+
+        <!-- Slide 12: Important Concepts -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key Terms to Know</h2>
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="example-icon">🤖</div>
+                    <div class="example-title">Machine Learning</div>
+                    <div class="example-desc">AI that improves through experience without explicit programming. The foundation of modern AI.</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">🧠</div>
+                    <div class="example-title">Neural Networks</div>
+                    <div class="example-desc">AI modelled loosely on the human brain — layers of connected nodes that process information.</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">💬</div>
+                    <div class="example-title">Large Language Model (LLM)</div>
+                    <div class="example-desc">AI trained on massive text datasets to understand and generate human-like text (ChatGPT, Claude, etc.)</div>
+                </div>
+                <div class="example-card">
+                    <div class="example-icon">📊</div>
+                    <div class="example-title">Training Data</div>
+                    <div class="example-desc">The examples AI learns from. Quality and diversity of data determine AI capabilities and biases.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Hands-On Activity -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Let's <em>Explore</em> AI</h2>
+            <div class="activity-section">
+                <h3>Hands-On Exploration Activities</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Choose one and spend 10 minutes exploring:</p>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-number">1</div>
+                        <div class="activity-text">
+                            <strong>Chat with AI:</strong> Ask ChatGPT or Claude to explain something you're curious about. Try asking the same question in different ways.
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-number">2</div>
+                        <div class="activity-text">
+                            <strong>Image Generation:</strong> Try Microsoft Designer or Bing Image Creator. Generate an image of "Perth skyline at sunset in cyberpunk style"
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-number">3</div>
+                        <div class="activity-text">
+                            <strong>Compare AI Tools:</strong> Ask the same question to ChatGPT, Claude, and Gemini. How do the responses differ?
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-number">4</div>
+                        <div class="activity-text">
+                            <strong>Test Limits:</strong> Try to find something AI can't do well. Ask it for very recent news, personal opinions, or complex maths.
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+                    Be ready to share: What surprised you? What worked well? What didn't?
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Discussion Questions -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Think About It</h2>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px;">
+                <div class="content-box">
+                    <h3 style="color: var(--accent-violet); font-size: 1.3rem; margin-bottom: 1rem;">💭</h3>
+                    <p style="font-size: 1.1rem; color: var(--text-secondary); line-height: 1.7;">
+                        If AI can write essays, what should schools actually test?
+                    </p>
+                </div>
+                <div class="content-box">
+                    <h3 style="color: var(--accent-blue); font-size: 1.3rem; margin-bottom: 1rem;">💭</h3>
+                    <p style="font-size: 1.1rem; color: var(--text-secondary); line-height: 1.7;">
+                        Should AI-generated content be labelled? How can you tell if something was made by AI?
+                    </p>
+                </div>
+                <div class="content-box">
+                    <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 1rem;">💭</h3>
+                    <p style="font-size: 1.1rem; color: var(--text-secondary); line-height: 1.7;">
+                        What jobs might AI replace? What new jobs might it create?
+                    </p>
+                </div>
+            </div>
+            <p class="stat-source">We'll explore these questions throughout the term</p>
+        </div>
+
+        <!-- Slide 15: Next Week -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Coming Up...</h2>
+            <div class="content-box" style="max-width: 700px; text-align: center; padding: 3rem;">
+                <h3 style="font-family: 'Instrument Serif', serif; font-size: 2rem; margin-bottom: 1.5rem; color: var(--accent-violet);">
+                    Week 2: AI Ethics & Bias
+                </h3>
+                <p style="font-size: 1.2rem; color: var(--text-secondary); line-height: 1.7;">
+                    Can AI be racist? Should we trust AI decisions? Who's responsible when AI makes mistakes?
+                </p>
+                <p style="margin-top: 2rem; color: var(--text-muted);">
+                    Before next class: Think about a time you used AI this week. What was it? How did it help (or not)?
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 16: End -->
+        <div class="slide">
+            <h1 class="slide-title">AI is a <em>Tool</em></h1>
+            <p class="slide-subtitle">Like any tool, its value depends on how you use it. Learn to use it well, critically, and ethically.</p>
+            <p class="stat-source">Questions? Let's chat.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 16</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

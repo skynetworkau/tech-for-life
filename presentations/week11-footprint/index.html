@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Footprint // Week 11 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0c0c0c;
+            --bg-secondary: #161616;
+            --bg-card: #1e1e1e;
+            --accent-indigo: #6366f1;
+            --accent-pink: #ec4899;
+            --accent-orange: #f97316;
+            --accent-green: #22c55e;
+            --accent-cyan: #06b6d4;
+            --text-primary: #fafafa;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-indigo), var(--accent-pink));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-pink);
+            color: var(--accent-pink);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-pink);
+            color: var(--accent-pink);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            color: var(--accent-pink);
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-huge {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(5rem, 18vw, 14rem);
+            font-weight: 400;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 700px;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Story */
+        .story-container {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .story-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .story-quote::before {
+            content: '"';
+            font-size: 8rem;
+            position: absolute;
+            top: -3rem;
+            left: -2rem;
+            color: var(--accent-pink);
+            opacity: 0.3;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .column-text .highlight {
+            color: var(--accent-pink);
+            font-weight: 600;
+        }
+
+        /* Generation comparison */
+        .generation-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .gen-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .gen-label {
+            width: 120px;
+            font-weight: 600;
+        }
+
+        .gen-bar {
+            flex: 1;
+            height: 50px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gen-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-weight: 700;
+            color: white;
+            border-radius: 8px;
+        }
+
+        /* What employers find */
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .finding-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .finding-card.bad {
+            border-top: 4px solid var(--accent-orange);
+        }
+
+        .finding-card.good {
+            border-top: 4px solid var(--accent-green);
+        }
+
+        .finding-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .finding-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .finding-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Social media audit */
+        .audit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .audit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .audit-item:hover {
+            transform: translateX(10px);
+        }
+
+        .audit-icon {
+            font-size: 2rem;
+        }
+
+        .audit-content {
+            flex: 1;
+        }
+
+        .audit-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .audit-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Profile mockup */
+        .profile-mockup {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 350px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .profile-name {
+            font-weight: 600;
+        }
+
+        .profile-handle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .profile-bio {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .profile-post {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-post.flagged {
+            border: 2px solid var(--accent-orange);
+        }
+
+        /* Activity link */
+        .activity-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-pink));
+            border-radius: 100px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .activity-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Comparison cards */
+        .comparison-row {
+            display: flex;
+            gap: 2rem;
+            max-width: 1000px;
+        }
+
+        .comparison-card {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .comparison-card.bad {
+            border: 2px solid var(--accent-orange);
+        }
+
+        .comparison-card.good {
+            border: 2px solid var(--accent-green);
+        }
+
+        .comparison-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card.bad .comparison-label { color: var(--accent-orange); }
+        .comparison-card.good .comparison-label { color: var(--accent-green); }
+
+        .comparison-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Tips grid */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+        }
+
+        .tip-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tip-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--accent-indigo);
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Tool cards for privacy tools */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-pink);
+        }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            border-radius: 8px;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tool-url {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            margin-top: 0.5rem;
+        }
+
+        /* Data collection chart */
+        .data-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .data-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .data-label {
+            width: 180px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .data-bar {
+            flex: 1;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .data-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        /* Video embed container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            margin: 2rem auto;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #1a0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .findings-grid { grid-template-columns: 1fr; }
+            .comparison-row { flex-direction: column; }
+            .tips-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .data-label { width: 140px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Your Digital <em>Shadow</em></h1>
+            <p class="slide-subtitle">What the internet knows about you — and why it matters for your future</p>
+            <p class="stat-source">Week 11 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Big Number -->
+        <div class="slide">
+            <div class="stat-huge">77%</div>
+            <p class="stat-label">of Australian employers check candidates' social media during hiring</p>
+            <p class="stat-source">Source: Indeed Australia Survey, 2024</p>
+        </div>
+
+        <!-- Slide 3: Rejected -->
+        <div class="slide gradient-bg">
+            <div class="stat-huge" style="font-size: 12rem;">68%</div>
+            <p class="stat-label">of recruiters have rejected a job application based on what they found online</p>
+            <p class="stat-source">Before you even get an interview, they've already made a judgement.</p>
+        </div>
+
+        <!-- Slide 4: Generation Gap -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Who's Getting Rejected?</h2>
+            <div class="generation-bars">
+                <div class="gen-row">
+                    <span class="gen-label">Gen Z</span>
+                    <div class="gen-bar">
+                        <div class="gen-bar-fill" style="width: 26%; background: linear-gradient(90deg, var(--accent-pink), var(--accent-orange));">26%</div>
+                    </div>
+                </div>
+                <div class="gen-row">
+                    <span class="gen-label">Millennials</span>
+                    <div class="gen-bar">
+                        <div class="gen-bar-fill" style="width: 10%; background: var(--accent-indigo);">10%</div>
+                    </div>
+                </div>
+                <div class="gen-row">
+                    <span class="gen-label">Gen X</span>
+                    <div class="gen-bar">
+                        <div class="gen-bar-fill" style="width: 1%; background: var(--text-muted);">1%</div>
+                    </div>
+                </div>
+                <div class="gen-row">
+                    <span class="gen-label">Boomers</span>
+                    <div class="gen-bar">
+                        <div class="gen-bar-fill" style="width: 1%; background: var(--text-muted);">1%</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Gen Z is 26× more likely to be rejected based on social media than older generations.</p>
+        </div>
+
+        <!-- Slide 5: Expert Quote -->
+        <div class="slide pattern-bg">
+            <div class="story-container">
+                <p class="story-quote">"While most Gen Z job seekers are aware of potential social media scrutiny by recruiters, many underestimate its impact — and it's costing them jobs."</p>
+                <p style="color: var(--text-muted); margin-top: 1rem;">— Sally McKibbin, Career Expert at Indeed</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: What Gets You Rejected -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Gets You Rejected</h2>
+            <div class="findings-grid">
+                <div class="finding-card bad">
+                    <div class="finding-icon">🍺</div>
+                    <div class="finding-title">Drug/Alcohol Content</div>
+                    <div class="finding-desc">Photos of parties, drinking, or drug references</div>
+                </div>
+                <div class="finding-card bad">
+                    <div class="finding-icon">😤</div>
+                    <div class="finding-title">Hostile Behaviour</div>
+                    <div class="finding-desc">Aggressive posts, online arguments, bullying</div>
+                </div>
+                <div class="finding-card bad">
+                    <div class="finding-icon">🤥</div>
+                    <div class="finding-title">Dishonesty</div>
+                    <div class="finding-desc">Claims that don't match your resume or application</div>
+                </div>
+                <div class="finding-card bad">
+                    <div class="finding-icon">🔞</div>
+                    <div class="finding-title">Inappropriate Content</div>
+                    <div class="finding-desc">Sexually suggestive or offensive material</div>
+                </div>
+                <div class="finding-card bad">
+                    <div class="finding-icon">⚖️</div>
+                    <div class="finding-title">Controversial Views</div>
+                    <div class="finding-desc">Extreme political or discriminatory posts</div>
+                </div>
+                <div class="finding-card bad">
+                    <div class="finding-icon">💼</div>
+                    <div class="finding-title">Bad-mouthing Employers</div>
+                    <div class="finding-desc">Complaints about previous jobs or bosses</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: What Helps -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Helps You Get Hired</h2>
+            <div class="findings-grid">
+                <div class="finding-card good">
+                    <div class="finding-icon">🎯</div>
+                    <div class="finding-title">Professional Presence</div>
+                    <div class="finding-desc">LinkedIn profile, clean bio, professional photo</div>
+                </div>
+                <div class="finding-card good">
+                    <div class="finding-icon">🎨</div>
+                    <div class="finding-title">Skills Showcase</div>
+                    <div class="finding-desc">Portfolio work, projects, achievements</div>
+                </div>
+                <div class="finding-card good">
+                    <div class="finding-icon">💬</div>
+                    <div class="finding-title">Positive Engagement</div>
+                    <div class="finding-desc">Thoughtful posts, community involvement</div>
+                </div>
+                <div class="finding-card good">
+                    <div class="finding-icon">📚</div>
+                    <div class="finding-title">Industry Interest</div>
+                    <div class="finding-desc">Following relevant companies, sharing industry content</div>
+                </div>
+                <div class="finding-card good">
+                    <div class="finding-icon">🤝</div>
+                    <div class="finding-title">Consistency</div>
+                    <div class="finding-desc">Profile matches resume, authentic representation</div>
+                </div>
+                <div class="finding-card good">
+                    <div class="finding-icon">✨</div>
+                    <div class="finding-title">Creativity</div>
+                    <div class="finding-desc">Unique interests that show personality positively</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: The Google Test -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem;">The Google Test</h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Search your full name in quotes. What comes up?</p>
+            <div style="background: var(--bg-card); padding: 2rem 4rem; border-radius: 16px; display: flex; align-items: center; gap: 1rem; border: 2px solid var(--text-muted);">
+                <span style="font-size: 2rem;">🔍</span>
+                <div style="font-size: 1.5rem; color: var(--text-secondary);">"Your Full Name"</div>
+            </div>
+            <p class="stat-source">Try adding your town or school name if there are many results. This is exactly what employers do.</p>
+        </div>
+
+        <!-- Slide 9: Profile Comparison -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Same Person, Different Impression</h2>
+            <div class="comparison-row">
+                <div class="comparison-card bad">
+                    <div class="comparison-label">❌ Red Flag Profile</div>
+                    <div style="text-align: left; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7;">
+                        <p><strong>Bio:</strong> "just here for a good time 🍻"</p>
+                        <p style="margin-top: 1rem;"><strong>Recent posts:</strong></p>
+                        <p>• Party photos at 3am on a Tuesday</p>
+                        <p>• "My boss is such an idiot"</p>
+                        <p>• Aggressive political rants</p>
+                        <p>• Location tags at clubs every weekend</p>
+                    </div>
+                </div>
+                <div class="comparison-card good">
+                    <div class="comparison-label">✓ Professional Profile</div>
+                    <div style="text-align: left; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7;">
+                        <p><strong>Bio:</strong> "Year 12 @ Denmark SHS | Interested in design & tech"</p>
+                        <p style="margin-top: 1rem;"><strong>Recent posts:</strong></p>
+                        <p>• Photos from a charity event</p>
+                        <p>• Sharing an article about their career interest</p>
+                        <p>• Travel photos with friends</p>
+                        <p>• Supporting local sports team</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Types of Footprint -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Two Types of Footprint</h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 20px;">
+                    <h3 style="color: var(--accent-indigo); font-size: 1.3rem; margin-bottom: 1rem;">Active Footprint</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem;">Things you deliberately post and share:</p>
+                    <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 1.5rem;">
+                        <li>Social media posts</li>
+                        <li>Comments and replies</li>
+                        <li>Photos and videos</li>
+                        <li>Profile information</li>
+                        <li>Reviews you leave</li>
+                    </ul>
+                </div>
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 20px;">
+                    <h3 style="color: var(--accent-pink); font-size: 1.3rem; margin-bottom: 1rem;">Passive Footprint</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem;">Data collected without you actively sharing:</p>
+                    <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 1.5rem;">
+                        <li>Browsing history & cookies</li>
+                        <li>Location data</li>
+                        <li>App usage patterns</li>
+                        <li>Purchase history</li>
+                        <li>Photos others tag you in</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Forever -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 3rem;">The Internet is <em>Forever</em></h2>
+            <p class="slide-subtitle">Even "deleted" posts can be:</p>
+            <div style="display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center;">
+                <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📸</div>
+                    <div style="font-weight: 600;">Screenshotted</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">💾</div>
+                    <div style="font-weight: 600;">Archived</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔄</div>
+                    <div style="font-weight: 600;">Shared</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+                    <div style="font-weight: 600;">Cached by search engines</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Quick Audit -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your 5-Minute Audit</h2>
+            <div class="audit-list">
+                <div class="audit-item">
+                    <span class="audit-icon">🔍</span>
+                    <div class="audit-content">
+                        <div class="audit-title">Google yourself</div>
+                        <div class="audit-desc">Search "Your Name" + your town. Check images too.</div>
+                    </div>
+                </div>
+                <div class="audit-item">
+                    <span class="audit-icon">👤</span>
+                    <div class="audit-content">
+                        <div class="audit-title">View as public</div>
+                        <div class="audit-desc">On Instagram/FB, log out and search for your profile. What can strangers see?</div>
+                    </div>
+                </div>
+                <div class="audit-item">
+                    <span class="audit-icon">📍</span>
+                    <div class="audit-content">
+                        <div class="audit-title">Check tagged photos</div>
+                        <div class="audit-desc">Review photos others have tagged you in. Remove tags if needed.</div>
+                    </div>
+                </div>
+                <div class="audit-item">
+                    <span class="audit-icon">⚙️</span>
+                    <div class="audit-content">
+                        <div class="audit-title">Review privacy settings</div>
+                        <div class="audit-desc">Set profiles to private, limit who can see posts and tag you.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Tips -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Managing Your Footprint</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <span class="tip-number">1</span>
+                    <div class="tip-content">
+                        <h4>Pause Before You Post</h4>
+                        <p>Would you be happy if a future employer, uni, or your grandma saw this?</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-number">2</span>
+                    <div class="tip-content">
+                        <h4>Lock It Down</h4>
+                        <p>Set profiles to private. Only accept people you actually know.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-number">3</span>
+                    <div class="tip-content">
+                        <h4>Create Positive Content</h4>
+                        <p>The best defence is offence. Create content you'd be proud of.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-number">4</span>
+                    <div class="tip-content">
+                        <h4>Build a Professional Presence</h4>
+                        <p>A LinkedIn profile can push negative results down in search.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Privacy Tools -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Privacy Check Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google" class="tool-logo">
+                    <div class="tool-name">Google Yourself</div>
+                    <div class="tool-desc">Search "Your Name" in quotes + your location</div>
+                    <div class="tool-url">google.com</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=oaic.gov.au&sz=64" alt="OAIC" class="tool-logo">
+                    <div class="tool-name">OAIC Privacy Rights</div>
+                    <div class="tool-desc">Your Australian privacy rights & complaint process</div>
+                    <div class="tool-url">oaic.gov.au</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="LinkedIn" class="tool-logo">
+                    <div class="tool-name">LinkedIn Profile</div>
+                    <div class="tool-desc">Create a professional presence to control search results</div>
+                    <div class="tool-url">linkedin.com</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Social media privacy: Settings → Privacy → Who can see your posts</p>
+        </div>
+
+        <!-- Slide 15: Data Companies Collect -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Companies Know About You</h2>
+            <div class="data-chart">
+                <div class="data-row">
+                    <span class="data-label">Location History</span>
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: 95%; background: var(--accent-pink);">95% of users tracked</div>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Browsing Habits</span>
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: 92%; background: var(--accent-orange);">92% monitored</div>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Purchase History</span>
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: 88%; background: var(--accent-indigo);">88% tracked</div>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Social Connections</span>
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: 85%; background: var(--accent-cyan);">85% mapped</div>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Voice & Video</span>
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: 72%; background: var(--accent-green);">72% collected</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Data from 2024 Privacy Report - Most collected via apps & social media</p>
+        </div>
+
+        <!-- Slide 16: Digital Footprint Video -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Digital Footprint Explained</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/Ro_LlRg8rEg" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source">Understanding your digital shadow and how to manage it</p>
+        </div>
+
+        <!-- Slide 17: Activity Intro -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem;">Audit Your <em>Footprint</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Complete our interactive audit to discover your digital exposure level and get personalised recommendations.</p>
+            <a href="../../activities/digital-footprint/index.html" class="activity-link">
+                👣 Launch Footprint Finder
+            </a>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">Self-assessment • Privacy audit • Action plan</p>
+        </div>
+
+        <!-- Slide 18: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Own Your <em>Story</em></h1>
+            <p class="slide-subtitle">Your digital footprint is your reputation. Make it one you're proud of.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 18</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

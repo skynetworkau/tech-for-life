@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Security // Week 10 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #030712;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            color: var(--accent-green);
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-huge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(5rem, 18vw, 14rem);
+            font-weight: 600;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Password display */
+        .password-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(2rem, 5vw, 4rem);
+            padding: 1.5rem 3rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            margin: 2rem 0;
+            letter-spacing: 0.1em;
+            border: 2px solid var(--text-muted);
+        }
+
+        .password-display.weak {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .password-display.strong {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Common passwords grid */
+        .common-passwords-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            max-width: 800px;
+        }
+
+        .common-pw {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Crack time comparison */
+        .crack-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .crack-row {
+            display: grid;
+            grid-template-columns: 1fr 200px 150px;
+            gap: 1.5rem;
+            align-items: center;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .crack-password {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+        }
+
+        .crack-time {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .crack-time.instant { color: var(--accent-red); }
+        .crack-time.hours { color: var(--accent-yellow); }
+        .crack-time.years { color: var(--accent-green); }
+
+        .crack-bar {
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .crack-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Story container */
+        .story-container {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .story-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .story-quote::before {
+            content: '"';
+            font-size: 8rem;
+            position: absolute;
+            top: -3rem;
+            left: -2rem;
+            color: var(--accent-green);
+            opacity: 0.3;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .column-text .highlight {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Breach timeline */
+        .breach-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+        }
+
+        .breach-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-top: 4px solid var(--accent-red);
+        }
+
+        .breach-company {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .breach-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .breach-stat {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--accent-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .breach-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Password manager showcase */
+        .manager-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+        }
+
+        .manager-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .manager-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-green);
+        }
+
+        .manager-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .manager-logo {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .manager-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .manager-price {
+            font-size: 0.85rem;
+            color: var(--accent-green);
+        }
+
+        .manager-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Tool cards for security tools */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+        }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            border-radius: 8px;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tool-url {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            margin-top: 0.5rem;
+        }
+
+        /* Video embed container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            margin: 2rem auto;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 2FA explanation */
+        .tfa-flow {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            max-width: 900px;
+        }
+
+        .tfa-step {
+            flex: 1;
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+        }
+
+        .tfa-step-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tfa-step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tfa-step-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tfa-arrow {
+            font-size: 2rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Activity link */
+        .activity-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            border-radius: 100px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .activity-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            text-align: left;
+            max-width: 700px;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+
+        .checklist li:last-child { border-bottom: none; }
+
+        .check-icon {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #001a00 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .breach-cards { grid-template-columns: 1fr; }
+            .manager-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-grid { grid-template-columns: 1fr; }
+            .common-passwords-grid { grid-template-columns: repeat(3, 1fr); }
+            .tfa-flow { flex-direction: column; }
+            .tfa-arrow { transform: rotate(90deg); }
+            .crack-row { grid-template-columns: 1fr; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">The Key to Your <em>Digital Life</em></h1>
+            <p class="slide-subtitle">Why passwords matter more than ever — and how to actually stay secure</p>
+            <p class="stat-source">Week 10 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Big Number -->
+        <div class="slide">
+            <div class="stat-huge">3.8B</div>
+            <p class="stat-label">Credentials leaked in the first half of 2025 alone</p>
+            <p class="stat-source">Source: Heimdal Security, 2025</p>
+        </div>
+
+        <!-- Slide 3: Mother of All Breaches -->
+        <div class="slide gradient-bg">
+            <div class="story-container">
+                <h2 style="font-family: 'Instrument Serif', serif; font-size: 2.5rem; margin-bottom: 1.5rem;">January 2024</h2>
+                <p class="story-quote">The "Mother of All Breaches" released 26 billion records in a single leak.</p>
+                <p class="stat-label" style="margin-top: 1rem;">That's more than 3 records for every person on Earth.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Australian Breaches -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Australia's Biggest Breaches</h2>
+            <div class="breach-cards">
+                <div class="breach-card">
+                    <div class="breach-company">Optus</div>
+                    <div class="breach-date">September 2022</div>
+                    <div class="breach-stat">10M records</div>
+                    <div class="breach-desc">40% of Australia's population. Driver's licences, passports, Medicare numbers exposed.</div>
+                </div>
+                <div class="breach-card">
+                    <div class="breach-company">Medibank</div>
+                    <div class="breach-date">October 2022</div>
+                    <div class="breach-stat">9.7M records</div>
+                    <div class="breach-desc">Health records published on dark web when $10M ransom wasn't paid.</div>
+                </div>
+                <div class="breach-card">
+                    <div class="breach-company">Latitude Financial</div>
+                    <div class="breach-date">March 2023</div>
+                    <div class="breach-stat">14M records</div>
+                    <div class="breach-desc">Driver's licences and financial documents stolen. Australia's largest breach by record count.</div>
+                </div>
+            </div>
+            <p class="stat-source">These three breaches alone affected over 33 million records in just 18 months</p>
+        </div>
+
+        <!-- Slide 5: Why It Matters -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem;">Why does this matter to <em>you</em>?</h2>
+            <div style="display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center;">
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; text-align: center; max-width: 300px;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎮</div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Gaming Accounts</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Your Steam, PlayStation, Xbox accounts can be worth hundreds</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; text-align: center; max-width: 300px;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Social Media</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Hackers can impersonate you, scam your friends, destroy your reputation</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; text-align: center; max-width: 300px;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💳</div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Future Finances</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Stolen identity now can affect you for years — credit scores, loans, jobs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Most Common Passwords -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The World's Most Common Passwords</h2>
+            <div class="common-passwords-grid">
+                <div class="common-pw">123456</div>
+                <div class="common-pw">password</div>
+                <div class="common-pw">12345678</div>
+                <div class="common-pw">qwerty</div>
+                <div class="common-pw">123456789</div>
+                <div class="common-pw">admin</div>
+                <div class="common-pw">welcome</div>
+                <div class="common-pw">letmein</div>
+                <div class="common-pw">monkey</div>
+                <div class="common-pw">dragon</div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">"123456" has been involved in over 50 million data breaches. It's cracked instantly.</p>
+        </div>
+
+        <!-- Slide 7: Crack Times -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Long to Crack?</h2>
+            <div class="crack-comparison">
+                <div class="crack-row">
+                    <div class="crack-password">password</div>
+                    <div class="crack-bar"><div class="crack-bar-fill" style="width: 5%; background: var(--accent-red);"></div></div>
+                    <div class="crack-time instant">Instantly</div>
+                </div>
+                <div class="crack-row">
+                    <div class="crack-password">P@ssw0rd!</div>
+                    <div class="crack-bar"><div class="crack-bar-fill" style="width: 15%; background: var(--accent-red);"></div></div>
+                    <div class="crack-time instant">3 hours</div>
+                </div>
+                <div class="crack-row">
+                    <div class="crack-password">Tr0ub4dor&3</div>
+                    <div class="crack-bar"><div class="crack-bar-fill" style="width: 35%; background: var(--accent-yellow);"></div></div>
+                    <div class="crack-time hours">3 days</div>
+                </div>
+                <div class="crack-row">
+                    <div class="crack-password">correct-horse-battery</div>
+                    <div class="crack-bar"><div class="crack-bar-fill" style="width: 75%; background: var(--accent-green);"></div></div>
+                    <div class="crack-time years">550 years</div>
+                </div>
+                <div class="crack-row">
+                    <div class="crack-password">coffee-kangaroo-sunset-42!</div>
+                    <div class="crack-bar"><div class="crack-bar-fill" style="width: 100%; background: var(--accent-cyan);"></div></div>
+                    <div class="crack-time years">Centuries</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Length vs Complexity -->
+        <div class="slide">
+            <div class="two-column">
+                <div class="column-text">
+                    <h2>Length Beats Complexity</h2>
+                    <p><span class="highlight">88% of cracked passwords</span> are under 12 characters.</p>
+                    <p>A short complex password like <code style="background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: 4px;">P@55w0rd!</code> is easier to crack than a long simple one.</p>
+                    <p>The secret? <span class="highlight">Passphrases</span> — multiple random words strung together.</p>
+                    <p>They're longer, harder to crack, and much easier to remember.</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="password-display weak" style="font-size: 1.8rem;">P@55w0rd!</div>
+                    <p style="color: var(--accent-red); margin-bottom: 2rem;">❌ Complex but short = weak</p>
+                    <div class="password-display strong" style="font-size: 1.8rem;">purple-koala-sunset</div>
+                    <p style="color: var(--accent-green);">✓ Simple but long = strong</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Password Reuse Problem -->
+        <div class="slide pattern-bg">
+            <div class="stat-huge" style="font-size: 10rem;">94%</div>
+            <p class="stat-label">of passwords are reused across 2 or more accounts</p>
+            <p class="stat-source">If hackers get ONE password, they try it on every site you might use.</p>
+        </div>
+
+        <!-- Slide 10: The Solution -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem;">The <em>Solution</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 3rem;">Password managers create and remember unique passwords for every account</p>
+            <div class="manager-grid">
+                <div class="manager-card">
+                    <img src="https://www.google.com/s2/favicons?domain=bitwarden.com&sz=64" alt="Bitwarden" class="manager-logo">
+                    <div class="manager-name">Bitwarden</div>
+                    <div class="manager-price">Free</div>
+                    <div class="manager-url">bitwarden.com</div>
+                </div>
+                <div class="manager-card">
+                    <img src="https://www.google.com/s2/favicons?domain=1password.com&sz=64" alt="1Password" class="manager-logo">
+                    <div class="manager-name">1Password</div>
+                    <div class="manager-price">$4/month</div>
+                    <div class="manager-url">1password.com</div>
+                </div>
+                <div class="manager-card">
+                    <img src="https://www.google.com/s2/favicons?domain=lastpass.com&sz=64" alt="LastPass" class="manager-logo">
+                    <div class="manager-name">LastPass</div>
+                    <div class="manager-price">Free/Premium</div>
+                    <div class="manager-url">lastpass.com</div>
+                </div>
+                <div class="manager-card">
+                    <img src="https://www.google.com/s2/favicons?domain=apple.com&sz=64" alt="Apple Keychain" class="manager-logo">
+                    <div class="manager-name">Apple Keychain</div>
+                    <div class="manager-price">Built-in</div>
+                    <div class="manager-url">iOS/Mac</div>
+                </div>
+            </div>
+            <p class="stat-source">You only need to remember ONE master password. The manager handles the rest.</p>
+        </div>
+
+        <!-- Slide 11: 2FA -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Two-Factor Authentication (2FA)</h2>
+            <div class="tfa-flow">
+                <div class="tfa-step">
+                    <div class="tfa-step-icon">🔑</div>
+                    <div class="tfa-step-title">Something You Know</div>
+                    <div class="tfa-step-desc">Your password</div>
+                </div>
+                <div class="tfa-arrow">→</div>
+                <div class="tfa-step">
+                    <div class="tfa-step-icon">📱</div>
+                    <div class="tfa-step-title">Something You Have</div>
+                    <div class="tfa-step-desc">SMS code, authenticator app, or hardware key</div>
+                </div>
+                <div class="tfa-arrow">→</div>
+                <div class="tfa-step">
+                    <div class="tfa-step-icon">✅</div>
+                    <div class="tfa-step-title">Access Granted</div>
+                    <div class="tfa-step-desc">Even if hackers have your password, they can't get in</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Enable 2FA on: Email, Banking, Social Media, Gaming accounts</p>
+        </div>
+
+        <!-- Slide 12: Security Tools -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Essential Security Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=haveibeenpwned.com&sz=64" alt="Have I Been Pwned" class="tool-logo">
+                    <div class="tool-name">Have I Been Pwned</div>
+                    <div class="tool-desc">Check if your email has been in a data breach</div>
+                    <div class="tool-url">haveibeenpwned.com</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=authy.com&sz=64" alt="Authy" class="tool-logo">
+                    <div class="tool-name">Authy / Google Authenticator</div>
+                    <div class="tool-desc">Free 2FA apps for secure login codes</div>
+                    <div class="tool-url">authy.com</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=microsoft.com&sz=64" alt="Microsoft Authenticator" class="tool-logo">
+                    <div class="tool-name">Microsoft Authenticator</div>
+                    <div class="tool-desc">2FA app with passwordless sign-in</div>
+                    <div class="tool-url">microsoft.com</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">All free tools to check your security and protect your accounts</p>
+        </div>
+
+        <!-- Slide 13: Password Security Video -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Hackers Crack Passwords</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/hGRii5f_uSc" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source">Understanding how attacks work helps you defend against them</p>
+        </div>
+
+        <!-- Slide 14: Action Checklist -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Security Checklist</h2>
+            <ul class="checklist">
+                <li>
+                    <span class="check-icon">☐</span>
+                    <span><strong>Check haveibeenpwned.com</strong> — See if your email has been in any breaches</span>
+                </li>
+                <li>
+                    <span class="check-icon">☐</span>
+                    <span><strong>Set up a password manager</strong> — Bitwarden is free and works everywhere</span>
+                </li>
+                <li>
+                    <span class="check-icon">☐</span>
+                    <span><strong>Enable 2FA</strong> — Start with email and banking, then social media</span>
+                </li>
+                <li>
+                    <span class="check-icon">☐</span>
+                    <span><strong>Update weak passwords</strong> — Especially any you've reused</span>
+                </li>
+                <li>
+                    <span class="check-icon">☐</span>
+                    <span><strong>Use passphrases</strong> — 4+ random words are better than complex gibberish</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 15: Activity Intro -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem;">Test Your <em>Passwords</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Try our password strength lab — see how quickly different passwords can be cracked</p>
+            <a href="../../activities/password-lab/index.html" class="activity-link">
+                🔐 Launch Password Lab
+            </a>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">Test passwords • Generate secure ones • See simulated hack attempts</p>
+        </div>
+
+        <!-- Slide 16: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">One Password to <em>Rule Them All</em></h1>
+            <p class="slide-subtitle">Your master password is the only one you need to remember. Make it count.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 16</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

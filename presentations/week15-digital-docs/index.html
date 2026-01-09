@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacking the AI Hiring Game // Week 15 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Tips list */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* Platform cards */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .platform-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+        }
+
+        .platform-logo {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .platform-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .platform-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Info card */
+        .info-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        .info-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .info-card ul {
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+
+        .info-card ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Activity box */
+        .activity-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
+            border: 2px solid var(--accent-violet);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .activity-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-violet);
+        }
+
+        .activity-instructions {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-steps {
+            text-align: left;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .activity-steps ol {
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .activity-steps li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Code box for prompts */
+        .code-box {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: var(--accent-cyan);
+            text-align: left;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        /* Cheat code badge */
+        .cheat-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        /* Big stat */
+        .big-stat {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(4rem, 10vw, 7rem);
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        /* Summary grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .summary-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .summary-item strong {
+            color: var(--accent-cyan);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .summary-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .platform-grid { grid-template-columns: 1fr; }
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Getting <em>Work Ready</em></h1>
+            <p class="slide-subtitle">How to hack the AI hiring game and land your first job in 2026</p>
+            <p class="stat-source">Week 15 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Truth About Hiring in 2026 -->
+        <div class="slide gradient-bg">
+            <div class="big-stat">75%</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">The Truth About <em>Hiring in 2026</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🤖</span>
+                    <div class="tip-content">
+                        <h4>75% of resumes never reach human eyes</h4>
+                        <p>AI filters them out first. Your beautifully designed resume? Rejected in 6 seconds by a robot.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📹</span>
+                    <div class="tip-content">
+                        <h4>Companies use AI for EVERYTHING now</h4>
+                        <p>Resume screening, video interviews, personality tests, LinkedIn ranking. It's robots all the way down.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎮</span>
+                    <div class="tip-content">
+                        <h4>But here's the thing...</h4>
+                        <p>It's not unfair — it's just the game. Learn the rules, use the cheat codes, win the game.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">The average job posting gets 250 applications. AI narrows it down to about 6 humans. Be one of the 6.</p>
+        </div>
+
+        <!-- Slide 3: What You're Up Against -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What You're <em>Up Against</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">The AI hiring stack (basically, robots judging you before humans do)</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">📄</span>
+                    <div class="tip-content">
+                        <h4>ATS (Applicant Tracking Systems)</h4>
+                        <p>Scans your resume for keywords. No keywords = straight to digital bin. Used by 99% of big companies.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎥</span>
+                    <div class="tip-content">
+                        <h4>AI Video Interviews</h4>
+                        <p>HireVue, Spark Hire, myInterview. You record answers alone. AI analyses your face, tone, word choice, eye contact.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💼</span>
+                    <div class="tip-content">
+                        <h4>LinkedIn AI Ranking</h4>
+                        <p>Your profile gets scored. Recruiters search and LinkedIn's algorithm decides if you appear in results.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🧠</span>
+                    <div class="tip-content">
+                        <h4>AI Personality Tests</h4>
+                        <p>Pymetrics, Predictive Index. Little games that analyse your decision-making patterns. Yes, really.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: ATS Explanation -->
+        <div class="slide pattern-bg">
+            <div class="cheat-badge">Know Your Enemy</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">ATS: The Resume <em>Robot</em></h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h2>What It Is</h2>
+                    <p>Software that scans resumes for keywords and phrases before a human sees them.</p>
+                    <p>It's looking for exact matches to the job ad. "Customer service" ≠ "helping people" to a robot.</p>
+                    <h2 style="margin-top: 2rem;">The Bad News</h2>
+                    <p>Your beautiful creative resume with graphics, columns, and fancy fonts? ATS can't read it. Straight to the shadow realm.</p>
+                </div>
+                <div class="info-card" style="border-left-color: var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose);">How ATS Kills Resumes</h3>
+                    <ul>
+                        <li>Fancy formatting (tables, columns, text boxes)</li>
+                        <li>Graphics and images (it's blind to them)</li>
+                        <li>Wrong file format (some can't read PDFs)</li>
+                        <li>Missing keywords from the job ad</li>
+                        <li>Creative job titles instead of standard ones</li>
+                    </ul>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">
+                        That internship at your uncle's business? If you called yourself "Brand Ambassador" instead of "Marketing Assistant", the ATS won't find you.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Resume Cheat Code 1 - Keywords -->
+        <div class="slide gradient-bg">
+            <div class="cheat-badge">Cheat Code #1</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Keyword <em>Hacking</em></h2>
+            <div class="tips-list" style="max-width: 800px;">
+                <div class="tip-item">
+                    <span class="tip-icon">🔑</span>
+                    <div class="tip-content">
+                        <h4>Copy keywords from the job ad INTO your resume</h4>
+                        <p>Literally copy-paste the exact phrases they use. If they say "team player", don't say "works well with others".</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤖</span>
+                    <div class="tip-content">
+                        <h4>AI is literal, not smart</h4>
+                        <p>It's scanning for exact matches. "Microsoft Excel" ≠ "spreadsheet software". Use their language.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Example: Job ad says "customer service"</h4>
+                        <p>Bad: "Helped customers and answered questions"<br>
+                        Good: "Provided customer service in fast-paced retail environment"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card" style="margin-top: 2rem; max-width: 800px; border-left-color: var(--accent-cyan);">
+                <h3 style="color: var(--accent-cyan);">🔧 Tool: Jobscan.co</h3>
+                <p style="color: var(--text-secondary); line-height: 1.7;">
+                    Paste the job ad + your resume. It shows you exactly what keywords you're missing. Free version gives you enough. Basically cheating, but legal.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Resume Cheat Code 2 - Format -->
+        <div class="slide">
+            <div class="cheat-badge">Cheat Code #2</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">ATS-Friendly <em>Format</em></h2>
+            <div class="two-column">
+                <div class="info-card" style="border-left-color: var(--accent-rose); background: rgba(244, 63, 94, 0.1);">
+                    <h3 style="color: var(--accent-rose);">❌ ATS Hates This</h3>
+                    <ul>
+                        <li>Two-column layouts</li>
+                        <li>Tables and text boxes</li>
+                        <li>Headers and footers with info</li>
+                        <li>Graphics, logos, icons</li>
+                        <li>Fancy fonts (script, decorative)</li>
+                        <li>Photos (unless hospitality/retail)</li>
+                    </ul>
+                </div>
+                <div class="info-card" style="border-left-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1);">
+                    <h3 style="color: var(--accent-emerald);">✓ ATS Loves This</h3>
+                    <ul>
+                        <li>Single-column layout</li>
+                        <li>Clear section headings (Education, Experience, Skills)</li>
+                        <li>Simple fonts (Arial, Calibri, Times)</li>
+                        <li>.docx format (unless they ask for PDF)</li>
+                        <li>Standard bullet points</li>
+                        <li>Plain text formatting</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source" style="text-align: center; max-width: 800px;">
+                Save the creativity for your portfolio. For job applications, boring wins. Get past the robot first, impress the human later.
+            </p>
+        </div>
+
+        <!-- Slide 7: Resume Cheat Code 3 - AI Assist -->
+        <div class="slide pattern-bg">
+            <div class="cheat-badge">Cheat Code #3</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Let AI Help You Beat <em>AI</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Use ChatGPT/Claude to make your resume better. Fight fire with fire.</p>
+            <div class="info-card" style="max-width: 900px; border-left-color: var(--accent-violet);">
+                <h3 style="color: var(--accent-violet);">💬 Copy These Prompts</h3>
+                <div class="code-box" style="margin-top: 1rem; margin-bottom: 1rem;">
+                    "Rewrite this for an ATS-friendly resume: I worked at a cafe making coffee and serving customers"
+                </div>
+                <div class="code-box" style="margin-bottom: 1rem;">
+                    "Add metrics and results to this job description: Worked retail at Kmart for 6 months"
+                </div>
+                <div class="code-box">
+                    "Here's a job ad [paste it]. Help me rewrite my resume bullet points to match their keywords"
+                </div>
+            </div>
+            <div class="tips-list" style="max-width: 900px; margin-top: 2rem;">
+                <div class="tip-item">
+                    <span class="tip-icon">✅</span>
+                    <div class="tip-content">
+                        <h4>What AI is great for</h4>
+                        <p>Improving wording, adding metrics, matching keywords, fixing grammar. Use it as a writing assistant.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">❌</span>
+                    <div class="tip-content">
+                        <h4>What NOT to do</h4>
+                        <p>Don't let AI invent experience you don't have. Don't copy-paste without reading. Keep it honest and keep it YOU.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: AI Video Interviews Intro -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Video Interviews Are <em>Real</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">(Yes, it's weird. Yes, you still have to do it.)</p>
+            <div class="tips-list" style="max-width: 800px;">
+                <div class="tip-item">
+                    <span class="tip-icon">📹</span>
+                    <div class="tip-content">
+                        <h4>How it works</h4>
+                        <p>You get a link. You record answers to questions. Alone. Talking to your webcam like a psychopath. No human present.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤖</span>
+                    <div class="tip-content">
+                        <h4>Companies using this</h4>
+                        <p>HireVue (used by Qantas, Telstra), Spark Hire, myInterview. Big companies love it because it's cheap.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎭</span>
+                    <div class="tip-content">
+                        <h4>What the AI watches</h4>
+                        <p>Facial expressions, eye contact, speaking pace, tone, word choice, background, even what you're wearing.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🧪</span>
+                    <div class="tip-content">
+                        <h4>The weird part</h4>
+                        <p>You usually get one or two practice attempts, then it's recorded. Can't redo it. Feels unnatural. That's normal.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: What AI Measures -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What AI Video Interviews <em>Measure</em></h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <strong>👁️ Eye Contact</strong>
+                    <p>Looking at the camera lens (not the screen). Measures confidence and engagement.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>🗣️ Speaking Pace & Clarity</strong>
+                    <p>Not too fast, not too slow. Clear pronunciation. No excessive "um" or "like".</p>
+                </div>
+                <div class="summary-item">
+                    <strong>😊 Facial Expressions</strong>
+                    <p>Smiling (but not creepy), showing enthusiasm, appropriate emotions for questions.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>🔑 Keywords in Answers</strong>
+                    <p>Speech-to-text analyses what you say. Using job-relevant keywords helps.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>💡 Lighting & Background</strong>
+                    <p>Properly lit face, clean background. First impression stuff.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>🎨 Professional Appearance</strong>
+                    <p>Dress like you would for an in-person interview. Top half at minimum.</p>
+                </div>
+            </div>
+            <p class="stat-source" style="text-align: center; margin-top: 1.5rem;">
+                Is this dystopian? Maybe. Is it the reality of job hunting in 2026? Absolutely.
+            </p>
+        </div>
+
+        <!-- Slide 10: AI Interview Cheat Codes -->
+        <div class="slide pattern-bg">
+            <div class="cheat-badge">AI Interview Cheat Codes</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How to <em>Win</em> at Robot Interviews</h2>
+            <div class="tips-list" style="max-width: 900px;">
+                <div class="tip-item">
+                    <span class="tip-icon">📷</span>
+                    <div class="tip-content">
+                        <h4>Look at the camera lens, not the screen</h4>
+                        <p>Put a sticky note with a smiley face next to your webcam. Talk to that. Sounds dumb, works perfectly.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💡</span>
+                    <div class="tip-content">
+                        <h4>Good lighting on your face</h4>
+                        <p>Face a window (daytime) or put a lamp in front of you. Ring light if you have one. No shadows on face.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🖼️</span>
+                    <div class="tip-content">
+                        <h4>Plain background (not your messy room)</h4>
+                        <p>Blank wall, bookshelf, tidy space. Virtual backgrounds can glitch. Real clean background is safer.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🗣️</span>
+                    <div class="tip-content">
+                        <h4>Speak clearly, not too fast</h4>
+                        <p>Practise speaking 10-15% slower than normal. It feels weird to you but sounds professional to listeners.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔑</span>
+                    <div class="tip-content">
+                        <h4>Use keywords from the job description</h4>
+                        <p>The AI is transcribing your speech. Naturally include words from the job ad in your answers.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📱</span>
+                    <div class="tip-content">
+                        <h4>Practise with your phone camera first</h4>
+                        <p>Record yourself answering common questions. Watch it back. Fix what looks weird. Treat it like a TikTok with stakes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: STAR Method -->
+        <div class="slide gradient-bg">
+            <div class="cheat-badge">Still Works for AI</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The STAR <em>Method</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">AI loves structure. Give it structure.</p>
+            <div class="summary-grid" style="max-width: 900px;">
+                <div class="summary-item" style="border-left-color: var(--accent-violet);">
+                    <strong style="color: var(--accent-violet);">S — Situation</strong>
+                    <p>Set the scene. Where were you? What was happening? Keep it brief (2-3 sentences).</p>
+                </div>
+                <div class="summary-item" style="border-left-color: var(--accent-blue);">
+                    <strong style="color: var(--accent-blue);">T — Task</strong>
+                    <p>What did you need to do? What was your responsibility or goal?</p>
+                </div>
+                <div class="summary-item" style="border-left-color: var(--accent-cyan);">
+                    <strong style="color: var(--accent-cyan);">A — Action</strong>
+                    <p>What YOU specifically did. Use "I", not "we". This is your moment.</p>
+                </div>
+                <div class="summary-item" style="border-left-color: var(--accent-emerald);">
+                    <strong style="color: var(--accent-emerald);">R — Result</strong>
+                    <p>What happened? Use numbers if possible. "Increased sales by 15%" hits harder than "did well".</p>
+                </div>
+            </div>
+            <div class="info-card" style="margin-top: 2rem; max-width: 800px; border-left-color: var(--accent-amber);">
+                <h3 style="color: var(--accent-amber);">💡 Example</h3>
+                <p style="color: var(--text-secondary); line-height: 1.8;">
+                    <strong>Question:</strong> "Tell me about a time you solved a problem."<br><br>
+                    <strong>S:</strong> "At my retail job, we were understaffed during the Christmas rush."<br>
+                    <strong>T:</strong> "I needed to keep customers happy despite long wait times."<br>
+                    <strong>A:</strong> "I reorganised the queue system and communicated wait times upfront."<br>
+                    <strong>R:</strong> "Customer complaints dropped by half and my manager put me on permanent rostering."
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 12: LinkedIn in 2026 -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">LinkedIn in <em>2026</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">It's not just for boomers any more. Recruiters live there.</p>
+            <div class="tips-list" style="max-width: 800px;">
+                <div class="tip-item">
+                    <span class="tip-icon">🔍</span>
+                    <div class="tip-content">
+                        <h4>Recruiters search LinkedIn with AI</h4>
+                        <p>Your profile gets ranked by algorithm. Right keywords = you appear in search results. No keywords = invisible.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">👻</span>
+                    <div class="tip-content">
+                        <h4>No LinkedIn = invisible to many employers</h4>
+                        <p>Especially for professional/office jobs. Tech, marketing, finance, government — they all recruit via LinkedIn.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>It's basically your professional Instagram</h4>
+                        <p>Profile photo, headline, about section, experience. Make it look decent. Doesn't take long.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: LinkedIn Cheat Codes -->
+        <div class="slide pattern-bg">
+            <div class="cheat-badge">LinkedIn Hacks</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">LinkedIn <em>Cheat Codes</em></h2>
+            <div class="tips-list" style="max-width: 900px;">
+                <div class="tip-item">
+                    <span class="tip-icon">📝</span>
+                    <div class="tip-content">
+                        <h4>Headline formula: "Student | [Your Skills] | Available [Month]"</h4>
+                        <p>Example: "Year 12 Student | Digital Media & Web Design | Available Feb 2027"</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔑</span>
+                    <div class="tip-content">
+                        <h4>Use keywords in your About section</h4>
+                        <p>Think about what jobs you want. What skills do they need? Put those words in your profile.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🟢</span>
+                    <div class="tip-content">
+                        <h4>"Open to Work" banner = +40% more recruiter messages</h4>
+                        <p>Turn it on. Green ring around your photo. Recruiters filter by this. Literally a cheat code.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤝</span>
+                    <div class="tip-content">
+                        <h4>Connect with 50+ people (unlocks features)</h4>
+                        <p>Classmates, teachers, family friends, people you've worked with. LinkedIn's algorithm rewards connections.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📸</span>
+                    <div class="tip-content">
+                        <h4>Profile photo = 14x more profile views</h4>
+                        <p>Clean background, shoulders up, smiling. Not a selfie. Not a party photo. Professional-ish.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📢</span>
+                    <div class="tip-content">
+                        <h4>Post occasionally (algorithm rewards activity)</h4>
+                        <p>Share school projects, achievements, articles. Even once a month helps. Shows you're active.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: AI Tools That Help YOU -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Tools That Help <em>YOU</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Fight fire with fire. Use AI to beat AI.</p>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64" alt="ChatGPT" class="platform-logo">
+                    <div class="platform-name">ChatGPT</div>
+                    <div class="platform-url">chatgpt.com</div>
+                    <div class="platform-desc">Write cover letters, improve resume bullet points, prep for interviews. Free version is fine.</div>
+                </div>
+                <div class="platform-card">
+                    <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude" class="platform-logo">
+                    <div class="platform-name">Claude</div>
+                    <div class="platform-url">claude.ai</div>
+                    <div class="platform-desc">Similar to ChatGPT. Good for writing professional emails and tailoring applications.</div>
+                </div>
+                <div class="platform-card">
+                    <img src="https://www.google.com/s2/favicons?domain=jobscan.co&sz=64" alt="Jobscan" class="platform-logo">
+                    <div class="platform-name">Jobscan</div>
+                    <div class="platform-url">jobscan.co</div>
+                    <div class="platform-desc">Scans your resume against job ads. Shows you exactly what keywords you're missing.</div>
+                </div>
+                <div class="platform-card">
+                    <img src="https://www.google.com/s2/favicons?domain=tealhq.com&sz=64" alt="Teal" class="platform-logo">
+                    <div class="platform-name">Teal</div>
+                    <div class="platform-url">tealhq.com</div>
+                    <div class="platform-desc">AI resume builder and job tracker. Helps you customise resumes for each application.</div>
+                </div>
+                <div class="platform-card">
+                    <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="LinkedIn" class="platform-logo">
+                    <div class="platform-name">LinkedIn AI</div>
+                    <div class="platform-url">Built-in</div>
+                    <div class="platform-desc">LinkedIn has AI writing assistance built in now. Use it for your profile and messages.</div>
+                </div>
+                <div class="platform-card">
+                    <img src="https://www.google.com/s2/favicons?domain=grammarly.com&sz=64" alt="Grammarly" class="platform-logo">
+                    <div class="platform-name">Grammarly</div>
+                    <div class="platform-url">grammarly.com</div>
+                    <div class="platform-desc">Spell-check and grammar on steroids. Free version is enough. Makes everything sound professional.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Killer Prompts -->
+        <div class="slide">
+            <div class="cheat-badge">Copy These Prompts</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Killer Prompts for <em>Job Hunting</em></h2>
+            <div class="info-card" style="max-width: 900px; border-left-color: var(--accent-violet);">
+                <h3 style="color: var(--accent-violet);">💬 Copy-Paste These Into ChatGPT/Claude</h3>
+
+                <div class="code-box" style="margin: 1rem 0;">
+                    "Write a cover letter for [job title] at [company name]. My experience is: [paste your resume or describe your experience]"
+                </div>
+
+                <div class="code-box" style="margin: 1rem 0;">
+                    "What questions might they ask for a [job title] interview at [company/industry]? Give me 10 common ones."
+                </div>
+
+                <div class="code-box" style="margin: 1rem 0;">
+                    "Help me answer 'tell me about yourself' for a [job title] role. I'm a Year 12 student with [your experience]."
+                </div>
+
+                <div class="code-box" style="margin: 1rem 0;">
+                    "Rewrite this resume bullet point with metrics and results: [paste your bullet point]"
+                </div>
+
+                <div class="code-box" style="margin: 1rem 0;">
+                    "I'm applying for [job]. Here's the job ad: [paste ad]. Here's my resume: [paste resume]. What keywords am I missing?"
+                </div>
+
+                <div class="code-box" style="margin: 1rem 0;">
+                    "Help me write a professional follow-up email. I applied for [position] at [company] two weeks ago."
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: What Still Matters -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What <em>Still Matters</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Get past the AI, then impress the human. Humans are still involved.</p>
+            <div class="tips-list" style="max-width: 800px;">
+                <div class="tip-item">
+                    <span class="tip-icon">🚪</span>
+                    <div class="tip-content">
+                        <h4>AI opens the door, you walk through it</h4>
+                        <p>These cheat codes get you to the interview. Then your actual skills and personality matter.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤝</span>
+                    <div class="tip-content">
+                        <h4>Networking > applying online (always)</h4>
+                        <p>Knowing someone at the company = 10x better than cold applying. Ask family, friends, teachers for connections.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📞</span>
+                    <div class="tip-content">
+                        <h4>References still matter</h4>
+                        <p>Teachers, coaches, volunteer coordinators. Ask them now if they'd be a reference. Keep their contact details.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💛</span>
+                    <div class="tip-content">
+                        <h4>Being a good human still matters</h4>
+                        <p>Show up on time, communicate clearly, be reliable. Basic stuff that shockingly few people do well.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Activity -->
+        <div class="slide gradient-bg">
+            <div class="activity-box">
+                <div class="activity-title">🔨 Activity: Resume Audit</div>
+                <div class="activity-instructions">
+                    Let's put this into practice right now.
+                </div>
+                <div class="activity-steps">
+                    <ol>
+                        <li>Take your resume (or create a quick one if you don't have one yet)</li>
+                        <li>Go to Seek.com.au or Indeed.com.au and find a job you'd actually want</li>
+                        <li>Read the job ad carefully. Highlight 5-10 keywords they use</li>
+                        <li>Compare: Do those keywords appear in your resume? If not, where could you add them?</li>
+                        <li>Take one bullet point from your resume and paste it into ChatGPT with this prompt: "Improve this resume bullet point with metrics and results: [your text]"</li>
+                        <li>Compare the AI version to yours. What did it add? Does it still sound like you?</li>
+                    </ol>
+                </div>
+                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                    ⏱️ 10 minutes • Pair up and compare what you found. Share tips.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 18: Cheat Sheet Summary -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your <em>Cheat Sheet</em></h2>
+            <div class="summary-grid" style="max-width: 1000px;">
+                <div class="summary-item">
+                    <strong>🔑 Keywords</strong>
+                    <p>Copy exact phrases from job ad into your resume. AI is literal, not smart.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>📄 Simple Format</strong>
+                    <p>Single-column, no graphics, .docx or PDF. Boring beats beautiful for ATS.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>📹 Camera Lens</strong>
+                    <p>Look at the lens, not the screen. Good lighting, clean background.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>⭐ STAR Method</strong>
+                    <p>Situation, Task, Action, Result. AI loves structure in answers.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>💼 LinkedIn Optimised</strong>
+                    <p>Keywords in profile, "Open to Work" turned on, decent photo.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>🤖 Use AI Tools</strong>
+                    <p>ChatGPT, Jobscan, Grammarly. Let robots help you beat robots.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>🤝 Network</strong>
+                    <p>Knowing someone beats applying online 10x over.</p>
+                </div>
+                <div class="summary-item">
+                    <strong>💛 Be Human</strong>
+                    <p>Get past AI, impress the human. Show up, communicate, be reliable.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Resources -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Resources <span style="font-size: 1rem; color: var(--text-muted);">(click to open)</span></h2>
+            <div class="platform-grid">
+                <a href="https://www.seek.com.au" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=seek.com.au&sz=64" alt="Seek" class="platform-logo">
+                    <div class="platform-name">Seek</div>
+                    <div class="platform-url">seek.com.au</div>
+                    <div class="platform-desc">Australia's biggest job site. Create profile, upload resume once.</div>
+                </a>
+                <a href="https://au.indeed.com" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=indeed.com&sz=64" alt="Indeed" class="platform-logo">
+                    <div class="platform-name">Indeed</div>
+                    <div class="platform-url">au.indeed.com</div>
+                    <div class="platform-desc">International job database. Good search filters and company reviews.</div>
+                </a>
+                <a href="https://www.linkedin.com" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="LinkedIn" class="platform-logo">
+                    <div class="platform-name">LinkedIn</div>
+                    <div class="platform-url">linkedin.com</div>
+                    <div class="platform-desc">Professional network. Essential for career jobs. Build profile now.</div>
+                </a>
+                <a href="https://au.jora.com" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=jora.com&sz=64" alt="Jora" class="platform-logo">
+                    <div class="platform-name">Jora</div>
+                    <div class="platform-url">au.jora.com</div>
+                    <div class="platform-desc">Aggregates jobs from smaller sites and company pages.</div>
+                </a>
+                <a href="https://www.fairwork.gov.au" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=fairwork.gov.au&sz=64" alt="Fair Work" class="platform-logo">
+                    <div class="platform-name">Fair Work</div>
+                    <div class="platform-url">fairwork.gov.au</div>
+                    <div class="platform-desc">Know your rights. Check pay rates, conditions, file complaints.</div>
+                </a>
+                <a href="https://www.jobscan.co" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=jobscan.co&sz=64" alt="Jobscan" class="platform-logo">
+                    <div class="platform-name">Jobscan</div>
+                    <div class="platform-url">jobscan.co</div>
+                    <div class="platform-desc">Check resume against job ads. Shows missing keywords. Free trial.</div>
+                </a>
+                <a href="https://www.tealhq.com" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=tealhq.com&sz=64" alt="Teal" class="platform-logo">
+                    <div class="platform-name">Teal</div>
+                    <div class="platform-url">tealhq.com</div>
+                    <div class="platform-desc">AI resume builder and application tracker. Free version available.</div>
+                </a>
+                <a href="https://chat.openai.com" target="_blank" class="platform-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="ChatGPT" class="platform-logo">
+                    <div class="platform-name">ChatGPT</div>
+                    <div class="platform-url">chat.openai.com</div>
+                    <div class="platform-desc">AI writing assistant for resumes, cover letters, interview prep.</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Slide 20: End -->
+        <div class="slide gradient-bg">
+            <h1 class="slide-title">May the Algorithm Be <em>Ever in Your Favour</em></h1>
+            <p class="slide-subtitle">The AI is coming for jobs... use it to get one first.</p>
+            <p class="stat-source" style="margin-top: 3rem; font-size: 1rem; max-width: 700px; text-align: center;">
+                You now know more about the AI hiring game than 95% of applicants. Use these cheat codes. Get past the robots. Impress the humans. Land the job.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 20</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

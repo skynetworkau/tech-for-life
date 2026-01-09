@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI for Study & Productivity // Week 2 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Use cases grid */
+        .usecases-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+        }
+
+        .usecase-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .usecase-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .usecase-card:nth-child(1) { border-color: var(--accent-violet); }
+        .usecase-card:nth-child(2) { border-color: var(--accent-blue); }
+        .usecase-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .usecase-card:nth-child(4) { border-color: var(--accent-emerald); }
+        .usecase-card:nth-child(5) { border-color: var(--accent-amber); }
+        .usecase-card:nth-child(6) { border-color: var(--accent-rose); }
+
+        .usecase-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .usecase-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .usecase-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Example blocks */
+        .example-block {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .example-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .example-icon {
+            font-size: 1.5rem;
+        }
+
+        .example-title {
+            font-weight: 600;
+        }
+
+        .example-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .example-content .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.25rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag.subject { background: var(--accent-violet); color: white; }
+        .tag.task { background: var(--accent-blue); color: white; }
+        .tag.context { background: var(--accent-cyan); color: var(--bg-primary); }
+        .tag.format { background: var(--accent-emerald); color: var(--bg-primary); }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .column-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border-left: 4px solid;
+        }
+
+        .column-card.green { border-color: var(--accent-emerald); }
+        .column-card.red { border-color: var(--accent-rose); }
+        .column-card.blue { border-color: var(--accent-blue); }
+        .column-card.amber { border-color: var(--accent-amber); }
+
+        .column-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .column-card.green h3 { color: var(--accent-emerald); }
+        .column-card.red h3 { color: var(--accent-rose); }
+        .column-card.blue h3 { color: var(--accent-blue); }
+        .column-card.amber h3 { color: var(--accent-amber); }
+
+        .column-card ul {
+            color: var(--text-secondary);
+            line-height: 2;
+            padding-left: 1.5rem;
+        }
+
+        .column-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Tips list */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 800px;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Process flow */
+        .process-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .process-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-violet);
+            flex-shrink: 0;
+        }
+
+        .process-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .process-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Subject examples grid */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .subject-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .subject-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .subject-example {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .subject-example:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Policy cards */
+        .policy-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .policy-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-violet);
+        }
+
+        .policy-card h3 {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent-violet);
+        }
+
+        .policy-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Stats highlight */
+        .stats-row {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Tool Logo */
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+        }
+
+        .tool-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .bar-label-text {
+            font-weight: 500;
+        }
+
+        .bar-label-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .bar {
+            height: 32px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; }
+            .usecases-grid { grid-template-columns: repeat(2, 1fr); }
+            .subject-grid { grid-template-columns: 1fr; }
+            .stats-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">AI for <em>Study</em> & Productivity</h1>
+            <p class="slide-subtitle">Using AI tools ethically to enhance your learning, not replace it</p>
+            <p class="stat-source">Week 2 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why This Matters -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why <em>This</em> Matters</h2>
+            <div class="bar-chart">
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-label-text">Australian Year 12 students using AI for study</span>
+                        <span class="bar-label-value">85%</span>
+                    </div>
+                    <div class="bar" style="width: 85%;"></div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-label-text">Employers expecting AI literacy by 2027</span>
+                        <span class="bar-label-value">78%</span>
+                    </div>
+                    <div class="bar" style="width: 78%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-emerald));"></div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-label-text">Australian universities developing AI policies</span>
+                        <span class="bar-label-value">100%</span>
+                    </div>
+                    <div class="bar" style="width: 100%; background: linear-gradient(90deg, var(--accent-violet), var(--accent-amber));"></div>
+                </div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <p class="stat-source">AI is a tool, not a replacement for learning. Universities and employers expect you to use it ethically.</p>
+                <p class="stat-source">Sources: Monash University Study (2025), LinkedIn Skills Report (2025), Australian Universities Review (2026)</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: AI Study Tools -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI <em>Study Tools</em></h2>
+            <div class="usecases-grid">
+                <div class="usecase-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&sz=64" alt="NotebookLM">
+                    </div>
+                    <div class="usecase-title">NotebookLM</div>
+                    <div class="usecase-desc">Google's AI study assistant - upload notes and PDFs</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=chat.openai.com&sz=64" alt="ChatGPT">
+                    </div>
+                    <div class="usecase-title">ChatGPT</div>
+                    <div class="usecase-desc">Research, explanations, and practice questions</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude">
+                    </div>
+                    <div class="usecase-title">Claude</div>
+                    <div class="usecase-desc">Deep analysis and detailed explanations</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini">
+                    </div>
+                    <div class="usecase-title">Gemini</div>
+                    <div class="usecase-desc">Google search integrated AI assistant</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=teacherscreen.com.au&sz=64" alt="TeacherScreen">
+                    </div>
+                    <div class="usecase-title">TeacherScreen</div>
+                    <div class="usecase-desc">Australian AI teaching and learning tool</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="tool-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=canva.com&sz=64" alt="Canva AI">
+                    </div>
+                    <div class="usecase-title">Canva AI</div>
+                    <div class="usecase-desc">Create presentations and visual study materials</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: What Can AI Do For You? -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Can AI Do For <em>You?</em></h2>
+            <div class="usecases-grid">
+                <div class="usecase-card">
+                    <div class="usecase-icon">🔍</div>
+                    <div class="usecase-title">Research</div>
+                    <div class="usecase-desc">Find information and understand complex topics</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">📝</div>
+                    <div class="usecase-title">Summarise</div>
+                    <div class="usecase-desc">Condense long texts into key points</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">💡</div>
+                    <div class="usecase-title">Brainstorm</div>
+                    <div class="usecase-desc">Generate ideas and different perspectives</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">📋</div>
+                    <div class="usecase-title">Plan</div>
+                    <div class="usecase-desc">Structure essays and projects</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">✅</div>
+                    <div class="usecase-title">Check</div>
+                    <div class="usecase-desc">Review your work for improvements</div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">🎓</div>
+                    <div class="usecase-title">Learn</div>
+                    <div class="usecase-desc">Get explanations and practice questions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Research & Information -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Using AI for <em>Research</em></h2>
+            <div class="example-block">
+                <div class="example-header">
+                    <span class="example-icon">🔍</span>
+                    <span class="example-title">Example: History Research</span>
+                </div>
+                <div class="example-content">
+                    <span class="tag subject">HISTORY</span> "I'm researching the impact of the 1967 Referendum on Indigenous Australians for my Modern History assignment.<br><br>
+                    Can you:<br>
+                    1. Explain what the referendum changed legally<br>
+                    2. Describe 3 immediate impacts<br>
+                    3. Explain 2 long-term consequences<br>
+                    4. Suggest 3 reliable sources I should read<br><br>
+                    Keep it under 300 words and suitable for a Year 12 assignment."
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">AI gives you a starting point — always verify facts with reliable sources!</p>
+        </div>
+
+        <!-- Slide 5: AI Research Tips -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Research <em>Tips</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">✅</span>
+                    <div class="tip-content">
+                        <h4>Always verify AI facts</h4>
+                        <p>AI can make mistakes or "hallucinate" information. Check facts against reliable sources.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📚</span>
+                    <div class="tip-content">
+                        <h4>Ask for sources</h4>
+                        <p>Request "3 reliable sources I can read about this topic" to guide your own research.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Be specific about your context</h4>
+                        <p>Mention "for a Year 12 WACE assignment" or "focusing on Western Australia" to get relevant answers.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔄</span>
+                    <div class="tip-content">
+                        <h4>Use AI as a starting point, not the end</h4>
+                        <p>AI helps you understand the topic so you can do deeper research yourself.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5.5: Video - AI for Studying -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Watch: <em>AI Study Strategies</em></h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/VznoKyh6AXs" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">How to Study with AI (ChatGPT, NotebookLM, Gemini) • Ali Abdaal • 8 minutes</p>
+        </div>
+
+        <!-- Slide 6: Creating Summaries -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Creating <em>Summaries</em> & Notes</h2>
+            <div class="example-block">
+                <div class="example-header">
+                    <span class="example-icon">📝</span>
+                    <span class="example-title">Example: Biology Notes</span>
+                </div>
+                <div class="example-content">
+                    <span class="tag subject">BIOLOGY</span> "Summarise this textbook chapter about cellular respiration into study notes for my WACE exam.<br><br>
+                    [paste chapter text or upload image]<br><br>
+                    Format:<br>
+                    • Key definitions<br>
+                    • Main processes (glycolysis, Krebs cycle, electron transport)<br>
+                    • Important equations<br>
+                    • Common exam questions about this topic<br><br>
+                    Keep it under 400 words."
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">Pro tip: You can paste text or upload images of textbook pages to most AI tools.</p>
+        </div>
+
+        <!-- Slide 7: Brainstorming & Mind Mapping -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>Brainstorming</em> with AI</h2>
+            <div class="two-column">
+                <div class="column-card blue">
+                    <h3>💭 Generate Ideas</h3>
+                    <p>"I need to write a persuasive essay about an environmental issue for English. Give me 10 specific topic ideas related to Western Australia."</p>
+                    <p style="margin-top: 1rem; font-style: italic;">AI excels at generating options you might not think of.</p>
+                </div>
+                <div class="column-card blue">
+                    <h3>🗺️ Mind Mapping</h3>
+                    <p>"I'm writing about ocean plastic pollution. Help me create a mind map showing: causes, effects, solutions, and stakeholders involved."</p>
+                    <p style="margin-top: 1rem; font-style: italic;">AI can help structure your thinking before you start writing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Essay Planning -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Essay <em>Planning</em></h2>
+            <div class="example-block">
+                <div class="example-header">
+                    <span class="example-icon">📋</span>
+                    <span class="example-title">Example: English Essay Structure</span>
+                </div>
+                <div class="example-content">
+                    <span class="tag subject">ENGLISH</span> "I'm writing a 1000-word essay analysing how Markus Zusak uses symbolism in The Book Thief.<br><br>
+                    Help me create a detailed essay structure with:<br>
+                    • Introduction approach<br>
+                    • 3 body paragraph topics (with specific examples I should analyse)<br>
+                    • Conclusion strategy<br><br>
+                    Don't write the essay — just help me plan it."
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">Ask for structure and direction, not for AI to write the essay for you.</p>
+        </div>
+
+        <!-- Slide 9: Checking Your Work -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>Checking</em> Your Work</h2>
+            <div class="process-flow">
+                <div class="process-step">
+                    <div class="process-number">1</div>
+                    <div class="process-content">
+                        <h4>Grammar & Spelling</h4>
+                        <p>"Check this paragraph for grammar and spelling errors. Explain any mistakes."</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">2</div>
+                    <div class="process-content">
+                        <h4>Clarity Check</h4>
+                        <p>"Does this argument make sense? Are there any logical gaps I need to address?"</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">3</div>
+                    <div class="process-content">
+                        <h4>Improvement Suggestions</h4>
+                        <p>"What are 3 ways I could make this introduction more engaging?"</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">4</div>
+                    <div class="process-content">
+                        <h4>Citation Check</h4>
+                        <p>"Is this reference formatted correctly in APA style?"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: WACE Subject Examples -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Subject-Specific <em>Examples</em></h2>
+            <div class="subject-grid">
+                <div class="subject-card">
+                    <div class="subject-name">📐 Mathematics Methods</div>
+                    <div class="subject-example">• "Explain the concept of derivatives using a real-world example"</div>
+                    <div class="subject-example">• "Check my working for this calculus problem" [paste work]</div>
+                    <div class="subject-example">• "Give me 5 practice questions on integration"</div>
+                </div>
+                <div class="subject-card">
+                    <div class="subject-name">🧪 Chemistry</div>
+                    <div class="subject-example">• "Explain redox reactions like I'm learning it for the first time"</div>
+                    <div class="subject-example">• "Help me remember the difference between exothermic and endothermic"</div>
+                    <div class="subject-example">• "Create a comparison table for acids and bases"</div>
+                </div>
+                <div class="subject-card">
+                    <div class="subject-name">💻 Computer Science</div>
+                    <div class="subject-example">• "Explain this code and what it does" [paste code]</div>
+                    <div class="subject-example">• "My code has a bug. Can you spot the error?" [paste code]</div>
+                    <div class="subject-example">• "Suggest how I could make this algorithm more efficient"</div>
+                </div>
+                <div class="subject-card">
+                    <div class="subject-name">🎭 Literature</div>
+                    <div class="subject-example">• "What are the main themes in [book title]?"</div>
+                    <div class="subject-example">• "Help me find quotes about identity in this text"</div>
+                    <div class="subject-example">• "Explain the context of when this text was written"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: The Line - OK vs Not OK -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>Line</em>: OK vs Not OK</h2>
+            <div class="two-column">
+                <div class="column-card green">
+                    <h3>✓ ACCEPTABLE Use</h3>
+                    <ul>
+                        <li>Brainstorming and generating ideas</li>
+                        <li>Understanding difficult concepts</li>
+                        <li>Creating essay outlines and structures</li>
+                        <li>Checking grammar and clarity</li>
+                        <li>Getting feedback on your work</li>
+                        <li>Creating practice questions</li>
+                        <li>Summarising research you've read</li>
+                    </ul>
+                </div>
+                <div class="column-card red">
+                    <h3>✗ UNACCEPTABLE Use</h3>
+                    <ul>
+                        <li>Having AI write your entire essay</li>
+                        <li>Copying AI text directly as your own</li>
+                        <li>Using AI during exams (unless allowed)</li>
+                        <li>Having AI do maths problems without learning how</li>
+                        <li>Submitting AI-generated code as your own</li>
+                        <li>Using AI when told not to by your teacher</li>
+                        <li>Not acknowledging AI assistance when required</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Academic Integrity -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Academic <em>Integrity</em></h2>
+            <div class="two-column">
+                <div class="column-card amber">
+                    <h3>🤔 The Test</h3>
+                    <p>Ask yourself:</p>
+                    <ul>
+                        <li>Am I still doing the learning?</li>
+                        <li>Could I explain this work to my teacher?</li>
+                        <li>Would I be comfortable telling my teacher how I used AI?</li>
+                        <li>Am I following my teacher's specific instructions?</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-weight: 600;">If you answered "no" to any of these, you've crossed the line.</p>
+                </div>
+                <div class="column-card green">
+                    <h3>📋 When to Acknowledge AI</h3>
+                    <p>You should state that you used AI when:</p>
+                    <ul>
+                        <li>It's required by your teacher or assignment brief</li>
+                        <li>AI helped generate significant content or ideas</li>
+                        <li>You're unsure — always better to disclose</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-style: italic;">Simple format: "I used ChatGPT to help brainstorm ideas and check grammar."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: WACE & University Policies -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>WACE</em> & University Policies</h2>
+            <div class="policy-grid">
+                <div class="policy-card">
+                    <h3>📚 WACE Exams</h3>
+                    <p><strong>NO AI tools</strong> are permitted in external WACE exams. This includes any device with internet access. Using AI during an exam is considered cheating and will result in severe penalties.</p>
+                </div>
+                <div class="policy-card">
+                    <h3>📝 School Assessments</h3>
+                    <p>Each teacher sets their own rules for assignments. <strong>Always check with your teacher</strong> before using AI for any assessment task. When in doubt, ask!</p>
+                </div>
+                <div class="policy-card">
+                    <h3>🎓 University Level</h3>
+                    <p>WA universities (UWA, Curtin, Murdoch, ECU) are developing AI policies. Most expect you to use AI ethically and acknowledge its use. Standards are similar to high school: using AI to learn is encouraged, using it to cheat is not. <strong>Always read the unit outline</strong> for specific policies.</p>
+                </div>
+            </div>
+            <p class="stat-source">Policies are evolving. Stay updated and always ask if you're unsure.</p>
+        </div>
+
+        <!-- Slide 14: Real Consequences -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real <em>Consequences</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">⚠️</span>
+                    <div class="tip-content">
+                        <h4>In High School</h4>
+                        <p>Academic misconduct can result in zero marks, disciplinary action, and notation on your record. For serious breaches, it may affect university applications.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎓</span>
+                    <div class="tip-content">
+                        <h4>At University</h4>
+                        <p>Academic misconduct is taken very seriously. Penalties range from failing the unit to suspension or expulsion. It becomes part of your permanent academic record.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💼</span>
+                    <div class="tip-content">
+                        <h4>In Your Career</h4>
+                        <p>Academic misconduct on your record can prevent you from entering certain professions (teaching, law, medicine) and can be discovered in background checks.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🧠</span>
+                    <div class="tip-content">
+                        <h4>Most Importantly</h4>
+                        <p>Using AI to avoid learning means you won't develop the skills you need. You're only cheating yourself.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: AI Limitations -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI <em>Limitations</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">❌</span>
+                    <div class="tip-content">
+                        <h4>AI Makes Mistakes</h4>
+                        <p>AI can "hallucinate" facts, dates, quotes, and sources. Always verify important information.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📅</span>
+                    <div class="tip-content">
+                        <h4>Knowledge Cutoff</h4>
+                        <p>Most AI models have a knowledge cutoff date. They don't know about very recent events or research.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤖</span>
+                    <div class="tip-content">
+                        <h4>No Real Understanding</h4>
+                        <p>AI doesn't truly understand content like a human does. It can miss nuance and context.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎨</span>
+                    <div class="tip-content">
+                        <h4>Lacks Creativity</h4>
+                        <p>AI is trained on existing work. It can't have truly original insights or perspectives like you can.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">⚖️</span>
+                    <div class="tip-content">
+                        <h4>Bias in Training</h4>
+                        <p>AI reflects biases present in its training data. Be critical of the responses you receive.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Practical Workflow -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your AI <em>Workflow</em></h2>
+            <div class="process-flow">
+                <div class="process-step">
+                    <div class="process-number">1</div>
+                    <div class="process-content">
+                        <h4>Start With Your Own Thinking</h4>
+                        <p>What do you already know? What do you need to learn? Write down your initial ideas first.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">2</div>
+                    <div class="process-content">
+                        <h4>Use AI to Explore & Understand</h4>
+                        <p>Ask questions, get explanations, brainstorm ideas. Use AI as a study partner.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">3</div>
+                    <div class="process-content">
+                        <h4>Do Your Own Research</h4>
+                        <p>Use AI-suggested sources and do deeper reading. Develop your own understanding.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">4</div>
+                    <div class="process-content">
+                        <h4>Create Your Own Work</h4>
+                        <p>Write in your own words, based on your research and understanding. Make it yours.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">5</div>
+                    <div class="process-content">
+                        <h4>Use AI to Review & Improve</h4>
+                        <p>Get feedback on clarity, grammar, and argument strength. Make final improvements yourself.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Privacy & Data -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Privacy & <em>Data Safety</em></h2>
+            <div class="two-column">
+                <div class="column-card red">
+                    <h3>❌ Never Share</h3>
+                    <ul>
+                        <li>Personal information (address, phone, email)</li>
+                        <li>Other people's personal details</li>
+                        <li>Passwords or login details</li>
+                        <li>Photos with identifiable people/places</li>
+                        <li>Confidential school information</li>
+                        <li>Private family matters</li>
+                    </ul>
+                </div>
+                <div class="column-card green">
+                    <h3>✓ Remember</h3>
+                    <ul>
+                        <li>AI conversations may be stored and reviewed</li>
+                        <li>Free AI tools use your data to improve their models</li>
+                        <li>Be vague with context when possible ("my city" not "Perth")</li>
+                        <li>Use school-approved AI tools when available</li>
+                        <li>Never use AI for sensitive or confidential information</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">When in doubt, leave it out. Protect your privacy and others'.</p>
+        </div>
+
+        <!-- Slide 18: Key Takeaways -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key <em>Takeaways</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>AI is a Learning Tool, Not a Shortcut</h4>
+                        <p>Use AI to understand better, not to avoid learning.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">✅</span>
+                    <div class="tip-content">
+                        <h4>Always Verify AI Information</h4>
+                        <p>AI makes mistakes. Check facts with reliable sources.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📋</span>
+                    <div class="tip-content">
+                        <h4>Follow Your Teacher's Rules</h4>
+                        <p>Each assignment has different AI policies. When in doubt, ask!</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🤝</span>
+                    <div class="tip-content">
+                        <h4>Acknowledge When You Use AI</h4>
+                        <p>Be transparent about how AI assisted you when required.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🧠</span>
+                    <div class="tip-content">
+                        <h4>Do the Learning Yourself</h4>
+                        <p>AI can't take exams for you. Build genuine skills and understanding.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Your Challenge -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem; margin-bottom: 2rem;">Your <em>Challenge</em></h2>
+            <div class="example-block">
+                <div class="example-header">
+                    <span class="example-icon">🎯</span>
+                    <span class="example-title">This Week's Task</span>
+                </div>
+                <div class="example-content" style="font-family: 'Inter', sans-serif;">
+                    <p style="margin-bottom: 1rem; font-size: 1.1rem;">Choose a topic you're currently studying in any subject.</p>
+                    <p style="margin-bottom: 1rem;">Use AI to:</p>
+                    <ul style="padding-left: 2rem; line-height: 2;">
+                        <li>Get a clear explanation of a concept you find difficult</li>
+                        <li>Create a summary or study notes</li>
+                        <li>Generate 5 practice questions</li>
+                    </ul>
+                    <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-violet);">Then: Do independent research to verify what AI told you and write your own notes based on both AI and your research.</p>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">Come prepared to discuss: What did AI do well? Where did it make mistakes? How did it help your learning?</p>
+        </div>
+
+        <!-- Slide 20: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">AI is Your <em>Study Partner</em></h1>
+            <p class="slide-subtitle">Use it to learn faster and deeper, but never let it replace your own thinking and understanding.</p>
+            <p class="stat-source">Questions? Let's discuss!</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 20</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

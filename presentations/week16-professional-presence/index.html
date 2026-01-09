@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Pathway // Week 16 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Pathway cards */
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .pathway-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .pathway-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pathway-card:nth-child(1) { border-color: var(--accent-violet); }
+        .pathway-card:nth-child(2) { border-color: var(--accent-blue); }
+        .pathway-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .pathway-card:nth-child(4) { border-color: var(--accent-emerald); }
+        .pathway-card:nth-child(5) { border-color: var(--accent-amber); }
+
+        .pathway-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pathway-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pathway-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Tips list */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 900px;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .tip-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tip-content ul {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .column-text p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .column-text ul {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 3px solid var(--accent-violet);
+            margin-top: 1rem;
+        }
+
+        /* Tool/Resource cards */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+        }
+
+        .tool-logo {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .tool-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tool-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Activity box */
+        .activity-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid var(--accent-emerald);
+        }
+
+        .activity-box h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent-emerald);
+        }
+
+        .activity-box ol {
+            color: var(--text-secondary);
+            line-height: 2;
+            padding-left: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .activity-box ol li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Date box */
+        .date-box {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-amber);
+        }
+
+        .date-box h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-amber);
+        }
+
+        .date-box p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .tool-grid { grid-template-columns: repeat(2, 1fr); }
+            .pathway-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Your <em>Pathway</em></h1>
+            <p class="slide-subtitle">University, TAFE, Apprenticeship, or Work — All valid choices for life after Year 12</p>
+            <p class="stat-source">Week 16 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: No Wrong Choice -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">There's <em>No Wrong Choice</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">✨</span>
+                    <div class="tip-content">
+                        <h4>All pathways lead to good careers</h4>
+                        <p>You can have a successful, fulfilling life through university, TAFE, an apprenticeship, or going straight to work. What matters is finding what suits YOU.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔄</span>
+                    <div class="tip-content">
+                        <h4>You can change direction later</h4>
+                        <p>Pathways aren't permanent. Many people change careers, go to uni as mature age students, or switch from one trade to another.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💡</span>
+                    <div class="tip-content">
+                        <h4>Many successful people didn't go to uni</h4>
+                        <p>Tradies, entrepreneurs, artists, and business owners build amazing careers without university degrees. Skills and experience matter more than paper qualifications.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎯</span>
+                    <div class="tip-content">
+                        <h4>Find what suits you</h4>
+                        <p>Do you love hands-on work? Theoretical learning? Working with people? Getting paid while you train? There's a pathway that matches your style.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Four Main Pathways -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Four Main <em>Pathways</em></h2>
+            <div class="pathway-grid">
+                <div class="pathway-card">
+                    <div class="pathway-icon">🎓</div>
+                    <div class="pathway-title">University</div>
+                    <div class="pathway-desc">3-4 year degrees in fields like engineering, nursing, law, business, science. Requires ATAR. Apply through TISC.</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-icon">🛠️</div>
+                    <div class="pathway-title">TAFE / VET</div>
+                    <div class="pathway-desc">Certificates and diplomas in trades, business, creative industries, health. Practical, hands-on learning. Can lead to uni later.</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-icon">👷</div>
+                    <div class="pathway-title">Apprenticeships</div>
+                    <div class="pathway-desc">Earn while you learn. 3-4 years training in trades like electrical, plumbing, carpentry, mechanics. Get paid and qualified.</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-icon">💼</div>
+                    <div class="pathway-title">Direct to Workforce</div>
+                    <div class="pathway-desc">Entry-level jobs in retail, hospitality, admin, agriculture. Build experience and skills. Can combine with part-time study.</div>
+                </div>
+                <div class="pathway-card" style="grid-column: 1 / -1; max-width: 600px; justify-self: center;">
+                    <div class="pathway-icon">🌏</div>
+                    <div class="pathway-title">Gap Year</div>
+                    <div class="pathway-desc">Take time before deciding. Work, travel, volunteer, or figure out what you want. Can defer uni offers to hold your place.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: University Path - Overview -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>University</em> Path</h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h3>What is University?</h3>
+                    <p>3-6 year degrees focused on theory, research, and professional careers. You specialise in fields like medicine, engineering, teaching, law, or science.</p>
+                    <p><strong>WA Universities:</strong></p>
+                    <ul>
+                        <li>University of Western Australia (UWA)</li>
+                        <li>Curtin University</li>
+                        <li>Murdoch University</li>
+                        <li>Edith Cowan University (ECU)</li>
+                        <li>University of Notre Dame</li>
+                    </ul>
+                </div>
+                <div class="column-text">
+                    <h3>ATAR & Course Requirements</h3>
+                    <p>Your ATAR (Australian Tertiary Admission Rank) is calculated from your Year 12 results. Different courses need different ATARs.</p>
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>Medicine: 99+ ATAR</li>
+                        <li>Engineering: 80-85 ATAR</li>
+                        <li>Arts, Business: 70-75 ATAR</li>
+                        <li>Some courses have no ATAR requirement</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <p><strong>Don't meet the ATAR?</strong> Many unis offer pathway programs, alternative entry, or portfolio entry for creative courses.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: University - TISC & Applications -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">TISC — Apply to <em>University</em></h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h3>What is TISC?</h3>
+                    <p><strong>Tertiary Institutions Service Centre</strong> — the central place to apply for undergraduate uni courses in WA.</p>
+                    <p><strong>How it works:</strong></p>
+                    <ul>
+                        <li>Create a TISC account at <strong>tisc.edu.au</strong></li>
+                        <li>List up to 6 course preferences in order</li>
+                        <li>TISC uses your ATAR to match you to courses</li>
+                        <li>You get offers in January (main round)</li>
+                    </ul>
+                </div>
+                <div class="column-text">
+                    <h3>Key Dates for 2026</h3>
+                    <div class="date-box">
+                        <h4>Applications Open</h4>
+                        <p>August 2026 — start browsing courses</p>
+                    </div>
+                    <div class="date-box">
+                        <h4>Applications Close</h4>
+                        <p>Late September 2026 (exact date TBA)</p>
+                    </div>
+                    <div class="date-box">
+                        <h4>Main Round Offers</h4>
+                        <p>Early January 2027</p>
+                    </div>
+                    <div class="highlight-box">
+                        <p><strong>Pro tip:</strong> Apply early. Don't wait until the deadline. You can change your preferences later!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: University - Costs & HECS-HELP -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Paying for Uni — <em>HECS-HELP</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">💰</span>
+                    <div class="tip-content">
+                        <h4>You don't pay upfront</h4>
+                        <p>Australian citizens and permanent residents can use HECS-HELP (Higher Education Loan Program). The government pays your fees, and you pay them back later through the tax system.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📊</span>
+                    <div class="tip-content">
+                        <h4>You only repay when you earn enough</h4>
+                        <p>You start repaying your HECS debt when you earn over approximately $54,000 per year. Repayments are automatic through tax. No interest — just indexed to inflation.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📚</span>
+                    <div class="tip-content">
+                        <h4>Study Assist — studyassist.gov.au</h4>
+                        <p>Visit Study Assist to calculate costs, understand HECS-HELP, and check if you're eligible for scholarships or Youth Allowance (Centrelink support for students).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: AI at University -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI at <em>University</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🤖</span>
+                    <div class="tip-content">
+                        <h4>Every university has AI policies now</h4>
+                        <p>Using AI tools like ChatGPT, Copilot, or Claude is increasingly common, but universities require transparency. Check your course outline for specific rules.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">⚖️</span>
+                    <div class="tip-content">
+                        <h4>Academic integrity — what's allowed</h4>
+                        <p>AI can help with research, brainstorming, and editing. But submitting AI-generated text as your own work is plagiarism. Always cite AI if you use it.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔍</span>
+                    <div class="tip-content">
+                        <h4>Using AI for research</h4>
+                        <p>Tools like <strong>NotebookLM</strong> can help summarise research papers. Always verify facts and cite your sources. AI can be wrong.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎓</span>
+                    <div class="tip-content">
+                        <h4>Turnitin and AI detection</h4>
+                        <p>Universities use Turnitin to check for plagiarism and AI-generated content. Don't rely on AI to write your assignments. Use it as a tool, not a replacement for your thinking.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: TAFE Path - Overview -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>TAFE</em> Path</h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h3>What is TAFE?</h3>
+                    <p>TAFE (Technical and Further Education) offers practical, hands-on courses from Certificate I to Advanced Diploma. It's focused on real-world skills you can use immediately.</p>
+                    <p><strong>WA TAFE Providers:</strong></p>
+                    <ul>
+                        <li>North Metropolitan TAFE</li>
+                        <li>South Metropolitan TAFE</li>
+                        <li>Regional TAFEs (Great Southern, etc.)</li>
+                    </ul>
+                </div>
+                <div class="column-text">
+                    <h3>Course Areas</h3>
+                    <ul>
+                        <li><strong>Trades:</strong> Electrical, plumbing, carpentry, automotive</li>
+                        <li><strong>Business:</strong> Accounting, admin, management</li>
+                        <li><strong>Creative:</strong> Graphic design, film, music</li>
+                        <li><strong>Health:</strong> Nursing, aged care, childcare</li>
+                        <li><strong>Hospitality:</strong> Commercial cookery, patisserie</li>
+                        <li><strong>IT:</strong> Networking, cybersecurity, programming</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <p><strong>Can lead to uni later:</strong> Many TAFE diplomas offer credit toward university degrees (pathway courses).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: TAFE - USI & Enrolment -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Enrolling in <em>TAFE</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🆔</span>
+                    <div class="tip-content">
+                        <h4>USI — Unique Student Identifier</h4>
+                        <p>You MUST have a USI to enrol in any VET course (TAFE, apprenticeships, traineeships). It's a free reference number that stays with you for life. Create yours at <strong>usi.gov.au</strong>.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💳</span>
+                    <div class="tip-content">
+                        <h4>VET Student Loans</h4>
+                        <p>For diploma-level courses, you can apply for a VET Student Loan (like HECS-HELP for TAFE). You pay the loan back through the tax system when you earn enough.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🔎</span>
+                    <div class="tip-content">
+                        <h4>Find TAFE courses at training.gov.au</h4>
+                        <p>Search for courses by name, qualification level, or field. Compare different TAFEs and check entry requirements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Apprenticeships - Overview -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>Apprenticeship</em> Path</h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h3>What is an Apprenticeship?</h3>
+                    <p>A full-time training contract where you <strong>earn while you learn</strong>. You work for an employer and study at TAFE part-time (usually one day per week or in blocks).</p>
+                    <p><strong>Duration:</strong> 3-4 years</p>
+                    <p><strong>Outcome:</strong> Nationally recognised trade qualification (Certificate III or IV)</p>
+                </div>
+                <div class="column-text">
+                    <h3>Common Trades</h3>
+                    <ul>
+                        <li><strong>Electrician</strong> — residential, commercial, industrial</li>
+                        <li><strong>Plumber</strong> — plumbing, gasfitting, drainage</li>
+                        <li><strong>Carpenter</strong> — building, joinery, cabinet making</li>
+                        <li><strong>Automotive</strong> — mechanics, spray painting</li>
+                        <li><strong>Chef</strong> — commercial cookery, patisserie</li>
+                        <li><strong>Bricklayer, Painter, Tiler</strong></li>
+                    </ul>
+                    <div class="highlight-box">
+                        <p><strong>Great demand in WA:</strong> Tradies are in high demand, especially in regional areas. Job security and good pay.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Apprenticeships - How to Find One -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Finding an <em>Apprenticeship</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🇦🇺</span>
+                    <div class="tip-content">
+                        <h4>Australian Apprenticeships</h4>
+                        <p>Start at <strong>australianapprenticeships.gov.au</strong>. Browse trades, find local opportunities, and learn about incentives for apprentices (government payments).</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🏢</span>
+                    <div class="tip-content">
+                        <h4>Group Training Organisations (GTOs)</h4>
+                        <p>GTOs employ apprentices and place them with host companies. They handle your pay, training, and support. Search for "GTO Western Australia" to find local ones.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📞</span>
+                    <div class="tip-content">
+                        <h4>Reach out directly to local businesses</h4>
+                        <p>Call or visit tradies in Denmark and the Great Southern. Many small businesses prefer local apprentices. Bring a resume and be ready to start.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💼</span>
+                    <div class="tip-content">
+                        <h4>Check Seek, Indeed, and job boards</h4>
+                        <p>Apprenticeships are advertised like jobs. Search "apprentice electrician WA" or "plumbing apprenticeship Great Southern."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Traineeships -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>Traineeship</em> Path</h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h3>What is a Traineeship?</h3>
+                    <p>Similar to an apprenticeship, but usually <strong>shorter (1-2 years)</strong> and in non-trade fields. You work full-time and study part-time for a Certificate III.</p>
+                    <p><strong>Common fields:</strong></p>
+                    <ul>
+                        <li>Business administration</li>
+                        <li>Retail</li>
+                        <li>Childcare and education</li>
+                        <li>IT support</li>
+                        <li>Hospitality</li>
+                    </ul>
+                </div>
+                <div class="column-text">
+                    <h3>Benefits</h3>
+                    <ul>
+                        <li>Earn a wage while getting qualified</li>
+                        <li>Shorter time commitment than apprenticeships</li>
+                        <li>Often leads to permanent employment</li>
+                        <li>Recognised qualification on completion</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <p><strong>Great for career changers:</strong> Traineeships are also for adults switching careers, not just school leavers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Direct to Work -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>Direct to Work</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🛍️</span>
+                    <div class="tip-content">
+                        <h4>Retail and Hospitality</h4>
+                        <p>Entry-level roles in shops, cafes, restaurants, and hotels. These jobs teach customer service, teamwork, and time management. Many people work up to management or start their own businesses.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📋</span>
+                    <div class="tip-content">
+                        <h4>Administration and Office Work</h4>
+                        <p>Receptionists, data entry, office assistants. These roles build skills in communication, organisation, and software (Microsoft Office, Google Workspace).</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🌾</span>
+                    <div class="tip-content">
+                        <h4>Agriculture and Regional Work</h4>
+                        <p>Farm work, shearing, machinery operation. Great for people who love outdoor, physical work. Pays well, especially in harvest seasons.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📚</span>
+                    <div class="tip-content">
+                        <h4>Work and study part-time</h4>
+                        <p>Many people combine entry-level work with part-time TAFE or online courses. You build experience, earn money, and gain qualifications at the same time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Gap Year -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Taking a <em>Gap Year</em></h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h3>What is a Gap Year?</h3>
+                    <p>Taking a year off before starting uni, TAFE, or an apprenticeship. It's a chance to work, travel, volunteer, or just figure out what you want to do.</p>
+                    <p><strong>Common gap year activities:</strong></p>
+                    <ul>
+                        <li>Working full-time and saving money</li>
+                        <li>Travelling (Australia or overseas)</li>
+                        <li>Volunteering or community work</li>
+                        <li>Taking short courses or learning new skills</li>
+                    </ul>
+                </div>
+                <div class="column-text">
+                    <h3>Deferring University Offers</h3>
+                    <p>If you get a uni offer through TISC, you can <strong>defer</strong> (postpone) your start date for one year. This holds your place while you take a gap year.</p>
+                    <div class="highlight-box">
+                        <p><strong>Pro tip:</strong> Many students come back from a gap year more focused and motivated. It's not "falling behind" — it's taking time to grow.</p>
+                    </div>
+                    <h3 style="margin-top: 1.5rem;">Is a Gap Year Right for You?</h3>
+                    <p>If you're unsure what to study, burned out, or want life experience before committing, a gap year can be a great choice.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Changing Your Mind -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Pathways Aren't <em>Permanent</em></h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🔄</span>
+                    <div class="tip-content">
+                        <h4>You can change your mind</h4>
+                        <p>Many people switch courses, change careers, or go back to study later. There's no "one path forever." Life is flexible.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎓</span>
+                    <div class="tip-content">
+                        <h4>Mature age entry to university</h4>
+                        <p>If you didn't go to uni straight after school, you can apply as a mature age student (usually 21+). Your work experience and TAFE qualifications count toward entry.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📜</span>
+                    <div class="tip-content">
+                        <h4>Credit transfer between courses</h4>
+                        <p>If you study a TAFE diploma, you might get credit toward a uni degree. If you change uni courses, your subjects might transfer too.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💼</span>
+                    <div class="tip-content">
+                        <h4>Most people change careers multiple times</h4>
+                        <p>The average person changes careers 5-7 times in their life. Don't feel locked in. Your first choice is just that — your first.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Digital Tools for Each Pathway -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Digital Tools for <em>Each Pathway</em></h2>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=tisc.edu.au&sz=64" alt="TISC" class="tool-logo">
+                    <div class="tool-name">TISC</div>
+                    <div class="tool-url">tisc.edu.au</div>
+                    <div class="tool-desc">Apply to WA universities — up to 6 course preferences</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=studyassist.gov.au&sz=64" alt="Study Assist" class="tool-logo">
+                    <div class="tool-name">Study Assist</div>
+                    <div class="tool-url">studyassist.gov.au</div>
+                    <div class="tool-desc">Understand HECS-HELP, costs, and student support</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=training.gov.au&sz=64" alt="Training.gov.au" class="tool-logo">
+                    <div class="tool-name">Training.gov.au</div>
+                    <div class="tool-url">training.gov.au</div>
+                    <div class="tool-desc">Search TAFE and VET courses across Australia</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=usi.gov.au&sz=64" alt="USI" class="tool-logo">
+                    <div class="tool-name">USI</div>
+                    <div class="tool-url">usi.gov.au</div>
+                    <div class="tool-desc">Create your Unique Student Identifier for TAFE/VET</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=australianapprenticeships.gov.au&sz=64" alt="Australian Apprenticeships" class="tool-logo">
+                    <div class="tool-name">Australian Apprenticeships</div>
+                    <div class="tool-url">australianapprenticeships.gov.au</div>
+                    <div class="tool-desc">Find apprenticeships and traineeships</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=myskills.gov.au&sz=64" alt="MySkills" class="tool-logo">
+                    <div class="tool-name">MySkills</div>
+                    <div class="tool-url">myskills.gov.au</div>
+                    <div class="tool-desc">Compare VET courses and providers</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=seek.com.au&sz=64" alt="Seek" class="tool-logo">
+                    <div class="tool-name">Seek</div>
+                    <div class="tool-url">seek.com.au</div>
+                    <div class="tool-desc">Search jobs, apprenticeships, and traineeships</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=indeed.com&sz=64" alt="Indeed" class="tool-logo">
+                    <div class="tool-name">Indeed</div>
+                    <div class="tool-url">indeed.com.au</div>
+                    <div class="tool-desc">Job search engine with salary insights</div>
+                </div>
+                <div class="tool-card">
+                    <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="LinkedIn" class="tool-logo">
+                    <div class="tool-name">LinkedIn</div>
+                    <div class="tool-url">linkedin.com</div>
+                    <div class="tool-desc">Professional network — connects to all pathways</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: What Denmark Leavers Have Done -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What <em>Denmark</em> Leavers Have Done</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <span class="tip-icon">🛠️</span>
+                    <div class="tip-content">
+                        <h4>Trades in the Great Southern</h4>
+                        <p>Electrical apprenticeships, carpentry, plumbing, and mechanics with local businesses. Many stay in the region and build careers here.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎓</span>
+                    <div class="tip-content">
+                        <h4>University in Perth</h4>
+                        <p>Degrees at UWA, Curtin, Murdoch, and ECU in fields like engineering, nursing, teaching, and business. Some come back to work regionally after graduating.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🛠️</span>
+                    <div class="tip-content">
+                        <h4>TAFE courses</h4>
+                        <p>Certificates in hospitality, childcare, IT, and agriculture. Many study in Albany or Perth and return to work locally.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">💼</span>
+                    <div class="tip-content">
+                        <h4>Local businesses and farms</h4>
+                        <p>Working in retail, hospitality, agriculture, and tourism. Denmark's economy relies on local workers who know the community.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">These are possibilities, not pressure. Your path is yours to choose.</p>
+        </div>
+
+        <!-- Slide 18: Activity -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 3rem; margin-bottom: 2rem;">Activity — Explore <em>Your Pathway</em></h2>
+            <div class="activity-box">
+                <h3>Pathway Exploration Task</h3>
+                <ol>
+                    <li>Pick ONE pathway that interests you (uni, TAFE, apprenticeship, or work).</li>
+                    <li>Look up ONE specific thing:
+                        <ul style="margin-top: 0.5rem;">
+                            <li><strong>University:</strong> Find a course on TISC and check the ATAR requirement.</li>
+                            <li><strong>TAFE:</strong> Search for a certificate or diploma on training.gov.au.</li>
+                            <li><strong>Apprenticeship:</strong> Find a trade on Australian Apprenticeships.</li>
+                            <li><strong>Work:</strong> Search for entry-level jobs in your area on Seek.</li>
+                        </ul>
+                    </li>
+                    <li>Write down:
+                        <ul style="margin-top: 0.5rem;">
+                            <li>What you found (course name, job title, etc.)</li>
+                            <li>What's the first step to apply?</li>
+                            <li>Does this pathway still interest you? Why or why not?</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <p class="stat-source">Take 15 minutes. Ask for help if you need it!</p>
+        </div>
+
+        <!-- Slide 19: Key Dates for 2026 -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key Dates for <em>2026</em></h2>
+            <div style="max-width: 900px; width: 100%;">
+                <div class="date-box">
+                    <h4>August - September 2026</h4>
+                    <p><strong>TISC applications open.</strong> Start browsing university courses and adding preferences.</p>
+                </div>
+                <div class="date-box">
+                    <h4>Late September 2026</h4>
+                    <p><strong>TISC applications close.</strong> Final date to submit your course preferences (exact date TBA).</p>
+                </div>
+                <div class="date-box">
+                    <h4>Throughout 2026</h4>
+                    <p><strong>TAFE enrolment periods.</strong> TAFE intakes happen multiple times per year. Check with your chosen TAFE for specific dates.</p>
+                </div>
+                <div class="date-box">
+                    <h4>Year-round</h4>
+                    <p><strong>Apprenticeship applications.</strong> Apprenticeships and traineeships are advertised like jobs — apply as opportunities arise.</p>
+                </div>
+                <div class="date-box">
+                    <h4>Start early for jobs</h4>
+                    <p><strong>Entry-level work.</strong> Begin applying 2-3 months before you finish school. Update your resume now.</p>
+                </div>
+            </div>
+            <p class="stat-source">Mark these dates in your calendar. Don't miss deadlines!</p>
+        </div>
+
+        <!-- Slide 20: Resources -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">All Your <em>Resources</em> <span style="font-size: 1rem; color: var(--text-muted);">(click to open)</span></h2>
+            <div class="tool-grid">
+                <a href="https://www.tisc.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=tisc.edu.au&sz=64" alt="TISC" class="tool-logo">
+                    <div class="tool-name">TISC</div>
+                    <div class="tool-url">tisc.edu.au</div>
+                    <div class="tool-desc">Apply to WA universities</div>
+                </a>
+                <a href="https://www.studyassist.gov.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=studyassist.gov.au&sz=64" alt="Study Assist" class="tool-logo">
+                    <div class="tool-name">Study Assist</div>
+                    <div class="tool-url">studyassist.gov.au</div>
+                    <div class="tool-desc">HECS-HELP and costs</div>
+                </a>
+                <a href="https://www.training.gov.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=training.gov.au&sz=64" alt="Training.gov.au" class="tool-logo">
+                    <div class="tool-name">Training.gov.au</div>
+                    <div class="tool-url">training.gov.au</div>
+                    <div class="tool-desc">TAFE course search</div>
+                </a>
+                <a href="https://www.usi.gov.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=usi.gov.au&sz=64" alt="USI" class="tool-logo">
+                    <div class="tool-name">USI</div>
+                    <div class="tool-url">usi.gov.au</div>
+                    <div class="tool-desc">Get your student ID</div>
+                </a>
+                <a href="https://www.australianapprenticeships.gov.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=australianapprenticeships.gov.au&sz=64" alt="Australian Apprenticeships" class="tool-logo">
+                    <div class="tool-name">Australian Apprenticeships</div>
+                    <div class="tool-url">australianapprenticeships.gov.au</div>
+                    <div class="tool-desc">Find apprenticeships</div>
+                </a>
+                <a href="https://www.myskills.gov.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=myskills.gov.au&sz=64" alt="MySkills" class="tool-logo">
+                    <div class="tool-name">MySkills</div>
+                    <div class="tool-url">myskills.gov.au</div>
+                    <div class="tool-desc">Compare VET providers</div>
+                </a>
+                <a href="https://www.seek.com.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=seek.com.au&sz=64" alt="Seek" class="tool-logo">
+                    <div class="tool-name">Seek</div>
+                    <div class="tool-url">seek.com.au</div>
+                    <div class="tool-desc">Job search</div>
+                </a>
+                <a href="https://au.indeed.com" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=indeed.com&sz=64" alt="Indeed" class="tool-logo">
+                    <div class="tool-name">Indeed</div>
+                    <div class="tool-url">au.indeed.com</div>
+                    <div class="tool-desc">Job search engine</div>
+                </a>
+                <a href="https://www.linkedin.com" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="LinkedIn" class="tool-logo">
+                    <div class="tool-name">LinkedIn</div>
+                    <div class="tool-url">linkedin.com</div>
+                    <div class="tool-desc">Professional network</div>
+                </a>
+                <a href="https://www.uwa.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=uwa.edu.au&sz=64" alt="UWA" class="tool-logo">
+                    <div class="tool-name">UWA</div>
+                    <div class="tool-url">uwa.edu.au</div>
+                    <div class="tool-desc">University of WA</div>
+                </a>
+                <a href="https://www.curtin.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=curtin.edu.au&sz=64" alt="Curtin" class="tool-logo">
+                    <div class="tool-name">Curtin</div>
+                    <div class="tool-url">curtin.edu.au</div>
+                    <div class="tool-desc">Curtin University</div>
+                </a>
+                <a href="https://www.murdoch.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=murdoch.edu.au&sz=64" alt="Murdoch" class="tool-logo">
+                    <div class="tool-name">Murdoch</div>
+                    <div class="tool-url">murdoch.edu.au</div>
+                    <div class="tool-desc">Murdoch University</div>
+                </a>
+                <a href="https://www.ecu.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=ecu.edu.au&sz=64" alt="ECU" class="tool-logo">
+                    <div class="tool-name">ECU</div>
+                    <div class="tool-url">ecu.edu.au</div>
+                    <div class="tool-desc">Edith Cowan University</div>
+                </a>
+                <a href="https://www.notredame.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=notredame.edu.au&sz=64" alt="Notre Dame" class="tool-logo">
+                    <div class="tool-name">Notre Dame</div>
+                    <div class="tool-url">notredame.edu.au</div>
+                    <div class="tool-desc">University of Notre Dame</div>
+                </a>
+                <a href="https://www.northmetrotafe.wa.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=northmetrotafe.wa.edu.au&sz=64" alt="North Metro TAFE" class="tool-logo">
+                    <div class="tool-name">North Metro TAFE</div>
+                    <div class="tool-url">northmetrotafe.wa.edu.au</div>
+                    <div class="tool-desc">Northern Perth TAFE</div>
+                </a>
+                <a href="https://www.southmetrotafe.wa.edu.au" target="_blank" class="tool-card" style="text-decoration: none; color: inherit;">
+                    <img src="https://www.google.com/s2/favicons?domain=southmetrotafe.wa.edu.au&sz=64" alt="South Metro TAFE" class="tool-logo">
+                    <div class="tool-name">South Metro TAFE</div>
+                    <div class="tool-url">southmetrotafe.wa.edu.au</div>
+                    <div class="tool-desc">Southern Perth TAFE</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Slide 21: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Your Path, <em>Your Pace</em>, Your Choice</h1>
+            <p class="slide-subtitle">Every pathway leads to opportunity. Whether you choose university, TAFE, an apprenticeship, work, or a gap year — the important thing is choosing what's right for you.</p>
+            <p class="stat-source">Good luck with your journey!</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 21</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

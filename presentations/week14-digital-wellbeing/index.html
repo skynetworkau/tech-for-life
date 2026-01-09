@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Admin Setup // Week 14 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .content-card h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        .content-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-card .highlight-box {
+            background: rgba(139, 92, 246, 0.1);
+            border-left: 3px solid var(--accent-violet);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .content-card .highlight-box p {
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        /* Service Cards with Logos */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card:nth-child(1) { border-color: var(--accent-violet); }
+        .service-card:nth-child(2) { border-color: var(--accent-blue); }
+        .service-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .service-card:nth-child(4) { border-color: var(--accent-emerald); }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .service-logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .service-card h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .service-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .service-card li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-left: 1.5rem;
+        }
+
+        .service-card li:last-child {
+            border-bottom: none;
+        }
+
+        .service-card li::before {
+            content: "→";
+            margin-right: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .service-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid var(--accent-violet);
+            border-radius: 8px;
+            color: var(--accent-violet);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .service-link:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        /* Step-by-step cards */
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .step-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-violet);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-content p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Warning boxes */
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent-amber);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .warning-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .warning-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .warning-text strong {
+            color: var(--accent-amber);
+        }
+
+        /* Checklist */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .checklist-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: var(--accent-emerald);
+            border-color: var(--accent-emerald);
+        }
+
+        .checkbox::after {
+            content: "✓";
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .checklist-item.checked .checkbox::after {
+            opacity: 1;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .checklist-item.checked .checklist-text {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .timeline-item {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .timeline-item:nth-child(1) { border-color: var(--accent-rose); }
+        .timeline-item:nth-child(2) { border-color: var(--accent-amber); }
+        .timeline-item:nth-child(3) { border-color: var(--accent-emerald); }
+
+        .timeline-item h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-item:nth-child(1) h3 { color: var(--accent-rose); }
+        .timeline-item:nth-child(2) h3 { color: var(--accent-amber); }
+        .timeline-item:nth-child(3) h3 { color: var(--accent-emerald); }
+
+        .timeline-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .timeline-item li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item li::before {
+            content: "•";
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        .timeline-item:nth-child(1) li::before { color: var(--accent-rose); }
+        .timeline-item:nth-child(2) li::before { color: var(--accent-amber); }
+        .timeline-item:nth-child(3) li::before { color: var(--accent-emerald); }
+
+        /* Resources Grid */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .resource-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 3px solid;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .resource-card:nth-child(1) { border-color: var(--accent-violet); }
+        .resource-card:nth-child(2) { border-color: var(--accent-blue); }
+        .resource-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .resource-card:nth-child(4) { border-color: var(--accent-emerald); }
+        .resource-card:nth-child(5) { border-color: var(--accent-amber); }
+        .resource-card:nth-child(6) { border-color: var(--accent-rose); }
+
+        .resource-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .resource-logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .resource-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .resource-link {
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .service-grid { grid-template-columns: 1fr; }
+            .resources-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Life Admin <em>Setup</em></h1>
+            <p class="slide-subtitle">Getting your digital life sorted before you leave school</p>
+            <p class="stat-source">Week 14 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why This Matters -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why This <em>Matters</em></h2>
+            <div class="content-card">
+                <h3>Do It Now While You Have Support</h3>
+                <p>In 6 months, you'll be applying for jobs, uni, or apprenticeships. You'll need to lodge tax returns, maybe apply for Youth Allowance, and manage your own healthcare.</p>
+                <p>Right now, you have teachers, parents, and school support. Use it.</p>
+                <div class="highlight-box">
+                    <p>Setting up these accounts and services NOW means you're ready when you need them, not scrambling at the last minute when you get your first job or uni offer.</p>
+                </div>
+                <p style="margin-top: 1.5rem;">This isn't busy work. This is the actual adulting stuff no one really teaches you.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: myGov Account - What It Is -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">myGov: Your <em>Digital Hub</em></h2>
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=my.gov.au&sz=64" alt="myGov">
+                        </div>
+                        <h3>myGov</h3>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">One login for all Australian Government services</p>
+                    <a href="https://my.gov.au" class="service-link" target="_blank">my.gov.au</a>
+                </div>
+                <div class="service-card">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">What You Can Link</h3>
+                    <ul>
+                        <li>Australian Taxation Office (ATO)</li>
+                        <li>Medicare</li>
+                        <li>Centrelink/Services Australia</li>
+                        <li>Australian JobSearch</li>
+                        <li>National Disability Insurance Scheme</li>
+                        <li>Child Support</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">This is the most important account you'll set up this year</p>
+        </div>
+
+        <!-- Slide 4: myGov Account - Setup Steps -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Setting Up <em>myGov</em></h2>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Go to my.gov.au and click "Create Account"</h4>
+                        <p>You'll need an email address you actually check (not your school email!)</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Create your username and password</h4>
+                        <p>Make it strong. You'll use this account for decades. Write it down somewhere secure.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Set up security questions and two-factor authentication</h4>
+                        <p>Choose questions you'll remember. Set up SMS or authenticator app verification.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Link services as you need them</h4>
+                        <p>Start with ATO and Medicare. You'll need your TFN and Medicare card number.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Tax File Number -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Tax File Number <em>(TFN)</em></h2>
+            <div class="content-card">
+                <div class="service-header">
+                    <div class="service-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=ato.gov.au&sz=64" alt="ATO">
+                    </div>
+                    <h3>Australian Taxation Office</h3>
+                </div>
+                <p><strong>Why you need one:</strong> Your employer MUST have your TFN to pay you correctly. Without it, you'll be taxed at the highest rate (47%) and won't get a refund.</p>
+                <p><strong>How to apply:</strong> Go to ato.gov.au and search "Apply for a TFN". You'll need ID (birth certificate, passport, or licence) and proof of identity.</p>
+                <div class="warning-box">
+                    <span class="warning-icon">⚠️</span>
+                    <div class="warning-text">
+                        <strong>Takes 28 days to arrive by mail.</strong> Apply NOW if you don't have one. Don't wait until you get a job offer.
+                    </div>
+                </div>
+                <a href="https://www.ato.gov.au/individuals-and-families/tax-file-number" class="service-link" target="_blank">Apply at ato.gov.au</a>
+                <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">Once you have it, keep it secure. You'll use the same TFN your whole life.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Medicare Card -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Medicare <em>Card</em></h2>
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=servicesaustralia.gov.au&sz=64" alt="Medicare">
+                        </div>
+                        <h3>Medicare</h3>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Free and subsidised healthcare in Australia</p>
+                    <a href="https://www.servicesaustralia.gov.au/medicare" class="service-link" target="_blank">servicesaustralia.gov.au</a>
+                </div>
+                <div class="service-card">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Getting Your Own Card</h3>
+                    <ul>
+                        <li>You're probably on your parents' card now</li>
+                        <li>Get your own card when you turn 15+ (or now)</li>
+                        <li>Apply online via myGov → Medicare</li>
+                        <li>Download the Express Plus Medicare app</li>
+                        <li>Digital card works for everything</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Your Medicare card gives you access to bulk-billed doctors, hospitals, and subsidised medications</p>
+        </div>
+
+        <!-- Slide 7: Bank Account Setup -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Bank Account <em>Setup</em></h2>
+            <div class="content-card">
+                <h3>Getting Paid Needs an Account in Your Name</h3>
+                <p><strong>If you don't have one:</strong> Most banks offer youth accounts with no monthly fees for under 25s. You can open one online with ID.</p>
+                <p><strong>Set up online banking:</strong> Download your bank's app. Enable notifications. Learn to check your balance.</p>
+                <div class="highlight-box">
+                    <p><strong>PayID is essential:</strong> This lets employers pay you using just your mobile number or email. Set this up through your banking app. Makes getting paid instant.</p>
+                </div>
+                <p style="margin-top: 1.5rem;"><strong>Compare accounts:</strong> Look for no monthly fees, no minimum balance, free ATM withdrawals. Most youth accounts offer this.</p>
+                <div class="warning-box">
+                    <span class="warning-icon">💡</span>
+                    <div class="warning-text">
+                        Ask about student accounts at your bank. They usually have better features and no fees until you're 25.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Centrelink & Youth Allowance -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Centrelink & <em>Youth Allowance</em></h2>
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-logo">
+                            <img src="https://www.google.com/s2/favicons?domain=servicesaustralia.gov.au&sz=64" alt="Centrelink">
+                        </div>
+                        <h3>Centrelink</h3>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Government financial support for students, job seekers, and apprentices</p>
+                </div>
+                <div class="service-card">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Who's Eligible?</h3>
+                    <ul>
+                        <li>Full-time uni or TAFE students (under 25)</li>
+                        <li>Australian Apprentices</li>
+                        <li>Job seekers (16-21 years old)</li>
+                        <li>Depends on your income and parents' income</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="content-card" style="margin-top: 2rem;">
+                <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">How to Apply</h3>
+                <p>Apply online via myGov → Centrelink. You'll need your TFN, bank details, and proof of study/work/job search.</p>
+                <p>If you're going to uni in 2027, apply for Youth Allowance in January. Processing takes 4-6 weeks.</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Professional Email -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Professional <em>Email Address</em></h2>
+            <div class="content-card">
+                <h3>Your School Email Will Be Deleted!</h3>
+                <div class="warning-box">
+                    <span class="warning-icon">⚠️</span>
+                    <div class="warning-text">
+                        <strong>Your school email will be shut down shortly after you graduate.</strong> All your accounts, contacts, and emails will be gone.
+                    </div>
+                </div>
+                <p style="margin-top: 1.5rem;"><strong>Create a professional email NOW:</strong> firstname.lastname@gmail.com or similar. No nicknames, no numbers unless necessary.</p>
+                <p><strong>Bad examples:</strong> xxcoolkid420xx@, gamergirl123@, party_animal@</p>
+                <p><strong>Good examples:</strong> emma.wilson@, james.nguyen@, sarah.patel@</p>
+                <div class="highlight-box">
+                    <p><strong>Set up an email signature:</strong> Your full name, mobile number, and LinkedIn profile (if you have one). Makes you look professional.</p>
+                </div>
+                <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">Use this email for job applications, myGov, bank accounts, and anything official. Keep your personal/social email separate.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Phone Plan -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Own <em>Phone Plan</em></h2>
+            <div class="content-card">
+                <h3>Getting Off Your Parents' Plan</h3>
+                <p><strong>Why now?</strong> When you move out or start working full-time, you'll need your own plan. Setting it up now means one less thing to worry about later.</p>
+                <p><strong>What you actually need:</strong> Most people use way less data than they think. 10-20GB is usually enough if you have wifi at home/school/work.</p>
+                <div class="highlight-box">
+                    <p><strong>Compare plans:</strong> Use comparison sites like Whistleout.com.au or Finder.com.au to see what's available. Prepaid plans are good for students — no bill shock.</p>
+                </div>
+                <p style="margin-top: 1.5rem;"><strong>Budget options:</strong> Aldi Mobile, Boost, Belong, and Amaysim offer cheap plans on major networks. $15-30/month for plenty of data.</p>
+                <div class="warning-box">
+                    <span class="warning-icon">💡</span>
+                    <div class="warning-text">
+                        Don't lock into long contracts. Month-to-month plans give you flexibility and are usually better value.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Digital Documents Folder -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Digital Documents <em>Folder</em></h2>
+            <div class="content-card">
+                <h3>Create a Secure Folder for Important Docs</h3>
+                <p>You'll need to access important documents throughout your life. Having them organised now saves massive headaches later.</p>
+                <div class="highlight-box">
+                    <p><strong>What to save:</strong></p>
+                    <ul style="list-style: none; padding-left: 0; margin-top: 0.5rem;">
+                        <li style="padding: 0.5rem 0; border: none;">• Scanned ID (licence, passport, birth certificate)</li>
+                        <li style="padding: 0.5rem 0; border: none;">• School reports and certificates</li>
+                        <li style="padding: 0.5rem 0; border: none;">• ATAR statement</li>
+                        <li style="padding: 0.5rem 0; border: none;">• References from teachers/employers</li>
+                        <li style="padding: 0.5rem 0; border: none;">• Resume and cover letter templates</li>
+                        <li style="padding: 0.5rem 0; border: none;">• Proof of address documents</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 1.5rem;"><strong>Cloud backup:</strong> Store these in Google Drive, iCloud, or OneDrive. Set up two-factor authentication. Don't rely on just your computer.</p>
+                <div class="warning-box">
+                    <span class="warning-icon">🔒</span>
+                    <div class="warning-text">
+                        <strong>Keep it secure:</strong> Don't share this folder. Don't store passwords in plain text. Consider encrypting sensitive docs.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Activity - Life Admin Checklist -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Life Admin <em>Checklist</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Click each item you've already done. What still needs doing?</p>
+            <div class="checklist">
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Created myGov account and set up two-factor authentication</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Applied for Tax File Number (TFN) from the ATO</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Got my own Medicare card (or added to myGov)</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Have a bank account in my name with PayID set up</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Created a professional email address (not school email)</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Organised digital folder with scanned ID and certificates</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checkbox"></div>
+                    <div class="checklist-text">Researched phone plans and know what I need</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Timeline - When to Do What -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Action <em>Timeline</em></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>Do NOW (Term 4, 2026)</h3>
+                    <ul>
+                        <li>Apply for TFN if you don't have one (takes 28 days)</li>
+                        <li>Create myGov account and link Medicare + ATO</li>
+                        <li>Set up professional email address</li>
+                        <li>Create digital documents folder</li>
+                        <li>Get your own Medicare card</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h3>After Exams (December 2026)</h3>
+                    <ul>
+                        <li>Scan and save all Year 12 certificates</li>
+                        <li>Get written references from teachers</li>
+                        <li>Transfer important emails from school account</li>
+                        <li>Update contact details everywhere to personal email</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h3>January 2027</h3>
+                    <ul>
+                        <li>Apply for Youth Allowance if going to uni/TAFE (before semester starts)</li>
+                        <li>Set up your own phone plan if needed</li>
+                        <li>Organise bank account for student payments</li>
+                        <li>Get RSA/First Aid if needed for work</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Resources -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Essential <em>Resources</em></h2>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=my.gov.au&sz=64" alt="myGov">
+                    </div>
+                    <div class="resource-name">myGov</div>
+                    <div class="resource-desc">One login for all government services</div>
+                    <a href="https://my.gov.au" class="resource-link" target="_blank">my.gov.au</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=ato.gov.au&sz=64" alt="ATO">
+                    </div>
+                    <div class="resource-name">ATO</div>
+                    <div class="resource-desc">Tax File Numbers and tax returns</div>
+                    <a href="https://www.ato.gov.au" class="resource-link" target="_blank">ato.gov.au</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=servicesaustralia.gov.au&sz=64" alt="Services Australia">
+                    </div>
+                    <div class="resource-name">Services Australia</div>
+                    <div class="resource-desc">Medicare and Centrelink services</div>
+                    <a href="https://www.servicesaustralia.gov.au" class="resource-link" target="_blank">servicesaustralia.gov.au</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=moneysmart.gov.au&sz=64" alt="MoneySmart">
+                    </div>
+                    <div class="resource-name">MoneySmart</div>
+                    <div class="resource-desc">Government guide to banking and finance</div>
+                    <a href="https://moneysmart.gov.au" class="resource-link" target="_blank">moneysmart.gov.au</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=whistleout.com.au&sz=64" alt="WhistleOut">
+                    </div>
+                    <div class="resource-name">WhistleOut</div>
+                    <div class="resource-desc">Compare phone plans and providers</div>
+                    <a href="https://www.whistleout.com.au" class="resource-link" target="_blank">whistleout.com.au</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">
+                        <img src="https://www.google.com/s2/favicons?domain=studyassist.gov.au&sz=64" alt="StudyAssist">
+                    </div>
+                    <div class="resource-name">StudyAssist</div>
+                    <div class="resource-desc">Info about Youth Allowance and HECS</div>
+                    <a href="https://www.studyassist.gov.au" class="resource-link" target="_blank">studyassist.gov.au</a>
+                </div>
+            </div>
+            <p class="stat-source">Bookmark these. You'll need them all in the next 12 months.</p>
+        </div>
+
+        <!-- Slide 15: Getting Help -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Getting <em>Help</em></h2>
+            <div class="content-card">
+                <h3>You Don't Have to Figure This Out Alone</h3>
+                <p style="margin-bottom: 1.5rem;">These systems can be confusing. It's OK to ask for help.</p>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="background: rgba(139, 92, 246, 0.1); padding: 1.25rem; border-radius: 8px;">
+                        <strong style="color: var(--accent-violet);">Parents/Family:</strong> They've done all this before. Ask them to help you set things up.
+                    </div>
+                    <div style="background: rgba(59, 130, 246, 0.1); padding: 1.25rem; border-radius: 8px;">
+                        <strong style="color: var(--accent-blue);">School Office:</strong> They can help with documentation and references.
+                    </div>
+                    <div style="background: rgba(6, 182, 212, 0.1); padding: 1.25rem; border-radius: 8px;">
+                        <strong style="color: var(--accent-cyan);">myGov Help Line:</strong> 132 307 — They can walk you through account setup.
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 1.25rem; border-radius: 8px;">
+                        <strong style="color: var(--accent-emerald);">Youth Workers/Counsellors:</strong> Many schools have people specifically to help with this stuff.
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 1.5rem;">
+                    <p>Everyone finds this stuff overwhelming at first. Asking for help is smart, not weak.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Final Slide -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Adulting Starts with <em>Admin</em></h1>
+            <p class="slide-subtitle">It's not glamorous, but having your life admin sorted gives you freedom. You can take opportunities when they come because you're already set up.</p>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.95rem;">Do it now. Future you will be grateful.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 16</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

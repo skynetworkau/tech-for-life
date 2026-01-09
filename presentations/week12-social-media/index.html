@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media & Your Future // Week 12 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Big stat */
+        .big-stat {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 400;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        /* Two column */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .flag-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 2px solid transparent;
+        }
+
+        .flag-box.red {
+            border-color: var(--accent-rose);
+        }
+
+        .flag-box.green {
+            border-color: var(--accent-emerald);
+        }
+
+        .flag-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .flag-box.red .flag-label { color: var(--accent-rose); }
+        .flag-box.green .flag-label { color: var(--accent-emerald); }
+
+        .flag-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .flag-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .flag-list li:last-child { border-bottom: none; }
+
+        /* Steps grid */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.75rem;
+            border-top: 4px solid;
+        }
+
+        .step-card:nth-child(1) { border-color: var(--accent-violet); }
+        .step-card:nth-child(2) { border-color: var(--accent-blue); }
+        .step-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .step-card:nth-child(4) { border-color: var(--accent-emerald); }
+
+        .step-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-card:nth-child(1) .step-number { color: var(--accent-violet); }
+        .step-card:nth-child(2) .step-number { color: var(--accent-blue); }
+        .step-card:nth-child(3) .step-number { color: var(--accent-cyan); }
+        .step-card:nth-child(4) .step-number { color: var(--accent-emerald); }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Platform cards */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+        }
+
+        .platform-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .platform-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-tip {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Action list */
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .action-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-violet);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .action-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Story box */
+        .story-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            border-left: 4px solid var(--accent-rose);
+        }
+
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .story-content {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .story-lesson {
+            font-size: 0.95rem;
+            color: var(--accent-amber);
+            font-weight: 500;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* LinkedIn section */
+        .linkedin-section {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .linkedin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .linkedin-header h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .linkedin-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .linkedin-stat {
+            text-align: center;
+        }
+
+        .linkedin-stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+        }
+
+        .linkedin-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 700px;
+        }
+
+        .checklist-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-emerald);
+        }
+
+        .checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-emerald);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .checklist-text {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Data visualization */
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--accent-cyan);
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            width: 120px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: width 1s ease;
+        }
+
+        .bar-fill:nth-child(1) { background: var(--accent-violet); }
+        .bar-fill:nth-child(2) { background: var(--accent-blue); }
+        .bar-fill:nth-child(3) { background: var(--accent-cyan); }
+        .bar-fill:nth-child(4) { background: var(--accent-emerald); }
+
+        .video-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .platform-grid { grid-template-columns: repeat(2, 1fr); }
+            .linkedin-stats { flex-direction: column; gap: 1rem; }
+            .bar-label { width: 80px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Social Media &<br><em>Your Future</em></h1>
+            <p class="slide-subtitle">How your online presence affects your career — and what to do about it</p>
+            <p class="stat-source">Week 12 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Reality Check -->
+        <div class="slide">
+            <div class="big-stat">73%</div>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1rem;">of employers check your social media</h2>
+            <p class="slide-subtitle">And 85% have rejected candidates because of what they found online</p>
+            <p class="stat-source">ResumeBuilder Survey 2023</p>
+        </div>
+
+        <!-- Slide 2.5: Australian Social Media Usage by Age -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Who's Using What in <em>Australia</em></h2>
+            <div class="chart-container">
+                <div class="chart-title">Daily Social Media Usage by Age Group</div>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <div class="bar-label">16-24 years</div>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" style="width: 95%;">95%</div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">25-34 years</div>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" style="width: 89%;">89%</div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">35-44 years</div>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" style="width: 82%;">82%</div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">45+ years</div>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" style="width: 68%;">68%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Australian Communications and Media Authority (ACMA) 2025</p>
+        </div>
+
+        <!-- Slide 2.6: Video - Social Media and Employability -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Employers <em>Really</em> View Your Profiles</h2>
+            <div class="video-container">
+                <div class="video-title">Social Media Screening: What Employers Are Looking For</div>
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px;">
+                    <iframe src="https://www.youtube.com/embed/Jq-RdjZKXkQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            <p class="stat-source">Watch how recruitment professionals screen social media profiles</p>
+        </div>
+
+        <!-- Slide 3: How Employers Search -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Employers Search You</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Google Your Name</div>
+                    <div class="step-desc">First page results matter most. They see what comes up for "[Your Name] [Your School/Suburb]"</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-title">LinkedIn Check</div>
+                    <div class="step-desc">Do you have a profile? Is it professional? Does it match your application?</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Facebook & Instagram</div>
+                    <div class="step-desc">Can they see your photos? What's your latest post? What are you tagged in?</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Other Platforms</div>
+                    <div class="step-desc">TikTok, Twitter/X, even old YouTube comments. Nothing is too obscure.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Red Flags vs Green Flags -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Red Flags vs Green Flags</h2>
+            <div class="two-column">
+                <div class="flag-box red">
+                    <div class="flag-label">🚩 Red Flags (What Gets You Rejected)</div>
+                    <ul class="flag-list">
+                        <li>Inappropriate photos or videos (40% rejection rate)</li>
+                        <li>Posts about drinking or drug use (36%)</li>
+                        <li>Discriminatory comments about race, gender, religion (31%)</li>
+                        <li>Links to criminal behaviour (30%)</li>
+                        <li>Complaining about current/past employers</li>
+                        <li>Aggressive or hostile language</li>
+                        <li>Lying about qualifications</li>
+                    </ul>
+                </div>
+                <div class="flag-box green">
+                    <div class="flag-label">✓ Green Flags (What Gets You Hired)</div>
+                    <ul class="flag-list">
+                        <li>Professional qualifications on display (37% approval)</li>
+                        <li>Good personality and cultural fit (31%)</li>
+                        <li>Strong communication skills (28%)</li>
+                        <li>Volunteer work and community involvement</li>
+                        <li>Awards and achievements</li>
+                        <li>Creative projects or portfolio work</li>
+                        <li>Thoughtful posts on industry topics</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">CareerBuilder Survey, Business News Daily 2025</p>
+        </div>
+
+        <!-- Slide 5: Real Story -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real Stories</h2>
+            <div class="story-box">
+                <div class="story-title">The Teacher Who Lost Her Job</div>
+                <div class="story-content">
+                    A newly qualified teacher in Perth posted photos from a friend's 21st birthday party on Instagram. The photos showed her drinking and wearing revealing clothing. Even though the account was "private," a parent screenshotted the images and sent them to the school board. She was dismissed during her probation period.<br><br>
+                    Another graduate applied for 15 hospitality jobs. She got zero callbacks. When she Googled herself, she found old Facebook posts from Year 10 where she complained about her job at Hungry Jack's and called customers "annoying." She deleted them, waited a month, and got 3 interview offers from her next round of applications.
+                </div>
+                <div class="story-lesson">⚠ Lesson: "Private" doesn't mean safe. What you post at 16 can affect you at 21 — or 25.</div>
+            </div>
+        </div>
+
+        <!-- Slide 6: LinkedIn Basics -->
+        <div class="slide">
+            <div class="linkedin-section">
+                <div class="linkedin-header">
+                    <h2>LinkedIn for Young Professionals</h2>
+                    <p class="slide-subtitle">Your first professional impression online</p>
+                </div>
+                <div class="linkedin-stats">
+                    <div class="linkedin-stat">
+                        <div class="linkedin-stat-number">26%</div>
+                        <div class="linkedin-stat-label">of LinkedIn users<br>are Gen Z</div>
+                    </div>
+                    <div class="linkedin-stat">
+                        <div class="linkedin-stat-number">21%</div>
+                        <div class="linkedin-stat-label">of employers won't hire<br>without an online presence</div>
+                    </div>
+                </div>
+                <div class="checklist">
+                    <div class="checklist-title">Basic LinkedIn Profile Checklist</div>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checklist-text"><strong>Professional photo</strong> — Face clearly visible, appropriate clothing, neutral background</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checklist-text"><strong>Headline</strong> — "Year 12 Student at [School] | Aspiring [Career Goal]" or "Recent Graduate seeking opportunities in [Industry]"</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checklist-text"><strong>About section</strong> — 3-4 sentences about your strengths, interests, and career goals</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checklist-text"><strong>Education</strong> — List your school, expected graduation, relevant subjects (ATAR courses, VET)</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checklist-text"><strong>Experience</strong> — Part-time jobs, volunteering, leadership roles (even if unpaid!)</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-checkbox"></div>
+                            <div class="checklist-text"><strong>Skills</strong> — Add 5-10 relevant skills. Ask friends or teachers to endorse them.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Action Plan - Clean Up -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Action 1: Clean Up Old Posts</h2>
+            <div class="action-list">
+                <div class="action-item">
+                    <span class="action-icon">🔍</span>
+                    <div class="action-content">
+                        <h4>Google Yourself</h4>
+                        <p>Search "[Your Name] [Your School]" in an incognito window. See what employers will see.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">⏪</span>
+                    <div class="action-content">
+                        <h4>Scroll Back 2+ Years</h4>
+                        <p>Go through your Facebook, Instagram, and TikTok history. Delete anything questionable. Yes, it takes time. Do it anyway.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">🏷</span>
+                    <div class="action-content">
+                        <h4>Review Tagged Photos</h4>
+                        <p>On Facebook and Instagram, check "Photos of You." Untag yourself from anything inappropriate.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">💬</span>
+                    <div class="action-content">
+                        <h4>Check Comments & Old Profiles</h4>
+                        <p>Look at your YouTube comments, old Reddit accounts, Twitter/X history. Delete or make private.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Privacy Settings -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Action 2: Lock Down Privacy</h2>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-icon">📘</div>
+                    <div class="platform-name">Facebook</div>
+                    <div class="platform-tip">Set posts to "Friends only." Limit past posts. Turn off public search.</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">📷</div>
+                    <div class="platform-name">Instagram</div>
+                    <div class="platform-tip">Make account private. Review follower list. Hide tagged photos.</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">🎵</div>
+                    <div class="platform-name">TikTok</div>
+                    <div class="platform-tip">Private account. Turn off "Suggest to others." Disable duets.</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon">👻</div>
+                    <div class="platform-name">Snapchat</div>
+                    <div class="platform-tip">Only share with friends. Turn off Snap Map. Disable public stories.</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Settings → Privacy → Public Profile → Friends Only (or equivalent)</p>
+        </div>
+
+        <!-- Slide 9: Build Positive Presence -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Action 3: Build a <em>Positive</em> Presence</h2>
+            <div class="two-column">
+                <div class="action-list">
+                    <div class="action-item">
+                        <span class="action-icon">📸</span>
+                        <div class="action-content">
+                            <h4>Share Achievements</h4>
+                            <p>Post about volunteer work, awards, projects, sports achievements — things that show who you are.</p>
+                        </div>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">💼</span>
+                        <div class="action-content">
+                            <h4>Use LinkedIn Actively</h4>
+                            <p>Connect with teachers, employers, professionals in your field. Comment thoughtfully on industry posts.</p>
+                        </div>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🎨</span>
+                        <div class="action-content">
+                            <h4>Show Your Work</h4>
+                            <p>Create a portfolio site (free via Wix, Notion, GitHub Pages) to showcase projects, artwork, writing.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-list">
+                    <div class="action-item">
+                        <span class="action-icon">💭</span>
+                        <div class="action-content">
+                            <h4>Think Before You Post</h4>
+                            <p>Ask: "Would I be comfortable with a future employer seeing this?" If no, don't post it.</p>
+                        </div>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🎯</span>
+                        <div class="action-content">
+                            <h4>Separate Personal & Professional</h4>
+                            <p>Consider having a public-facing professional account and a private personal one.</p>
+                        </div>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🔄</span>
+                        <div class="action-content">
+                            <h4>Regular Audits</h4>
+                            <p>Every 6 months, review your online presence. Update, delete, refresh.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: The "No Presence" Problem -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Having <em>Nothing</em> Online?</h2>
+            <div class="story-box" style="border-left-color: var(--accent-amber);">
+                <div class="story-title">Also a Problem</div>
+                <div class="story-content">
+                    47% of employers say they're less likely to interview a candidate if they can't find them online.<br><br>
+                    Why? Because employers want to verify you're a real person, see how you communicate, and get a sense of your personality and interests. A complete absence looks suspicious in 2026.<br><br>
+                    <strong>The solution isn't to hide completely — it's to control what's visible.</strong>
+                </div>
+                <div class="story-lesson">✓ Aim for: A professional LinkedIn profile + clean, locked-down personal accounts</div>
+            </div>
+            <p class="stat-source">CareerBuilder Survey 2025</p>
+        </div>
+
+        <!-- Slide 11: What To Do TODAY -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Action Plan for <em>Today</em></h2>
+            <div class="action-list">
+                <div class="action-item">
+                    <span class="action-icon">1️⃣</span>
+                    <div class="action-content">
+                        <h4>Google yourself (10 min)</h4>
+                        <p>Incognito mode. "[Your Name] [Your School/Suburb]". See what shows up.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">2️⃣</span>
+                    <div class="action-content">
+                        <h4>Delete/hide 5 questionable posts (15 min)</h4>
+                        <p>Go back through your feed. Be ruthless. If you're unsure, delete it.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">3️⃣</span>
+                    <div class="action-content">
+                        <h4>Update privacy settings (10 min)</h4>
+                        <p>Instagram and Facebook to private. TikTok to friends-only. Snapchat public stories off.</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">4️⃣</span>
+                    <div class="action-content">
+                        <h4>Create/update LinkedIn (20 min)</h4>
+                        <p>Add a photo, fill in your education, write 3 sentences about yourself. That's enough to start.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Total time: Under 1 hour. Could save your career.</p>
+        </div>
+
+        <!-- Slide 12: The Bottom Line -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Bottom Line</h2>
+            <div class="story-box" style="border-left-color: var(--accent-violet);">
+                <div class="story-content" style="font-size: 1.2rem;">
+                    Your social media is part of your reputation.<br><br>
+                    Employers <em>will</em> search you. They <em>will</em> judge you based on what they find.<br><br>
+                    You can't control everything online — but you can control most of it.<br><br>
+                    Clean up the past. Lock down the present. Build for the future.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Resources -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Where to Get Help</h2>
+            <div class="action-list">
+                <div class="action-item">
+                    <span class="action-icon">🌐</span>
+                    <div class="action-content">
+                        <h4>eSafety Commissioner</h4>
+                        <p>esafety.gov.au — Report harmful content, get advice on removing posts, image-based abuse support</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">🗑</span>
+                    <div class="action-content">
+                        <h4>Google Content Removal</h4>
+                        <p>support.google.com/websearch — Request removal of personal info from Google search results</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">💼</span>
+                    <div class="action-content">
+                        <h4>LinkedIn Student Resources</h4>
+                        <p>linkedin.com/students — Free guides on building your profile, making connections, job searching</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">👨‍🏫</span>
+                    <div class="action-content">
+                        <h4>Your Careers Counsellor</h4>
+                        <p>Ask for help reviewing your online presence before applying for apprenticeships, uni, or jobs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: End -->
+        <div class="slide">
+            <h1 class="slide-title">Your Future Self<br>Will <em>Thank You</em></h1>
+            <p class="slide-subtitle">Start managing your digital reputation today. One hour now could change your career trajectory.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 16</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

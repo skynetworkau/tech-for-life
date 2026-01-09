@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PASSWORD LAB // Cybersecurity Training Facility</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --matrix-dark: #003b00;
+            --cyber-blue: #00f0ff;
+            --warning-red: #ff0040;
+            --warning-orange: #ff8800;
+            --success-green: #00ff88;
+            --bg-black: #000a00;
+            --bg-dark: #001a00;
+            --panel-bg: rgba(0, 30, 0, 0.8);
+            --text-green: #00cc33;
+            --text-dim: #006600;
+            --purple: #b026ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-black);
+            color: var(--matrix-green);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Matrix rain effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.2;
+            color: var(--matrix-green);
+            text-shadow: 0 0 10px var(--matrix-green);
+            animation: matrix-fall linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes matrix-fall {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        /* Scanline overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 1px,
+                rgba(0, 255, 65, 0.03) 1px,
+                rgba(0, 255, 65, 0.03) 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border: 2px solid var(--matrix-green);
+            background: var(--panel-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: var(--matrix-green);
+            animation: scan 4s infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .header-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px var(--matrix-green), 0 0 40px var(--matrix-green);
+            animation: flicker 3s infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+            97% { opacity: 0.9; }
+            98% { opacity: 1; }
+        }
+
+        .header-subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            letter-spacing: 0.2em;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Statistics Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--text-dim);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--warning-red);
+            text-shadow: 0 0 10px var(--warning-red);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--text-dim);
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-tab {
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tab:hover {
+            color: var(--matrix-green);
+            border-color: var(--matrix-green);
+        }
+
+        .nav-tab.active {
+            background: var(--matrix-green);
+            color: var(--bg-black);
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--matrix-green);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--matrix-green);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--matrix-green), transparent);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--text-dim);
+        }
+
+        .panel-icon {
+            font-size: 1.5rem;
+        }
+
+        .panel-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .panel-description {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Password input section */
+        .password-input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .password-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            background: var(--bg-black);
+            border: 2px solid var(--text-dim);
+            color: var(--matrix-green);
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .password-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-visibility:hover {
+            color: var(--matrix-green);
+        }
+
+        /* Strength meter */
+        .strength-meter {
+            margin-bottom: 2rem;
+        }
+
+        .strength-bar {
+            height: 10px;
+            background: var(--bg-black);
+            border: 1px solid var(--text-dim);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .strength-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .strength-fill.weak { background: var(--warning-red); width: 25%; }
+        .strength-fill.fair { background: var(--warning-orange); width: 50%; }
+        .strength-fill.good { background: var(--cyber-blue); width: 75%; }
+        .strength-fill.strong { background: var(--success-green); width: 100%; }
+
+        .strength-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .strength-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .strength-label.weak { color: var(--warning-red); }
+        .strength-label.fair { color: var(--warning-orange); }
+        .strength-label.good { color: var(--cyber-blue); }
+        .strength-label.strong { color: var(--success-green); }
+
+        .crack-time {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-green);
+        }
+
+        .entropy-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--cyber-blue);
+        }
+
+        /* Criteria checklist */
+        .criteria-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-black);
+            border: 1px solid var(--text-dim);
+            transition: all 0.3s ease;
+        }
+
+        .criteria-item.met {
+            border-color: var(--success-green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .criteria-icon {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .criteria-item.met .criteria-icon {
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .criteria-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            transition: color 0.3s ease;
+        }
+
+        .criteria-item.met .criteria-text {
+            color: var(--text-green);
+        }
+
+        /* Brute Force Animation */
+        .brute-force-visual {
+            background: var(--bg-black);
+            border: 2px solid var(--warning-red);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            min-height: 120px;
+        }
+
+        .attack-attempt {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.5rem;
+            background: rgba(255, 0, 64, 0.1);
+            border: 1px solid var(--warning-red);
+            color: var(--warning-red);
+            text-align: center;
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .attack-attempt.cracked {
+            background: var(--warning-red);
+            color: var(--bg-black);
+            animation: crack 0.5s ease;
+        }
+
+        @keyframes crack {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-5deg); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            75% { transform: scale(1.2) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .attack-stats {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        /* Hack simulation */
+        .hack-panel {
+            background: var(--bg-black);
+            border: 1px solid var(--warning-red);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .hack-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .hack-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--warning-red);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .hack-btn {
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0.5rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--warning-red);
+            color: var(--warning-red);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hack-btn:hover {
+            background: var(--warning-red);
+            color: var(--bg-black);
+        }
+
+        .hack-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hack-output {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            min-height: 80px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--text-dim);
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .hack-output .attempt {
+            color: var(--warning-orange);
+        }
+
+        .hack-output .success {
+            color: var(--warning-red);
+            text-shadow: 0 0 10px var(--warning-red);
+        }
+
+        .hack-output .protected {
+            color: var(--success-green);
+            text-shadow: 0 0 10px var(--success-green);
+        }
+
+        /* Common passwords section */
+        .common-passwords {
+            margin-top: 1.5rem;
+        }
+
+        .common-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            letter-spacing: 0.1em;
+        }
+
+        .password-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .common-pw {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            padding: 0.75rem 0.5rem;
+            background: var(--bg-black);
+            border: 1px solid var(--text-dim);
+            color: var(--warning-red);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .common-pw:hover {
+            border-color: var(--warning-red);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 64, 0.3);
+        }
+
+        /* Generator section */
+        .generator-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--text-dim);
+        }
+
+        .generator-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--cyber-blue);
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .generator-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .option-input {
+            width: 70px;
+            padding: 0.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            background: var(--bg-black);
+            border: 1px solid var(--text-dim);
+            color: var(--matrix-green);
+            text-align: center;
+        }
+
+        .option-input:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-option input {
+            display: none;
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--text-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-option input:checked + .custom-checkbox {
+            border-color: var(--matrix-green);
+            color: var(--matrix-green);
+        }
+
+        .generate-btn, .action-btn {
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0.75rem 2rem;
+            background: transparent;
+            border: 2px solid var(--matrix-green);
+            color: var(--matrix-green);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover, .action-btn:hover {
+            background: var(--matrix-green);
+            color: var(--bg-black);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        }
+
+        .generate-btn:disabled, .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .generated-password {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-black);
+            border: 2px solid var(--matrix-green);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .generated-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--matrix-green);
+            letter-spacing: 0.1em;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0.5rem 1rem;
+            background: var(--matrix-green);
+            border: none;
+            color: var(--bg-black);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        /* Pattern Examples */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-card {
+            background: var(--bg-black);
+            border: 1px solid var(--warning-orange);
+            padding: 1rem;
+        }
+
+        .pattern-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--warning-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .pattern-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pattern-example {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(255, 136, 0, 0.1);
+            border-left: 2px solid var(--warning-orange);
+            color: var(--text-green);
+        }
+
+        /* Game Section */
+        .game-container {
+            background: var(--bg-black);
+            border: 2px solid var(--purple);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .game-score {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            color: var(--purple);
+        }
+
+        .game-input {
+            width: 100%;
+            padding: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            background: rgba(176, 38, 255, 0.1);
+            border: 2px solid var(--purple);
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+        }
+
+        .game-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(176, 38, 255, 0.5);
+        }
+
+        .game-hint {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(176, 38, 255, 0.05);
+            border-left: 3px solid var(--purple);
+        }
+
+        .game-feedback {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--text-dim);
+        }
+
+        /* Breach Checker */
+        .breach-input {
+            width: 100%;
+            padding: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            background: var(--bg-black);
+            border: 2px solid var(--text-dim);
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+        }
+
+        .breach-results {
+            padding: 1.5rem;
+            background: var(--bg-black);
+            border: 2px solid var(--warning-red);
+            margin-top: 1rem;
+        }
+
+        .breach-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 0, 64, 0.1);
+            border-left: 3px solid var(--warning-red);
+        }
+
+        .breach-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            color: var(--warning-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .breach-details {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* 2FA Demo */
+        .twofa-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .twofa-method {
+            background: var(--bg-black);
+            border: 1px solid var(--cyber-blue);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .twofa-method:hover {
+            border-color: var(--success-green);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .twofa-method.active {
+            border-color: var(--success-green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .twofa-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .twofa-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .twofa-desc {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .twofa-simulator {
+            padding: 1.5rem;
+            background: var(--bg-black);
+            border: 2px solid var(--cyber-blue);
+            margin-top: 1.5rem;
+        }
+
+        .code-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            text-align: center;
+            color: var(--success-green);
+            letter-spacing: 0.5em;
+            padding: 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--success-green);
+            margin-bottom: 1rem;
+        }
+
+        .code-timer {
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* Challenge Mode */
+        .challenge-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-black);
+            border: 2px solid var(--success-green);
+            margin-bottom: 1.5rem;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--success-green);
+            display: block;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* Passphrase section */
+        .passphrase-example {
+            background: var(--bg-black);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 3px solid var(--success-green);
+        }
+
+        .passphrase-bad {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--warning-red);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            text-decoration: line-through;
+        }
+
+        .passphrase-good {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--success-green);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .passphrase-note {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.75rem;
+            line-height: 1.5;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            border: 1px solid var(--text-dim);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .comparison-table th {
+            background: var(--bg-black);
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .comparison-table td {
+            color: var(--text-green);
+        }
+
+        .comparison-table td.weak {
+            color: var(--warning-red);
+        }
+
+        .comparison-table td.strong {
+            color: var(--success-green);
+        }
+
+        /* Tips section */
+        .tips-panel {
+            background: rgba(0, 240, 255, 0.05);
+            border-color: var(--cyber-blue);
+        }
+
+        .tips-panel::before {
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .tip-item:last-child {
+            border-bottom: none;
+        }
+
+        .tip-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .tip-content h4 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--cyber-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-content p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid var(--cyber-blue);
+            border-left: 4px solid var(--cyber-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-box-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box-content {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: rgba(255, 0, 64, 0.05);
+            border: 1px solid var(--warning-red);
+            border-left: 4px solid var(--warning-red);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--warning-red);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-box-content {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+
+            .nav-tab {
+                white-space: nowrap;
+            }
+
+            .criteria-list {
+                grid-template-columns: 1fr;
+            }
+
+            .generator-options {
+                flex-direction: column;
+            }
+
+            .generated-password {
+                flex-direction: column;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .comparison-table {
+                font-size: 0.7rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header-title {
+                letter-spacing: 0.15em;
+            }
+
+            .attack-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg" id="matrixBg"></div>
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="header-title">PASSWORD LAB</h1>
+            <p class="header-subtitle">// CYBERSECURITY TRAINING FACILITY //</p>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-number">19.2M</span>
+                    <span class="stat-label">Australian Records Breached (2022-2024)</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">3.8B</span>
+                    <span class="stat-label">Credentials Leaked (H1 2025)</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">94%</span>
+                    <span class="stat-label">Password Reuse Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">30%</span>
+                    <span class="stat-label">Use Pet Names/Birthdays</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('analyser')">Strength Analyser</button>
+            <button class="nav-tab" onclick="switchTab('simulator')">Brute Force Attack</button>
+            <button class="nav-tab" onclick="switchTab('generator')">Password Generator</button>
+            <button class="nav-tab" onclick="switchTab('game')">Hack the Password</button>
+            <button class="nav-tab" onclick="switchTab('breach')">Breach Checker</button>
+            <button class="nav-tab" onclick="switchTab('twofa')">2FA Demo</button>
+            <button class="nav-tab" onclick="switchTab('patterns')">Password Patterns</button>
+            <button class="nav-tab" onclick="switchTab('challenge')">Challenge Mode</button>
+        </nav>
+
+        <main>
+            <!-- Tab 1: Password Strength Analyser -->
+            <section class="tab-content active" id="tab-analyser">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">🔐</span>
+                        <h2 class="panel-title">Password Strength Analyser</h2>
+                    </div>
+                    <p class="panel-description">Test how secure your passwords are. Don't use real passwords - this is for testing only!</p>
+
+                    <div class="password-input-container">
+                        <label class="password-label">Enter a test password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" class="password-input" id="passwordInput" placeholder="Type a test password..." autocomplete="off">
+                            <button class="toggle-visibility" onclick="togglePassword()">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="strength-meter">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text">
+                            <span class="strength-label" id="strengthLabel">Enter a password</span>
+                            <span class="crack-time" id="crackTime"></span>
+                            <span class="entropy-display" id="entropyDisplay"></span>
+                        </div>
+                    </div>
+
+                    <div class="criteria-list" id="criteriaList">
+                        <div class="criteria-item" id="criteria-length">
+                            <div class="criteria-icon">✗</div>
+                            <span class="criteria-text">At least 12 characters</span>
+                        </div>
+                        <div class="criteria-item" id="criteria-upper">
+                            <div class="criteria-icon">✗</div>
+                            <span class="criteria-text">Uppercase letter (A-Z)</span>
+                        </div>
+                        <div class="criteria-item" id="criteria-lower">
+                            <div class="criteria-icon">✗</div>
+                            <span class="criteria-text">Lowercase letter (a-z)</span>
+                        </div>
+                        <div class="criteria-item" id="criteria-number">
+                            <div class="criteria-icon">✗</div>
+                            <span class="criteria-text">Number (0-9)</span>
+                        </div>
+                        <div class="criteria-item" id="criteria-special">
+                            <div class="criteria-icon">✗</div>
+                            <span class="criteria-text">Special character (!@#$%)</span>
+                        </div>
+                        <div class="criteria-item" id="criteria-common">
+                            <div class="criteria-icon">✗</div>
+                            <span class="criteria-text">Not a common password</span>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="warning-box-title">Australian Data Breaches</div>
+                        <div class="warning-box-content">
+                            <strong>Optus (2022):</strong> 9.5 million customer records compromised<br>
+                            <strong>Medibank (2022):</strong> 9.7 million current and former customers affected<br>
+                            <strong>Latitude Financial (2023):</strong> 14 million records stolen<br>
+                            These breaches show why strong, unique passwords are critical for every account.
+                        </div>
+                    </div>
+
+                    <div class="common-passwords">
+                        <p class="common-title">⚠️ Most Common Passwords (click to test)</p>
+                        <div class="password-grid">
+                            <div class="common-pw" onclick="testCommon('password')">password</div>
+                            <div class="common-pw" onclick="testCommon('123456')">123456</div>
+                            <div class="common-pw" onclick="testCommon('qwerty')">qwerty</div>
+                            <div class="common-pw" onclick="testCommon('abc123')">abc123</div>
+                            <div class="common-pw" onclick="testCommon('letmein')">letmein</div>
+                            <div class="common-pw" onclick="testCommon('admin')">admin</div>
+                            <div class="common-pw" onclick="testCommon('welcome')">welcome</div>
+                            <div class="common-pw" onclick="testCommon('monkey')">monkey</div>
+                            <div class="common-pw" onclick="testCommon('dragon')">dragon</div>
+                            <div class="common-pw" onclick="testCommon('master')">master</div>
+                            <div class="common-pw" onclick="testCommon('password1')">password1</div>
+                            <div class="common-pw" onclick="testCommon('sunshine')">sunshine</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Brute Force Simulator -->
+            <section class="tab-content" id="tab-simulator">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">⚡</span>
+                        <h2 class="panel-title">Brute Force Attack Simulator</h2>
+                    </div>
+                    <p class="panel-description">Watch how hackers attempt to crack passwords by trying thousands of combinations. Weak passwords fall in seconds!</p>
+
+                    <div class="password-input-container">
+                        <label class="password-label">Enter a password to attack (or use one from the analyser)</label>
+                        <div class="password-input-wrapper">
+                            <input type="text" class="password-input" id="simulatorInput" placeholder="e.g. password123" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="brute-force-visual">
+                        <div class="attack-stats">
+                            <span>Attempts: <strong id="attackCount">0</strong></span>
+                            <span>Speed: <strong id="attackSpeed">0</strong> attempts/second</span>
+                            <span>Time: <strong id="attackTime">0.0s</strong></span>
+                        </div>
+                        <div class="attack-grid" id="attackGrid"></div>
+                        <div style="text-align: center;">
+                            <button class="hack-btn" id="startAttackBtn" onclick="startBruteForce()">Start Attack</button>
+                            <button class="hack-btn" id="stopAttackBtn" onclick="stopBruteForce()" style="display: none;">Stop Attack</button>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">How Brute Force Attacks Work</div>
+                        <div class="info-box-content">
+                            Brute force attacks try every possible combination of characters until they find the correct password. Modern computers can try billions of combinations per second. A simple 6-character password with only lowercase letters can be cracked in under a second. Adding length, uppercase, numbers, and symbols exponentially increases the time needed to crack a password.
+                        </div>
+                    </div>
+
+                    <div class="hack-panel">
+                        <div class="hack-header">
+                            <span class="hack-title">Terminal Output</span>
+                        </div>
+                        <div class="hack-output" id="hackOutput">Ready to simulate attack. Enter a password above and click "Start Attack".</div>
+                    </div>
+
+                    <h3 class="generator-title" style="margin-top: 2rem;">Crack Time Comparison</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Password Type</th>
+                                <th>Example</th>
+                                <th>Combinations</th>
+                                <th>Crack Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="weak">6 lowercase letters</td>
+                                <td class="weak">flower</td>
+                                <td>308 million</td>
+                                <td class="weak">Instant</td>
+                            </tr>
+                            <tr>
+                                <td class="weak">8 mixed case</td>
+                                <td class="weak">Password</td>
+                                <td>53 trillion</td>
+                                <td class="weak">1 minute</td>
+                            </tr>
+                            <tr>
+                                <td>10 mixed + numbers</td>
+                                <td>Password99</td>
+                                <td>3.7 quadrillion</td>
+                                <td>6 hours</td>
+                            </tr>
+                            <tr>
+                                <td>12 all character types</td>
+                                <td>P@ssw0rd!123</td>
+                                <td>95^12</td>
+                                <td>3 months</td>
+                            </tr>
+                            <tr>
+                                <td class="strong">16 all character types</td>
+                                <td>Tr0pic@l!R3ef#42</td>
+                                <td>95^16</td>
+                                <td class="strong">438 years</td>
+                            </tr>
+                            <tr>
+                                <td class="strong">20+ character passphrase</td>
+                                <td>KangarooCoffee!Beach99</td>
+                                <td>95^23</td>
+                                <td class="strong">1 million years</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 3: Password Generator -->
+            <section class="tab-content" id="tab-generator">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">🎲</span>
+                        <h2 class="panel-title">Secure Password Generator</h2>
+                    </div>
+                    <p class="panel-description">Generate cryptographically secure passwords with customisable options.</p>
+
+                    <div class="generator-section" style="margin-top: 0; padding-top: 0; border-top: none;">
+                        <h3 class="generator-title">Password Options</h3>
+                        <div class="generator-options">
+                            <div class="option-group">
+                                <span class="option-label">Length:</span>
+                                <input type="number" class="option-input" id="genLength" value="16" min="8" max="64">
+                            </div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="genUpper" checked>
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Uppercase (A-Z)</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="genLower" checked>
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Lowercase (a-z)</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="genNumbers" checked>
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Numbers (0-9)</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="genSymbols" checked>
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Symbols (!@#$%)</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="genExcludeAmbiguous">
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Exclude Ambiguous (0,O,l,1)</span>
+                            </label>
+                        </div>
+                        <button class="generate-btn" onclick="generatePassword()">Generate Secure Password</button>
+                        <div class="generated-password hidden" id="generatedContainer">
+                            <span class="generated-text" id="generatedPassword"></span>
+                            <button class="copy-btn" onclick="copyPassword()">Copy</button>
+                        </div>
+
+                        <div class="info-box" style="margin-top: 1.5rem;">
+                            <div class="info-box-title">Generated Password Strength</div>
+                            <div class="info-box-content" id="generatedStrength">Generate a password to see its strength analysis.</div>
+                        </div>
+                    </div>
+
+                    <div class="generator-section">
+                        <h3 class="generator-title">Passphrase Generator</h3>
+                        <p class="panel-description">Passphrases are easier to remember and more secure than complex passwords.</p>
+
+                        <div class="generator-options">
+                            <div class="option-group">
+                                <span class="option-label">Word Count:</span>
+                                <input type="number" class="option-input" id="passphraseWords" value="4" min="3" max="8">
+                            </div>
+                            <div class="option-group">
+                                <span class="option-label">Separator:</span>
+                                <input type="text" class="option-input" id="passphraseSeparator" value="-" maxlength="1" style="width: 50px;">
+                            </div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="passphraseCapitalise" checked>
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Capitalise Words</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="passphraseNumber" checked>
+                                <span class="custom-checkbox">✓</span>
+                                <span class="option-label">Add Number</span>
+                            </label>
+                        </div>
+                        <button class="generate-btn" onclick="generatePassphrase()">Generate Passphrase</button>
+                        <div class="generated-password hidden" id="passphraseContainer">
+                            <span class="generated-text" id="generatedPassphrase"></span>
+                            <button class="copy-btn" onclick="copyPassphrase()">Copy</button>
+                        </div>
+
+                        <div class="passphrase-example" style="margin-top: 1.5rem;">
+                            <div class="passphrase-bad">Tr0ub4dor&3 (11 chars, complex)</div>
+                            <div class="passphrase-good">correct-horse-battery-staple (28 chars, memorable)</div>
+                            <p class="passphrase-note">
+                                The famous XKCD comic illustrates this perfectly: complex passwords like "Tr0ub4dor&3" are hard to remember and easier to crack (3 days) than simple passphrases like "correct horse battery staple" (550 years to crack). Australian-themed example: "Kangaroo-Beach-Vegemite-42" is both memorable and incredibly secure.
+                            </p>
+                        </div>
+
+                        <h3 class="generator-title" style="margin-top: 2rem;">Australian-Themed Passphrase Examples</h3>
+                        <div class="password-grid">
+                            <div class="common-pw" style="border-color: var(--success-green); color: var(--success-green);" onclick="showPassphrase('Kangaroo-Surfing-Sunset-77')">Kangaroo-Surfing-Sunset-77</div>
+                            <div class="common-pw" style="border-color: var(--success-green); color: var(--success-green);" onclick="showPassphrase('Koala-Vegemite-Beach-42')">Koala-Vegemite-Beach-42</div>
+                            <div class="common-pw" style="border-color: var(--success-green); color: var(--success-green);" onclick="showPassphrase('Perth-Coffee-Ocean-99')">Perth-Coffee-Ocean-99</div>
+                            <div class="common-pw" style="border-color: var(--success-green); color: var(--success-green);" onclick="showPassphrase('Wombat-Cricket-Thunder-23')">Wombat-Cricket-Thunder-23</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Password Manager Recommendation</div>
+                        <div class="info-box-content">
+                            Don't try to remember all your passwords! Use a password manager like:
+                            <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                <li><strong>Bitwarden</strong> (free, open-source)</li>
+                                <li><strong>1Password</strong> (family plans available)</li>
+                                <li><strong>Apple Keychain</strong> (built into iOS/macOS)</li>
+                                <li><strong>Google Password Manager</strong> (built into Chrome)</li>
+                            </ul>
+                            You only need to remember ONE strong master password, and the manager handles the rest.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 4: Hack the Password Game -->
+            <section class="tab-content" id="tab-game">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">🎮</span>
+                        <h2 class="panel-title">Hack the Password Game</h2>
+                    </div>
+                    <p class="panel-description">Can you guess the most common passwords? Think like a hacker!</p>
+
+                    <div class="game-container">
+                        <div class="game-header">
+                            <span class="game-score">Round: <strong id="gameRound">1</strong>/10</span>
+                            <span class="game-score">Score: <strong id="gameScore">0</strong></span>
+                            <span class="game-score">Attempts: <strong id="gameAttempts">3</strong></span>
+                        </div>
+
+                        <div class="game-hint" id="gameHint">Loading...</div>
+
+                        <input type="text" class="game-input" id="gameInput" placeholder="Enter your guess..." autocomplete="off">
+
+                        <button class="action-btn" onclick="submitGuess()" style="width: 100%; margin-bottom: 1rem;">Submit Guess</button>
+
+                        <div class="game-feedback hidden" id="gameFeedback"></div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Why This Matters</div>
+                        <div class="info-box-content">
+                            These common passwords are the first ones hackers try. If your password is on this list (or similar), your account can be compromised in seconds. Hackers use "dictionary attacks" that try millions of common words, names, and patterns automatically.
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="warning-box-title">Common Password Patterns Hackers Exploit</div>
+                        <div class="warning-box-content">
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Name + year (e.g., "Sarah2006")</li>
+                                <li>Word + numbers (e.g., "password123")</li>
+                                <li>Keyboard patterns (e.g., "qwerty", "asdfgh")</li>
+                                <li>Sports teams (e.g., "Eagles2024")</li>
+                                <li>Pet names + numbers</li>
+                                <li>Simple substitutions (e.g., "p@ssw0rd")</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 5: Data Breach Checker -->
+            <section class="tab-content" id="tab-breach">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">💀</span>
+                        <h2 class="panel-title">Data Breach Checker Simulation</h2>
+                    </div>
+                    <p class="panel-description">This is an educational simulation. For real breach checking, visit <strong>haveibeenpwned.com</strong></p>
+
+                    <div class="warning-box">
+                        <div class="warning-box-title">Never Enter Real Passwords Here!</div>
+                        <div class="warning-box-content">
+                            This is a simulation for educational purposes only. To check if your real email or password has been compromised, visit Troy Hunt's legitimate service at <strong>haveibeenpwned.com</strong>
+                        </div>
+                    </div>
+
+                    <input type="text" class="breach-input" id="breachInput" placeholder="Enter a test email or common password to check...">
+                    <button class="action-btn" onclick="checkBreach()">Simulate Breach Check</button>
+
+                    <div class="breach-results hidden" id="breachResults">
+                        <h3 class="generator-title" style="color: var(--warning-red); margin-bottom: 1rem;">Simulated Breach Results</h3>
+                        <div id="breachList"></div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <div class="info-box-title">Real Australian Data Breaches</div>
+                        <div class="info-box-content">
+                            <strong>Recent Major Breaches:</strong><br><br>
+                            <strong>Optus (September 2022):</strong> 9.5 million customers' personal details including names, dates of birth, phone numbers, and email addresses compromised.<br><br>
+                            <strong>Medibank (October 2022):</strong> 9.7 million current and former customers affected. Personal and health information stolen including medical claims data.<br><br>
+                            <strong>Latitude Financial (March 2023):</strong> 14 million records stolen, affecting 7.9 million Australian and New Zealand customers. Driver's licences and financial statements compromised.<br><br>
+                            <strong>What This Means:</strong> If your data was in any of these breaches, you should change all passwords immediately and enable 2FA everywhere possible.
+                        </div>
+                    </div>
+
+                    <h3 class="generator-title" style="margin-top: 2rem;">What To Do If You're In A Breach</h3>
+                    <div class="pattern-grid">
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">1. Change Passwords Immediately</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Change the breached account's password first</div>
+                                <div class="pattern-example">Change ANY account using the same password</div>
+                                <div class="pattern-example">Use unique passwords for every account</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--warning-orange);">
+                            <div class="pattern-title" style="color: var(--warning-orange);">2. Enable Two-Factor Authentication</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Add 2FA to all important accounts</div>
+                                <div class="pattern-example">Use authenticator apps (not SMS if possible)</div>
+                                <div class="pattern-example">Save backup codes securely</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--cyber-blue);">
+                            <div class="pattern-title" style="color: var(--cyber-blue);">3. Monitor Your Accounts</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Check bank statements regularly</div>
+                                <div class="pattern-example">Set up account alerts</div>
+                                <div class="pattern-example">Consider credit monitoring services</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 6: Two-Factor Authentication Demo -->
+            <section class="tab-content" id="tab-twofa">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">🔒</span>
+                        <h2 class="panel-title">Two-Factor Authentication (2FA) Demo</h2>
+                    </div>
+                    <p class="panel-description">2FA adds a second layer of security beyond your password. Even if someone steals your password, they can't access your account without the second factor.</p>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Why 2FA Matters</div>
+                        <div class="info-box-content">
+                            Two-Factor Authentication (also called Multi-Factor Authentication or MFA) requires two different types of verification:
+                            <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                <li><strong>Something you know</strong> (password)</li>
+                                <li><strong>Something you have</strong> (phone, security key)</li>
+                                <li><strong>Something you are</strong> (fingerprint, face)</li>
+                            </ul>
+                            Studies show 2FA blocks 99.9% of automated account attacks.
+                        </div>
+                    </div>
+
+                    <h3 class="generator-title">Choose a 2FA Method to Simulate</h3>
+                    <div class="twofa-demo">
+                        <div class="twofa-method" onclick="demo2FA('sms')">
+                            <div class="twofa-icon">📱</div>
+                            <div class="twofa-name">SMS Code</div>
+                            <div class="twofa-desc">6-digit code sent via text message</div>
+                        </div>
+                        <div class="twofa-method" onclick="demo2FA('app')">
+                            <div class="twofa-icon">🔑</div>
+                            <div class="twofa-name">Authenticator App</div>
+                            <div class="twofa-desc">Time-based codes from apps like Google Authenticator</div>
+                        </div>
+                        <div class="twofa-method" onclick="demo2FA('hardware')">
+                            <div class="twofa-icon">🔐</div>
+                            <div class="twofa-name">Hardware Key</div>
+                            <div class="twofa-desc">Physical security key (YubiKey, Titan)</div>
+                        </div>
+                        <div class="twofa-method" onclick="demo2FA('biometric')">
+                            <div class="twofa-icon">👆</div>
+                            <div class="twofa-name">Biometric</div>
+                            <div class="twofa-desc">Fingerprint or facial recognition</div>
+                        </div>
+                    </div>
+
+                    <div class="twofa-simulator hidden" id="twofaSimulator">
+                        <h3 class="generator-title" id="twofaMethodTitle">Authenticator App</h3>
+                        <p class="panel-description" id="twofaMethodDesc">Generating time-based authentication code...</p>
+                        <div class="code-display" id="twofaCode">------</div>
+                        <div class="code-timer" id="twofaTimer">Code expires in: <strong>30</strong> seconds</div>
+                        <button class="action-btn" onclick="verify2FA()" style="width: 100%; margin-top: 1rem;">Verify Code</button>
+                    </div>
+
+                    <h3 class="generator-title" style="margin-top: 2rem;">2FA Security Comparison</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Security Level</th>
+                                <th>Pros</th>
+                                <th>Cons</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SMS Code</td>
+                                <td class="weak">Low-Medium</td>
+                                <td>Easy to use, widely supported</td>
+                                <td>Vulnerable to SIM swapping</td>
+                            </tr>
+                            <tr>
+                                <td>Authenticator App</td>
+                                <td class="strong">High</td>
+                                <td>More secure, works offline</td>
+                                <td>Requires smartphone</td>
+                            </tr>
+                            <tr>
+                                <td>Hardware Key</td>
+                                <td class="strong">Very High</td>
+                                <td>Most secure, phishing-resistant</td>
+                                <td>Costs money, can be lost</td>
+                            </tr>
+                            <tr>
+                                <td>Biometric</td>
+                                <td class="strong">High</td>
+                                <td>Convenient, can't be forgotten</td>
+                                <td>Can't be changed if compromised</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box" style="margin-top: 1.5rem;">
+                        <div class="warning-box-title">How to Enable 2FA on Popular Services</div>
+                        <div class="warning-box-content">
+                            <strong>Google:</strong> Account settings → Security → 2-Step Verification<br>
+                            <strong>Microsoft:</strong> Account settings → Security → Two-step verification<br>
+                            <strong>Instagram/Facebook:</strong> Settings → Security → Two-factor authentication<br>
+                            <strong>Banking:</strong> Most Australian banks enable 2FA by default via SMS or app notifications<br><br>
+                            <strong>Pro Tip:</strong> Use authenticator apps (Google Authenticator, Microsoft Authenticator, Authy) instead of SMS when possible for better security.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 7: Password Patterns -->
+            <section class="tab-content" id="tab-patterns">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">🎯</span>
+                        <h2 class="panel-title">Password Patterns & Attack Methods</h2>
+                    </div>
+                    <p class="panel-description">Learn how hackers identify and exploit common password patterns.</p>
+
+                    <h3 class="generator-title">Common Password Patterns</h3>
+                    <div class="pattern-grid">
+                        <div class="pattern-card">
+                            <div class="pattern-title">Name + Year</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">sarah2006</div>
+                                <div class="pattern-example">john1999</div>
+                                <div class="pattern-example">emma2010</div>
+                                <div class="pattern-example">⏱️ Crack time: Seconds</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-title">Word + Numbers</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">password123</div>
+                                <div class="pattern-example">welcome1</div>
+                                <div class="pattern-example">hello123</div>
+                                <div class="pattern-example">⏱️ Crack time: Instant</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-title">Keyboard Patterns</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">qwerty123</div>
+                                <div class="pattern-example">asdfghjkl</div>
+                                <div class="pattern-example">1q2w3e4r</div>
+                                <div class="pattern-example">⏱️ Crack time: Instant</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-title">Simple Substitutions</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">p@ssw0rd</div>
+                                <div class="pattern-example">l3tm31n</div>
+                                <div class="pattern-example">h3ll0</div>
+                                <div class="pattern-example">⏱️ Crack time: Minutes</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-title">Sports Teams</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">eagles2024</div>
+                                <div class="pattern-example">dockers23</div>
+                                <div class="pattern-example">tigers1</div>
+                                <div class="pattern-example">⏱️ Crack time: Seconds</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-title">Pet Names + Dates</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">fluffy123</div>
+                                <div class="pattern-example">buddy2020</div>
+                                <div class="pattern-example">max2018</div>
+                                <div class="pattern-example">⏱️ Crack time: Seconds</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="warning-box-title">94% Password Reuse Rate</div>
+                        <div class="warning-box-content">
+                            Studies show that 94% of people reuse passwords across multiple accounts. This is extremely dangerous! When one site gets breached, hackers immediately try those credentials on other popular sites (this is called "credential stuffing"). One compromised password can lead to multiple account takeovers.
+                        </div>
+                    </div>
+
+                    <h3 class="generator-title" style="margin-top: 2rem;">How Hackers Attack Passwords</h3>
+                    <div class="pattern-grid">
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">Dictionary Attack</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Tries common words from dictionaries</div>
+                                <div class="pattern-example">Includes names, places, sports teams</div>
+                                <div class="pattern-example">Can crack simple passwords in seconds</div>
+                                <div class="pattern-example">Billions of attempts per second</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">Brute Force Attack</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Tries every possible combination</div>
+                                <div class="pattern-example">Starts with short, simple passwords</div>
+                                <div class="pattern-example">Modern GPUs: billions of attempts/sec</div>
+                                <div class="pattern-example">Length is the best defence</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">Credential Stuffing</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Uses stolen username/password pairs</div>
+                                <div class="pattern-example">Tries same credentials on many sites</div>
+                                <div class="pattern-example">Why password reuse is dangerous</div>
+                                <div class="pattern-example">Automated bots test millions of accounts</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">Social Engineering</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Uses personal information</div>
+                                <div class="pattern-example">Tries birthdays, pet names, addresses</div>
+                                <div class="pattern-example">Info from social media profiles</div>
+                                <div class="pattern-example">30% of passwords use personal data</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">Rainbow Table Attack</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Pre-computed password hashes</div>
+                                <div class="pattern-example">Instantly cracks unhashed passwords</div>
+                                <div class="pattern-example">Defeats simple passwords immediately</div>
+                                <div class="pattern-example">Why sites "salt" password hashes</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" style="border-color: var(--warning-red);">
+                            <div class="pattern-title" style="color: var(--warning-red);">Phishing</div>
+                            <div class="pattern-examples">
+                                <div class="pattern-example">Fake login pages steal credentials</div>
+                                <div class="pattern-example">Emails that look legitimate</div>
+                                <div class="pattern-example">Most common attack method</div>
+                                <div class="pattern-example">2FA prevents this!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <div class="info-box-title">How to Create Unbreakable Passwords</div>
+                        <div class="info-box-content">
+                            <strong>✓ DO:</strong>
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Use at least 16 characters (longer is better)</li>
+                                <li>Use a mix of uppercase, lowercase, numbers, and symbols</li>
+                                <li>Use completely random or unrelated words (passphrases)</li>
+                                <li>Use a different password for every account</li>
+                                <li>Use a password manager to remember them</li>
+                            </ul>
+                            <br>
+                            <strong>✗ DON'T:</strong>
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Use personal information (names, birthdays, addresses)</li>
+                                <li>Use common words or phrases</li>
+                                <li>Use keyboard patterns (qwerty, 123456)</li>
+                                <li>Reuse passwords across multiple sites</li>
+                                <li>Use simple substitutions (p@ssw0rd)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 8: Challenge Mode -->
+            <section class="tab-content" id="tab-challenge">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">🏆</span>
+                        <h2 class="panel-title">Password Challenge Mode</h2>
+                    </div>
+                    <p class="panel-description">Create the strongest password you can and compete for the highest security score!</p>
+
+                    <div class="challenge-score">
+                        <div class="score-item">
+                            <span class="score-value" id="challengeEntropy">0</span>
+                            <span class="score-label">Entropy Bits</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="challengeScore">0</span>
+                            <span class="score-label">Total Score</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="challengeCrackTime">—</span>
+                            <span class="score-label">Crack Time</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="challengeRank">—</span>
+                            <span class="score-label">Rank</span>
+                        </div>
+                    </div>
+
+                    <div class="password-input-container">
+                        <label class="password-label">Create Your Best Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="text" class="password-input" id="challengeInput" placeholder="Type your strongest password..." autocomplete="off">
+                        </div>
+                    </div>
+
+                    <button class="action-btn" onclick="evaluateChallenge()" style="width: 100%; margin-bottom: 1.5rem;">Evaluate Password</button>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Scoring System</div>
+                        <div class="info-box-content">
+                            Your score is based on:
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li><strong>Entropy:</strong> Mathematical measure of password randomness (bits)</li>
+                                <li><strong>Length:</strong> Each character adds exponentially more security</li>
+                                <li><strong>Character Variety:</strong> Using all character types increases combinations</li>
+                                <li><strong>Unpredictability:</strong> Avoiding patterns and common words</li>
+                            </ul>
+                            <br>
+                            <strong>Ranks:</strong>
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Novice: 0-30 bits</li>
+                                <li>Apprentice: 31-50 bits</li>
+                                <li>Professional: 51-70 bits</li>
+                                <li>Expert: 71-90 bits</li>
+                                <li>Master: 91+ bits</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 class="generator-title">Challenge Leaderboard</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Password Type</th>
+                                <th>Entropy</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard">
+                            <tr>
+                                <td>🥇</td>
+                                <td>64-char random (all types)</td>
+                                <td class="strong">384 bits</td>
+                                <td class="strong">10,000</td>
+                            </tr>
+                            <tr>
+                                <td>🥈</td>
+                                <td>32-char random (all types)</td>
+                                <td class="strong">192 bits</td>
+                                <td class="strong">5,000</td>
+                            </tr>
+                            <tr>
+                                <td>🥉</td>
+                                <td>20-char passphrase</td>
+                                <td class="strong">120 bits</td>
+                                <td class="strong">3,000</td>
+                            </tr>
+                            <tr>
+                                <td>4th</td>
+                                <td>16-char mixed</td>
+                                <td>96 bits</td>
+                                <td>2,000</td>
+                            </tr>
+                            <tr>
+                                <td>5th</td>
+                                <td>12-char mixed</td>
+                                <td>72 bits</td>
+                                <td>1,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box" style="margin-top: 1.5rem;">
+                        <div class="warning-box-title">Remember: Don't Use These Passwords!</div>
+                        <div class="warning-box-content">
+                            This is a learning exercise. Any password you type here should be considered compromised and never used for real accounts. Always generate unique passwords with a password manager for actual use.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Common passwords list (expanded)
+        const commonPasswords = [
+            'password', '123456', '12345678', 'qwerty', 'abc123', 'monkey', 'letmein',
+            'dragon', 'football', 'master', 'welcome', 'login', 'princess', 'admin',
+            'password1', 'sunshine', 'iloveyou', 'trustno1', 'whatever', 'shadow',
+            '123456789', 'password123', 'qwerty123', '1q2w3e4r', 'baseball', 'football',
+            'superman', 'batman', 'starwars', 'australia', 'sydney', 'melbourne'
+        ];
+
+        // Australian word list for passphrases
+        const australianWords = [
+            'kangaroo', 'koala', 'wombat', 'platypus', 'emu', 'kookaburra',
+            'beach', 'surf', 'reef', 'outback', 'billabong', 'boomerang',
+            'vegemite', 'barbie', 'arvo', 'mate', 'brekkie', 'dunny',
+            'perth', 'sydney', 'melbourne', 'brisbane', 'darwin', 'hobart',
+            'sunshine', 'ocean', 'cricket', 'footy', 'pavlova', 'lamington'
+        ];
+
+        // Game data
+        const gamePasswords = [
+            { password: 'password', hint: 'The most common password in the world - literally the word for what it is!', type: 'Simple word' },
+            { password: '123456', hint: 'The second most common - just counting up from 1', type: 'Number sequence' },
+            { password: 'qwerty', hint: 'Look at the top row of your keyboard', type: 'Keyboard pattern' },
+            { password: 'abc123', hint: 'First three letters followed by first three numbers', type: 'Simple pattern' },
+            { password: 'password1', hint: 'Most common password plus a number at the end', type: 'Word + number' },
+            { password: 'letmein', hint: 'What you\'re asking the system to do', type: 'Common phrase' },
+            { password: 'welcome', hint: 'A friendly greeting, but terrible password', type: 'Simple word' },
+            { password: 'admin', hint: 'Default password for many systems', type: 'Default credential' },
+            { password: 'monkey', hint: 'A popular primate, and surprisingly common password', type: 'Animal name' },
+            { password: 'dragon', hint: 'Mythical creature that breathes fire', type: 'Animal name' }
+        ];
+
+        let currentGameRound = 0;
+        let gameScore = 0;
+        let gameAttempts = 3;
+        let currentPassword = null;
+
+        // Breach simulation data
+        const simulatedBreaches = [
+            { name: 'Optus (2022)', records: '9.5M', data: 'Names, addresses, dates of birth, phone numbers, email addresses, driver\'s licence numbers', year: 2022 },
+            { name: 'Medibank (2022)', records: '9.7M', data: 'Personal details, health claims data, medical diagnoses, procedures', year: 2022 },
+            { name: 'Latitude Financial (2023)', records: '14M', data: 'Driver\'s licences, financial statements, personal details', year: 2023 },
+            { name: 'MyDeal (2023)', records: '2.2M', data: 'Email addresses, names, phone numbers, delivery addresses', year: 2023 },
+            { name: 'HealthEngine (2018)', records: '140K', data: 'Names, dates of birth, email addresses, medical appointment details', year: 2018 }
+        ];
+
+        let bruteForceInterval = null;
+        let bruteForceAttempts = 0;
+        let bruteForceStartTime = 0;
+        let twoFAInterval = null;
+        let twoFATimeLeft = 30;
+
+        // Matrix effect
+        function createMatrixRain() {
+            const bg = document.getElementById('matrixBg');
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+            for (let i = 0; i < 50; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = `${Math.random() * 100}%`;
+                column.style.animationDuration = `${5 + Math.random() * 10}s`;
+                column.style.animationDelay = `${Math.random() * 5}s`;
+
+                let text = '';
+                for (let j = 0; j < 30; j++) {
+                    text += characters[Math.floor(Math.random() * characters.length)] + '\n';
+                }
+                column.textContent = text;
+                bg.appendChild(column);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrixRain();
+            document.getElementById('passwordInput').addEventListener('input', analysePassword);
+            initGame();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Initialize tab-specific functionality
+            if (tabName === 'game' && currentGameRound === 0) {
+                startNewGame();
+            }
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function analysePassword() {
+            const password = document.getElementById('passwordInput').value;
+
+            // Check criteria
+            const criteria = {
+                length: password.length >= 12,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+                common: !commonPasswords.includes(password.toLowerCase())
+            };
+
+            // Update criteria display
+            Object.keys(criteria).forEach(key => {
+                const element = document.getElementById(`criteria-${key}`);
+                const icon = element.querySelector('.criteria-icon');
+                if (criteria[key]) {
+                    element.classList.add('met');
+                    icon.textContent = '✓';
+                } else {
+                    element.classList.remove('met');
+                    icon.textContent = '✗';
+                }
+            });
+
+            // Calculate strength
+            const metCount = Object.values(criteria).filter(Boolean).length;
+            const fill = document.getElementById('strengthFill');
+            const label = document.getElementById('strengthLabel');
+            const crackTime = document.getElementById('crackTime');
+            const entropyDisplay = document.getElementById('entropyDisplay');
+
+            fill.className = 'strength-fill';
+            label.className = 'strength-label';
+
+            if (password.length === 0) {
+                label.textContent = 'Enter a password';
+                crackTime.textContent = '';
+                entropyDisplay.textContent = '';
+                return;
+            }
+
+            const entropy = calculateEntropy(password);
+            entropyDisplay.textContent = `Entropy: ${entropy.toFixed(1)} bits`;
+
+            if (metCount <= 2 || !criteria.common) {
+                fill.classList.add('weak');
+                label.classList.add('weak');
+                label.textContent = 'WEAK';
+                crackTime.textContent = 'Crack time: Instantly';
+            } else if (metCount <= 3) {
+                fill.classList.add('fair');
+                label.classList.add('fair');
+                label.textContent = 'FAIR';
+                crackTime.textContent = 'Crack time: Minutes to hours';
+            } else if (metCount <= 4) {
+                fill.classList.add('good');
+                label.classList.add('good');
+                label.textContent = 'GOOD';
+                crackTime.textContent = 'Crack time: Days to months';
+            } else {
+                fill.classList.add('strong');
+                label.classList.add('strong');
+                label.textContent = 'STRONG';
+
+                if (entropy > 100) {
+                    crackTime.textContent = 'Crack time: Billions of years';
+                } else if (entropy > 80) {
+                    crackTime.textContent = 'Crack time: Centuries+';
+                } else if (entropy > 60) {
+                    crackTime.textContent = 'Crack time: Many years';
+                } else {
+                    crackTime.textContent = 'Crack time: Months to years';
+                }
+            }
+        }
+
+        function calculateEntropy(password) {
+            let charset = 0;
+            if (/[a-z]/.test(password)) charset += 26;
+            if (/[A-Z]/.test(password)) charset += 26;
+            if (/[0-9]/.test(password)) charset += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) charset += 32;
+
+            return Math.log2(Math.pow(charset, password.length));
+        }
+
+        function testCommon(password) {
+            document.getElementById('passwordInput').value = password;
+            document.getElementById('passwordInput').type = 'text';
+            analysePassword();
+
+            // Switch to analyser tab
+            switchTab('analyser');
+            document.querySelectorAll('.nav-tab')[0].classList.add('active');
+        }
+
+        // Brute Force Simulator
+        function startBruteForce() {
+            const password = document.getElementById('simulatorInput').value;
+            if (!password) {
+                alert('Please enter a password to attack!');
+                return;
+            }
+
+            const output = document.getElementById('hackOutput');
+            const grid = document.getElementById('attackGrid');
+            const startBtn = document.getElementById('startAttackBtn');
+            const stopBtn = document.getElementById('stopAttackBtn');
+
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+
+            grid.innerHTML = '';
+            bruteForceAttempts = 0;
+            bruteForceStartTime = Date.now();
+
+            output.innerHTML = 'Initialising brute force attack...\nScanning target...\nConnecting to password hash...\n<span class="attempt">Attack commenced!</span>\n';
+
+            const isWeak = commonPasswords.includes(password.toLowerCase()) || password.length < 8;
+            const targetAttempts = isWeak ? 50 : 500;
+            const speed = isWeak ? 50 : 20;
+
+            bruteForceInterval = setInterval(() => {
+                bruteForceAttempts++;
+                const elapsed = ((Date.now() - bruteForceStartTime) / 1000).toFixed(1);
+                const attemptsPerSecond = Math.floor(bruteForceAttempts / (Date.now() - bruteForceStartTime) * 1000);
+
+                document.getElementById('attackCount').textContent = bruteForceAttempts;
+                document.getElementById('attackSpeed').textContent = attemptsPerSecond;
+                document.getElementById('attackTime').textContent = elapsed + 's';
+
+                // Generate random attempt
+                const chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+                let attempt = '';
+                for (let i = 0; i < Math.min(password.length, 8); i++) {
+                    attempt += chars[Math.floor(Math.random() * chars.length)];
+                }
+
+                const attemptDiv = document.createElement('div');
+                attemptDiv.className = 'attack-attempt';
+                attemptDiv.textContent = attempt;
+                grid.appendChild(attemptDiv);
+
+                // Keep grid manageable
+                if (grid.children.length > 40) {
+                    grid.removeChild(grid.firstChild);
+                }
+
+                // Check for success/failure
+                if (isWeak && bruteForceAttempts >= targetAttempts) {
+                    clearInterval(bruteForceInterval);
+                    const crackedDiv = document.createElement('div');
+                    crackedDiv.className = 'attack-attempt cracked';
+                    crackedDiv.textContent = password;
+                    grid.appendChild(crackedDiv);
+
+                    output.innerHTML += `\n<span class="success">🚨 PASSWORD CRACKED: "${password}"</span>\n`;
+                    output.innerHTML += `<span class="attempt">Compromised in ${bruteForceAttempts} attempts (${elapsed}s)</span>\n`;
+                    output.innerHTML += '\nThis password is VULNERABLE to brute force attacks!\n';
+                    output.innerHTML += 'A real attacker with modern hardware could crack this in seconds.';
+
+                    startBtn.style.display = 'inline-block';
+                    stopBtn.style.display = 'none';
+                }
+
+                if (!isWeak && bruteForceAttempts >= targetAttempts) {
+                    clearInterval(bruteForceInterval);
+                    output.innerHTML += `\n<span class="protected">✓ PASSWORD DEFENDED: Attack timed out</span>\n`;
+                    output.innerHTML += `<span class="attempt">Attack abandoned after ${bruteForceAttempts} attempts (${elapsed}s)</span>\n`;
+                    output.innerHTML += '\nThis password is RESISTANT to quick brute force attacks.\n';
+                    output.innerHTML += 'Would take much longer to crack with real attack methods.';
+
+                    startBtn.style.display = 'inline-block';
+                    stopBtn.style.display = 'none';
+                }
+
+                output.scrollTop = output.scrollHeight;
+            }, speed);
+        }
+
+        function stopBruteForce() {
+            if (bruteForceInterval) {
+                clearInterval(bruteForceInterval);
+                const output = document.getElementById('hackOutput');
+                output.innerHTML += '\n<span class="attempt">Attack manually terminated.</span>\n';
+
+                document.getElementById('startAttackBtn').style.display = 'inline-block';
+                document.getElementById('stopAttackBtn').style.display = 'none';
+            }
+        }
+
+        // Password Generator
+        function generatePassword() {
+            const length = parseInt(document.getElementById('genLength').value) || 16;
+            const useUpper = document.getElementById('genUpper').checked;
+            const useLower = document.getElementById('genLower').checked;
+            const useNumbers = document.getElementById('genNumbers').checked;
+            const useSymbols = document.getElementById('genSymbols').checked;
+            const excludeAmbiguous = document.getElementById('genExcludeAmbiguous').checked;
+
+            let charset = '';
+            if (useUpper) charset += excludeAmbiguous ? 'ABCDEFGHJKLMNPQRSTUVWXYZ' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useLower) charset += excludeAmbiguous ? 'abcdefghijkmnopqrstuvwxyz' : 'abcdefghijklmnopqrstuvwxyz';
+            if (useNumbers) charset += excludeAmbiguous ? '23456789' : '0123456789';
+            if (useSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+            if (!charset) {
+                charset = 'abcdefghijklmnopqrstuvwxyz';
+            }
+
+            let password = '';
+            const array = new Uint32Array(length);
+            crypto.getRandomValues(array);
+
+            for (let i = 0; i < length; i++) {
+                password += charset[array[i] % charset.length];
+            }
+
+            document.getElementById('generatedPassword').textContent = password;
+            document.getElementById('generatedContainer').classList.remove('hidden');
+
+            // Show strength analysis
+            const entropy = calculateEntropy(password);
+            let crackTime = '';
+            if (entropy > 100) crackTime = 'billions of years';
+            else if (entropy > 80) crackTime = 'centuries';
+            else if (entropy > 60) crackTime = 'many years';
+            else crackTime = 'months to years';
+
+            document.getElementById('generatedStrength').innerHTML =
+                `<strong>Entropy:</strong> ${entropy.toFixed(1)} bits<br>
+                <strong>Estimated crack time:</strong> ${crackTime}<br>
+                <strong>Character set size:</strong> ${charset.length}<br>
+                <strong>Possible combinations:</strong> ${charset.length}^${length} = ~10^${Math.floor(Math.log10(Math.pow(charset.length, length)))}`;
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('generatedPassword').textContent;
+            navigator.clipboard.writeText(password).then(() => {
+                const btn = document.querySelector('#generatedContainer .copy-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Passphrase Generator
+        function generatePassphrase() {
+            const wordCount = parseInt(document.getElementById('passphraseWords').value) || 4;
+            const separator = document.getElementById('passphraseSeparator').value || '-';
+            const capitalise = document.getElementById('passphraseCapitalise').checked;
+            const addNumber = document.getElementById('passphraseNumber').checked;
+
+            let words = [];
+            for (let i = 0; i < wordCount; i++) {
+                let word = australianWords[Math.floor(Math.random() * australianWords.length)];
+                if (capitalise) {
+                    word = word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                words.push(word);
+            }
+
+            let passphrase = words.join(separator);
+            if (addNumber) {
+                passphrase += separator + Math.floor(Math.random() * 100);
+            }
+
+            document.getElementById('generatedPassphrase').textContent = passphrase;
+            document.getElementById('passphraseContainer').classList.remove('hidden');
+        }
+
+        function copyPassphrase() {
+            const passphrase = document.getElementById('generatedPassphrase').textContent;
+            navigator.clipboard.writeText(passphrase).then(() => {
+                const btn = document.querySelector('#passphraseContainer .copy-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function showPassphrase(text) {
+            document.getElementById('generatedPassphrase').textContent = text;
+            document.getElementById('passphraseContainer').classList.remove('hidden');
+        }
+
+        // Game Functions
+        function initGame() {
+            currentGameRound = 0;
+            gameScore = 0;
+            gameAttempts = 3;
+        }
+
+        function startNewGame() {
+            currentGameRound = 1;
+            gameScore = 0;
+            gameAttempts = 3;
+            updateGameDisplay();
+            loadNextPassword();
+        }
+
+        function loadNextPassword() {
+            if (currentGameRound > gamePasswords.length) {
+                endGame();
+                return;
+            }
+
+            currentPassword = gamePasswords[currentGameRound - 1];
+            gameAttempts = 3;
+
+            document.getElementById('gameHint').textContent = `Hint: ${currentPassword.hint}`;
+            document.getElementById('gameInput').value = '';
+            document.getElementById('gameFeedback').classList.add('hidden');
+            updateGameDisplay();
+        }
+
+        function submitGuess() {
+            const guess = document.getElementById('gameInput').value.toLowerCase().trim();
+            const feedback = document.getElementById('gameFeedback');
+
+            if (!guess) {
+                feedback.innerHTML = '⚠️ Please enter a guess!';
+                feedback.style.color = 'var(--warning-orange)';
+                feedback.classList.remove('hidden');
+                return;
+            }
+
+            if (guess === currentPassword.password) {
+                gameScore += gameAttempts * 10;
+                feedback.innerHTML = `✅ Correct! The password was "${currentPassword.password}"<br>Type: ${currentPassword.type}<br>+${gameAttempts * 10} points`;
+                feedback.style.color = 'var(--success-green)';
+                feedback.classList.remove('hidden');
+
+                setTimeout(() => {
+                    currentGameRound++;
+                    loadNextPassword();
+                }, 2000);
+            } else {
+                gameAttempts--;
+                if (gameAttempts > 0) {
+                    feedback.innerHTML = `❌ Incorrect! ${gameAttempts} attempts remaining.`;
+                    feedback.style.color = 'var(--warning-red)';
+                    feedback.classList.remove('hidden');
+                } else {
+                    feedback.innerHTML = `💀 Out of attempts! The password was "${currentPassword.password}"<br>Type: ${currentPassword.type}`;
+                    feedback.style.color = 'var(--warning-red)';
+                    feedback.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        currentGameRound++;
+                        loadNextPassword();
+                    }, 3000);
+                }
+            }
+
+            updateGameDisplay();
+        }
+
+        function updateGameDisplay() {
+            document.getElementById('gameRound').textContent = currentGameRound;
+            document.getElementById('gameScore').textContent = gameScore;
+            document.getElementById('gameAttempts').textContent = gameAttempts;
+        }
+
+        function endGame() {
+            const feedback = document.getElementById('gameFeedback');
+            let rank = '';
+            if (gameScore >= 250) rank = 'Master Hacker 👑';
+            else if (gameScore >= 200) rank = 'Expert 🏆';
+            else if (gameScore >= 150) rank = 'Professional 🥇';
+            else if (gameScore >= 100) rank = 'Intermediate 🥈';
+            else rank = 'Novice 🥉';
+
+            feedback.innerHTML = `
+                <strong style="font-size: 1.2rem;">Game Over!</strong><br><br>
+                Final Score: <strong>${gameScore}</strong><br>
+                Rank: <strong>${rank}</strong><br><br>
+                You've learned how hackers think when trying common passwords!
+            `;
+            feedback.style.color = 'var(--cyber-blue)';
+            feedback.classList.remove('hidden');
+
+            document.getElementById('gameHint').textContent = 'Click the button below to play again!';
+            document.getElementById('gameInput').disabled = true;
+        }
+
+        // Breach Checker
+        function checkBreach() {
+            const input = document.getElementById('breachInput').value.toLowerCase().trim();
+            const results = document.getElementById('breachResults');
+            const list = document.getElementById('breachList');
+
+            if (!input) {
+                alert('Please enter an email or password to check!');
+                return;
+            }
+
+            results.classList.remove('hidden');
+            list.innerHTML = '';
+
+            // Simulate breach check
+            const isCommon = commonPasswords.includes(input) || input.includes('@');
+            const breachCount = isCommon ? Math.floor(Math.random() * 3) + 2 : Math.floor(Math.random() * 2);
+
+            if (breachCount === 0) {
+                list.innerHTML = '<div style="color: var(--success-green); text-align: center; padding: 2rem;"><strong>✓ Good news!</strong><br>This credential was not found in any simulated breaches.</div>';
+            } else {
+                const shuffled = [...simulatedBreaches].sort(() => 0.5 - Math.random());
+                for (let i = 0; i < breachCount; i++) {
+                    const breach = shuffled[i];
+                    list.innerHTML += `
+                        <div class="breach-item">
+                            <div class="breach-name">⚠️ ${breach.name}</div>
+                            <div class="breach-details">
+                                <strong>Records affected:</strong> ${breach.records}<br>
+                                <strong>Year:</strong> ${breach.year}<br>
+                                <strong>Data compromised:</strong> ${breach.data}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // 2FA Demo
+        function demo2FA(method) {
+            document.querySelectorAll('.twofa-method').forEach(m => m.classList.remove('active'));
+            event.target.closest('.twofa-method').classList.add('active');
+
+            const simulator = document.getElementById('twofaSimulator');
+            const title = document.getElementById('twofaMethodTitle');
+            const desc = document.getElementById('twofaMethodDesc');
+
+            simulator.classList.remove('hidden');
+
+            if (twoFAInterval) {
+                clearInterval(twoFAInterval);
+            }
+
+            switch(method) {
+                case 'sms':
+                    title.textContent = 'SMS Code Authentication';
+                    desc.textContent = 'A 6-digit code has been sent to your phone: +61 4XX XXX XXX';
+                    generate2FACode();
+                    break;
+                case 'app':
+                    title.textContent = 'Authenticator App';
+                    desc.textContent = 'Time-based one-time password (TOTP) from your authenticator app:';
+                    generate2FACode();
+                    start2FATimer();
+                    break;
+                case 'hardware':
+                    title.textContent = 'Hardware Security Key';
+                    desc.textContent = 'Insert your security key (YubiKey, Titan, etc.) and tap when it blinks:';
+                    document.getElementById('twofaCode').textContent = 'TAP KEY';
+                    document.getElementById('twofaTimer').textContent = 'Waiting for hardware key...';
+                    break;
+                case 'biometric':
+                    title.textContent = 'Biometric Authentication';
+                    desc.textContent = 'Place your finger on the sensor or look at the camera:';
+                    document.getElementById('twofaCode').textContent = '👆 SCANNING';
+                    document.getElementById('twofaTimer').textContent = 'Authenticating biometric data...';
+                    setTimeout(() => {
+                        document.getElementById('twofaCode').textContent = '✓ VERIFIED';
+                    }, 1500);
+                    break;
+            }
+        }
+
+        function generate2FACode() {
+            const code = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('twofaCode').textContent = code;
+        }
+
+        function start2FATimer() {
+            twoFATimeLeft = 30;
+            updateTimerDisplay();
+
+            twoFAInterval = setInterval(() => {
+                twoFATimeLeft--;
+                updateTimerDisplay();
+
+                if (twoFATimeLeft <= 0) {
+                    generate2FACode();
+                    twoFATimeLeft = 30;
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('twofaTimer').innerHTML = `Code expires in: <strong>${twoFATimeLeft}</strong> seconds`;
+        }
+
+        function verify2FA() {
+            alert('✅ Authentication Successful!\n\nYou have been verified using two-factor authentication. This adds a critical second layer of security to your account.');
+        }
+
+        // Challenge Mode
+        function evaluateChallenge() {
+            const password = document.getElementById('challengeInput').value;
+
+            if (!password) {
+                alert('Please enter a password to evaluate!');
+                return;
+            }
+
+            const entropy = calculateEntropy(password);
+            let score = Math.floor(entropy * 10);
+
+            // Bonus points
+            if (password.length >= 16) score += 50;
+            if (password.length >= 20) score += 100;
+            if (!commonPasswords.includes(password.toLowerCase())) score += 50;
+
+            let rank = '';
+            if (entropy <= 30) rank = 'Novice 🔰';
+            else if (entropy <= 50) rank = 'Apprentice 🎓';
+            else if (entropy <= 70) rank = 'Professional 💼';
+            else if (entropy <= 90) rank = 'Expert 🏆';
+            else rank = 'Master 👑';
+
+            let crackTime = '';
+            if (entropy > 100) crackTime = 'Billions of years';
+            else if (entropy > 80) crackTime = 'Centuries';
+            else if (entropy > 60) crackTime = 'Decades';
+            else if (entropy > 40) crackTime = 'Years';
+            else if (entropy > 20) crackTime = 'Days';
+            else crackTime = 'Hours';
+
+            document.getElementById('challengeEntropy').textContent = entropy.toFixed(1);
+            document.getElementById('challengeScore').textContent = score;
+            document.getElementById('challengeCrackTime').textContent = crackTime;
+            document.getElementById('challengeRank').textContent = rank;
+        }
+
+        // Allow Enter key for game
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('gameInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') submitGuess();
+            });
+
+            document.getElementById('challengeInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') evaluateChallenge();
+            });
+        });
+    </script>
+</body>
+</html>

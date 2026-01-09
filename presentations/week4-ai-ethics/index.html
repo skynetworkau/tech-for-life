@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Ethics & Bias // Week 4 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-rose), var(--accent-amber), var(--accent-emerald));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-rose);
+            color: var(--accent-rose);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-rose);
+            color: var(--accent-rose);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Case study cards */
+        .case-study-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .case-study-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .case-study-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .case-study-card:nth-child(1) { border-color: var(--accent-rose); }
+        .case-study-card:nth-child(2) { border-color: var(--accent-amber); }
+        .case-study-card:nth-child(3) { border-color: var(--accent-violet); }
+
+        .case-study-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-study-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .case-study-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .case-study-impact {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .column-content h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .column-content li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        /* Problem/solution boxes */
+        .problem-solution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .ps-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 2px solid transparent;
+        }
+
+        .ps-box.problem {
+            border-color: var(--accent-rose);
+        }
+
+        .ps-box.solution {
+            border-color: var(--accent-emerald);
+        }
+
+        .ps-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .ps-box.problem .ps-label { color: var(--accent-rose); }
+        .ps-box.solution .ps-label { color: var(--accent-emerald); }
+
+        .ps-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .ps-content ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+        }
+
+        .ps-content li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .ps-content li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+        }
+
+        .problem .ps-content li:before { color: var(--accent-rose); }
+        .solution .ps-content li:before { color: var(--accent-emerald); }
+
+        /* Big stat */
+        .big-stat {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .big-stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 400;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .big-stat-label {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .big-stat-context {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            position: relative;
+        }
+
+        .timeline-year {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--accent-amber);
+            min-width: 100px;
+        }
+
+        .timeline-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Discussion prompts */
+        .discussion-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 900px;
+            border-left: 4px solid var(--accent-amber);
+        }
+
+        .discussion-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .discussion-question {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            line-height: 1.4;
+            margin-bottom: 1.5rem;
+        }
+
+        .discussion-prompts {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .discussion-prompt {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .discussion-prompt:before {
+            content: "?";
+            position: absolute;
+            left: 0;
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        /* Impact grid */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .impact-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .impact-card:nth-child(1) { border-color: var(--accent-rose); }
+        .impact-card:nth-child(2) { border-color: var(--accent-violet); }
+        .impact-card:nth-child(3) { border-color: var(--accent-cyan); }
+        .impact-card:nth-child(4) { border-color: var(--accent-emerald); }
+
+        .impact-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .impact-icon {
+            font-size: 2rem;
+        }
+
+        .impact-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .impact-content {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .impact-stat {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .checklist-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .checklist-check {
+            font-size: 1.5rem;
+            color: var(--accent-emerald);
+            line-height: 1;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(244, 63, 94, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+        }
+
+        /* Quote block */
+        .quote-block {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 900px;
+            border-left: 6px solid var(--accent-amber);
+        }
+
+        .quote-text {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .quote-author {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Video embed */
+        .video-embed-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Enhanced bias example cards */
+        .bias-examples-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .bias-example-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid;
+        }
+
+        .bias-example-card:nth-child(1) { border-color: var(--accent-rose); }
+        .bias-example-card:nth-child(2) { border-color: var(--accent-amber); }
+        .bias-example-card:nth-child(3) { border-color: var(--accent-violet); }
+        .bias-example-card:nth-child(4) { border-color: var(--accent-cyan); }
+
+        .bias-example-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .bias-example-icon {
+            font-size: 2rem;
+        }
+
+        .bias-example-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .bias-example-year {
+            font-size: 0.8rem;
+            color: var(--accent-amber);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .bias-example-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .bias-example-impact {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .bias-example-card:nth-child(1) .bias-example-impact { color: var(--accent-rose); }
+        .bias-example-card:nth-child(2) .bias-example-impact { color: var(--accent-amber); }
+        .bias-example-card:nth-child(3) .bias-example-impact { color: var(--accent-violet); }
+        .bias-example-card:nth-child(4) .bias-example-impact { color: var(--accent-cyan); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .case-study-grid { grid-template-columns: 1fr; }
+            .problem-solution { grid-template-columns: 1fr; }
+            .impact-grid { grid-template-columns: 1fr; }
+            .bias-examples-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">AI Ethics <em>&</em> Bias</h1>
+            <p class="slide-subtitle">When artificial intelligence gets it wrong — and what happens when the decisions really matter</p>
+            <p class="stat-source">Week 4 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Promise vs Reality -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Promise vs The Reality</h2>
+            <div class="problem-solution">
+                <div class="ps-box problem">
+                    <div class="ps-label">What We're Told</div>
+                    <div class="ps-content">
+                        <ul>
+                            <li>AI makes fair, objective decisions</li>
+                            <li>Removes human bias from systems</li>
+                            <li>More efficient than humans</li>
+                            <li>Always logical and neutral</li>
+                            <li>The future of decision-making</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="ps-box solution">
+                    <div class="ps-label">What Actually Happens</div>
+                    <div class="ps-content">
+                        <ul>
+                            <li>AI amplifies existing biases</li>
+                            <li>Makes systematic errors at scale</li>
+                            <li>Harder to detect mistakes</li>
+                            <li>No accountability when wrong</li>
+                            <li>Can cause real harm to people</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">AI isn't neutral — it learns from us, flaws and all.</p>
+        </div>
+
+        <!-- Slide 3: What is AI Bias? -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What is <em>AI Bias?</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>AI bias occurs when...</h3>
+                    <ul>
+                        <li>Training data reflects historical discrimination</li>
+                        <li>Certain groups are underrepresented in data</li>
+                        <li>Programmers' assumptions shape the algorithm</li>
+                        <li>The system optimises for the wrong thing</li>
+                        <li>Context and nuance are ignored</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>The result...</h3>
+                    <ul>
+                        <li>Women and minorities discriminated against</li>
+                        <li>Incorrect decisions about people's lives</li>
+                        <li>Reinforcement of existing inequalities</li>
+                        <li>Loss of opportunities based on flawed data</li>
+                        <li>Harm that's hard to challenge or appeal</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Bias in, bias out — but faster and at massive scale.</p>
+        </div>
+
+        <!-- Slide 4: Real Examples of AI Bias -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real Examples of AI <em>Bias</em></h2>
+            <div class="bias-examples-grid">
+                <div class="bias-example-card">
+                    <div class="bias-example-year">2018 • Amazon</div>
+                    <div class="bias-example-header">
+                        <span class="bias-example-icon">👔</span>
+                        <h3 class="bias-example-title">Hiring Algorithm Discrimination</h3>
+                    </div>
+                    <p class="bias-example-desc">Amazon's AI recruiting tool systematically penalised CVs containing the word "women's" (as in "women's chess club") and downranked graduates of two all-women's colleges. The algorithm was trained on 10 years of CVs submitted to Amazon — mostly from male candidates — and learned to prefer male applicants.</p>
+                    <div class="bias-example-impact">Impact: Tool scrapped after discriminating against female candidates for tech roles</div>
+                </div>
+                <div class="bias-example-card">
+                    <div class="bias-example-year">2019 • Healthcare</div>
+                    <div class="bias-example-header">
+                        <span class="bias-example-icon">🏥</span>
+                        <h3 class="bias-example-title">Healthcare Algorithm Racial Bias</h3>
+                    </div>
+                    <p class="bias-example-desc">A widely-used US healthcare algorithm affected over 200 million people, systematically discriminating against Black patients. It used healthcare costs as a proxy for health needs — but Black patients historically receive less care due to systemic barriers, creating lower costs. The algorithm wrongly concluded Black patients were healthier than equally sick white patients.</p>
+                    <div class="bias-example-impact">Impact: Black patients needed to be significantly sicker than white patients to receive the same care recommendations</div>
+                </div>
+                <div class="bias-example-card">
+                    <div class="bias-example-year">2020 • Law Enforcement</div>
+                    <div class="bias-example-header">
+                        <span class="bias-example-icon">👁️</span>
+                        <h3 class="bias-example-title">Facial Recognition Accuracy Disparities</h3>
+                    </div>
+                    <p class="bias-example-desc">MIT and NIST studies found major facial recognition systems have error rates up to 34% higher for darker-skinned women compared to lighter-skinned men. Multiple cases of false arrests: Robert Williams (Detroit, 2020) and Michael Oliver (Detroit, 2019) were both Black men wrongly arrested after facial recognition misidentified them.</p>
+                    <div class="bias-example-impact">Impact: Wrongful arrests, false accusations, and disproportionate surveillance of communities of colour</div>
+                </div>
+                <div class="bias-example-card">
+                    <div class="bias-example-year">2024 • AI Image Generation</div>
+                    <div class="bias-example-header">
+                        <span class="bias-example-icon">🎨</span>
+                        <h3 class="bias-example-title">AI-Generated Image Stereotypes</h3>
+                    </div>
+                    <p class="bias-example-desc">Research by Bloomberg found AI image generators consistently perpetuate harmful stereotypes: prompts for "productive person" generate mostly images of white men; "person in jail" generates mostly Black men; "flight attendant" generates mostly women. These tools reflect and amplify societal biases from their training data.</p>
+                    <div class="bias-example-impact">Impact: Reinforces stereotypes and limits representation in AI-generated visual content used globally</div>
+                </div>
+            </div>
+            <p class="stat-source">These aren't edge cases — they're systematic problems affecting millions of people's lives</p>
+        </div>
+
+        <!-- Slide 5: Australian Example - Robodebt -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Robodebt: When Automation <em>Fails</em></h2>
+            <div class="two-column" style="max-width: 1100px;">
+                <div>
+                    <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; height: 100%;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--accent-rose);">What Happened</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li style="margin-bottom: 1rem;">🤖 Centrelink automated debt calculation system (2016-2019)</li>
+                            <li style="margin-bottom: 1rem;">📊 Averaged annual income data to calculate fortnightly earnings</li>
+                            <li style="margin-bottom: 1rem;">⚠️ Assumed people earned the same each fortnight</li>
+                            <li style="margin-bottom: 1rem;">💸 Issued 470,000+ debt notices</li>
+                            <li style="margin-bottom: 1rem;">❌ Most debts were incorrect or unlawful</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; height: 100%;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--accent-amber);">The Impact</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li style="margin-bottom: 1rem;">😰 Severe mental health impacts on victims</li>
+                            <li style="margin-bottom: 1rem;">💔 Multiple suicides linked to the scheme</li>
+                            <li style="margin-bottom: 1rem;">⚖️ Royal Commission found it unlawful</li>
+                            <li style="margin-bottom: 1rem;">💰 $1.8 billion in repayments ordered</li>
+                            <li style="margin-bottom: 1rem;">🎯 Disproportionately affected vulnerable people</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">A cautionary tale about automated decision-making without human oversight.</p>
+        </div>
+
+        <!-- Slide 6: Video on AI Bias -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Understanding AI <em>Bias</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">MIT researcher Joy Buolamwini explains how bias gets embedded in AI systems</p>
+            <div class="video-embed-container">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/UG_X_7g63rY" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">Joy Buolamwini's research on facial recognition bias led to the first US legislation regulating this technology</p>
+        </div>
+
+        <!-- Slide 7: Why AI Gets Things Wrong -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why AI Gets Things <em>Wrong</em></h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">🗄️</span>
+                        <span class="impact-title">Training Data Problems</span>
+                    </div>
+                    <div class="impact-content">
+                        AI learns from historical data that contains human biases. If police historically stopped more people of colour, the AI "learns" to do the same.
+                    </div>
+                    <div class="impact-stat">Garbage in, garbage out</div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">🎭</span>
+                        <span class="impact-title">Hallucinations</span>
+                    </div>
+                    <div class="impact-content">
+                        AI systems confidently make up facts, citations, and information that sound plausible but are completely false. They can't distinguish truth from invention.
+                    </div>
+                    <div class="impact-stat">Confident but wrong</div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">📊</span>
+                        <span class="impact-title">Correlation ≠ Causation</span>
+                    </div>
+                    <div class="impact-content">
+                        AI finds patterns in data but doesn't understand why. It might learn that postcode predicts loan default without understanding systemic inequality.
+                    </div>
+                    <div class="impact-stat">Pattern recognition without meaning</div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">🎯</span>
+                        <span class="impact-title">Optimising the Wrong Thing</span>
+                    </div>
+                    <div class="impact-content">
+                        Systems optimised for "engagement" promote outrage and misinformation. Healthcare AI optimised for cost reduction denies necessary care.
+                    </div>
+                    <div class="impact-stat">Meeting the metric, missing the point</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: AI Failures Timeline -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Notable AI Failures</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2018</div>
+                    <div class="timeline-content">
+                        <h4>Amazon Scraps Hiring AI</h4>
+                        <p>Amazon abandons AI recruiting tool after discovering it discriminated against women, having learned bias from historical hiring patterns.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2020</div>
+                    <div class="timeline-content">
+                        <h4>UK Exam Algorithm Disaster</h4>
+                        <p>AI system used to grade A-levels during COVID downgraded 40% of students, disproportionately affecting disadvantaged schools. Led to nationwide protests.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2023</div>
+                    <div class="timeline-content">
+                        <h4>Air Canada Chatbot Liable</h4>
+                        <p>Court rules Air Canada must honour discount promised by its AI chatbot, even though it was hallucinated. Company tried to claim chatbot was "separate legal entity."</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2024</div>
+                    <div class="timeline-content">
+                        <h4>Google AI Overview Errors</h4>
+                        <p>Google's AI-powered search suggests eating rocks for minerals, using glue on pizza, and other dangerous misinformation with complete confidence.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Privacy Concerns -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI and <em>Privacy</em></h2>
+            <div class="two-column">
+                <div>
+                    <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; border-left: 4px solid var(--accent-violet);">
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem;">What AI Companies Collect</h3>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Every conversation and prompt you enter</li>
+                            <li>Your writing style and preferences</li>
+                            <li>Personal information you share in context</li>
+                            <li>Files and documents you upload</li>
+                            <li>Your location, device, and usage patterns</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; border-left: 4px solid var(--accent-rose);">
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem;">The Risks</h3>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Your data used to train future models</li>
+                            <li>Potential data breaches expose conversations</li>
+                            <li>Information shared with third parties</li>
+                            <li>No way to fully delete your data</li>
+                            <li>AI recreates your style without consent</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">In 2024, Samsung banned ChatGPT after employees leaked sensitive code. Italian regulators temporarily banned ChatGPT over privacy concerns.</p>
+        </div>
+
+        <!-- Slide 9: Environmental Impact -->
+        <div class="slide pattern-bg">
+            <div class="big-stat">
+                <div class="big-stat-number">500kg</div>
+                <div class="big-stat-label">of CO₂ to train one large AI model</div>
+                <div class="big-stat-context">
+                    Training a single large language model emits as much carbon as five cars do over their entire lifetime. ChatGPT uses enough electricity to power 17,000 Australian homes every day. Google's AI features increased their carbon emissions by 48% in 2023.
+                    <br><br>
+                    AI data centres also consume massive amounts of water for cooling — about 500ml per 5-50 prompts, equivalent to a bottle of water.
+                </div>
+            </div>
+            <p class="stat-source">Source: University of Massachusetts Amherst, Google Environmental Report 2024</p>
+        </div>
+
+        <!-- Slide 10: Who is Responsible? -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Who is <em>Responsible</em> When AI Causes Harm?</h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">🏢</span>
+                        <span class="impact-title">The Company?</span>
+                    </div>
+                    <div class="impact-content">
+                        Many companies claim their AI is a "tool" they're not liable for, while refusing to explain how it works due to "trade secrets."
+                    </div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">👨‍💻</span>
+                        <span class="impact-title">The Developers?</span>
+                    </div>
+                    <div class="impact-content">
+                        Programmers say they only wrote code to specification. Hard to prove individual responsibility in complex systems built by large teams.
+                    </div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">🤖</span>
+                        <span class="impact-title">The AI Itself?</span>
+                    </div>
+                    <div class="impact-content">
+                        AI isn't a legal entity and can't be held accountable. Air Canada tried this argument — it failed. But legal frameworks are still unclear.
+                    </div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-header">
+                        <span class="impact-icon">👤</span>
+                        <span class="impact-title">The User?</span>
+                    </div>
+                    <div class="impact-content">
+                        Are you responsible if you trust AI advice that's wrong? What if you're required to use it by your employer or government?
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">The accountability gap: everyone points to someone else when AI causes harm.</p>
+        </div>
+
+        <!-- Slide 11: Discussion -->
+        <div class="slide gradient-bg">
+            <div class="discussion-box">
+                <div class="discussion-icon">💭</div>
+                <h3 class="discussion-question">If AI makes a decision that harms someone, who should be held accountable?</h3>
+                <div class="discussion-prompts">
+                    <div class="discussion-prompt">Should companies be liable for their AI's decisions, even if they can't fully explain how the AI reached that decision?</div>
+                    <div class="discussion-prompt">Should governments ban AI use in high-stakes decisions like welfare, healthcare, or criminal justice?</div>
+                    <div class="discussion-prompt">Is it ethical to use AI systems that are known to be biased but are "better than humans on average"?</div>
+                    <div class="discussion-prompt">Should there be a "right to human review" for all automated decisions that significantly affect you?</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Critical Thinking Checklist -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Critical Thinking with <em>AI Outputs</em></h2>
+            <div class="checklist">
+                <h3 class="checklist-title">Before trusting AI, ask...</h3>
+                <div class="checklist-items">
+                    <div class="checklist-item">
+                        <span class="checklist-check">✓</span>
+                        <span class="checklist-text"><strong>Can I verify this?</strong> Check claims against reliable sources. AI often sounds confident when it's wrong.</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">✓</span>
+                        <span class="checklist-text"><strong>Who trained this AI?</strong> What data was it trained on? Whose perspectives might be missing?</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">✓</span>
+                        <span class="checklist-text"><strong>What's the context?</strong> AI doesn't understand nuance. Is this situation more complex than the AI realises?</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">✓</span>
+                        <span class="checklist-text"><strong>Who benefits from this?</strong> Whose interests does this AI serve? What are the financial incentives?</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">✓</span>
+                        <span class="checklist-text"><strong>What could go wrong?</strong> If this is incorrect, what's the harm? Who gets hurt?</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">✓</span>
+                        <span class="checklist-text"><strong>Is there a human I can appeal to?</strong> If the AI decision is wrong, can you challenge it?</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: What Can We Do? -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What <em>Can</em> We Do?</h2>
+            <div class="two-column">
+                <div>
+                    <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px;">
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--accent-emerald);">As Individuals</h3>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Verify AI outputs before trusting them</li>
+                            <li>Protect your privacy — don't share sensitive data</li>
+                            <li>Question automated decisions that affect you</li>
+                            <li>Consider environmental impact of AI use</li>
+                            <li>Speak up when you see AI causing harm</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px;">
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--accent-cyan);">As a Society</h3>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Demand transparency in AI systems</li>
+                            <li>Require human oversight for critical decisions</li>
+                            <li>Hold companies accountable for AI harms</li>
+                            <li>Diverse teams building and testing AI</li>
+                            <li>Regulation that protects vulnerable people</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">The EU AI Act (2024) and Australia's proposed AI regulations aim to address these concerns.</p>
+        </div>
+
+        <!-- Slide 14: Key Takeaways -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key Takeaways</h2>
+            <div class="checklist" style="max-width: 900px;">
+                <div class="checklist-items">
+                    <div class="checklist-item">
+                        <span class="checklist-check">1</span>
+                        <span class="checklist-text"><strong>AI isn't neutral</strong> — it reflects the biases, limitations, and priorities of those who built it and the data it was trained on.</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">2</span>
+                        <span class="checklist-text"><strong>Real harm, real people</strong> — AI failures aren't abstract. They deny opportunities, spread misinformation, and can ruin lives (Robodebt).</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">3</span>
+                        <span class="checklist-text"><strong>Privacy matters</strong> — Everything you share with AI is collected, potentially used to train models, and could be exposed in a breach.</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">4</span>
+                        <span class="checklist-text"><strong>Environmental cost</strong> — Training and running AI models consumes enormous amounts of energy and water, contributing to climate change.</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">5</span>
+                        <span class="checklist-text"><strong>Accountability gap</strong> — When AI causes harm, it's often unclear who is responsible or how victims can get justice.</span>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-check">6</span>
+                        <span class="checklist-text"><strong>Question everything</strong> — Always verify AI outputs, understand limitations, and maintain critical thinking when using AI tools.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: End -->
+        <div class="slide gradient-bg">
+            <h1 class="slide-title">AI is a <em>Tool</em>, Not an Oracle</h1>
+            <p class="slide-subtitle">It can be incredibly useful, but it requires critical thinking, ethical consideration, and an understanding of its limitations. Don't let convenience override caution.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 16</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
