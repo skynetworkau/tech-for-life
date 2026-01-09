@@ -341,18 +341,38 @@
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(244, 114, 182, 0.1));
             border: 1px solid var(--accent-primary);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1rem 1.5rem;
             margin-top: 2rem;
         }
 
-        .teacher-notes h3 {
+        .teacher-notes summary {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1rem;
             color: var(--accent-primary);
-            margin-bottom: 1rem;
+            cursor: pointer;
+            list-style: none;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .teacher-notes summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .teacher-notes summary::after {
+            content: "▶";
+            font-size: 0.7rem;
+            margin-left: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .teacher-notes[open] summary::after {
+            transform: rotate(90deg);
+        }
+
+        .teacher-notes[open] ul {
+            margin-top: 1rem;
         }
 
         .teacher-notes ul {
@@ -791,9 +811,9 @@
             </div>
         </section>
 
-        <!-- Teacher Notes -->
-        <div class="teacher-notes">
-            <h3>📋 Teacher Notes</h3>
+        <!-- Teacher Notes (collapsible) -->
+        <details class="teacher-notes">
+            <summary>📋 Teacher Notes</summary>
             <ul>
                 <li><strong>Format:</strong> 30 min instruction + 30 min study time per session</li>
                 <li><strong>Assessment:</strong> All formative — no formal assessments</li>
@@ -803,7 +823,7 @@
                 <li><strong>Guest Speakers:</strong> Consider inviting cyber security professionals, local business owners</li>
                 <li><strong>Activities work best on:</strong> Chrome, Safari, Firefox (no special software needed)</li>
             </ul>
-        </div>
+        </details>
 
         <footer class="footer">
             <p>Tech for Life — Denmark Senior High School — 2026</p>
