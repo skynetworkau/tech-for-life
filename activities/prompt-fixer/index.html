@@ -57,10 +57,16 @@
             z-index: 1;
         }
 
-        .home-link {
+        .nav-links {
             position: fixed;
             top: 1rem;
             left: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            z-index: 100;
+        }
+
+        .home-link {
             padding: 0.5rem 1rem;
             background: var(--bg-card);
             border: 1px solid var(--bg-hover);
@@ -68,7 +74,6 @@
             text-decoration: none;
             font-size: 0.75rem;
             transition: all 0.2s ease;
-            z-index: 100;
         }
 
         .home-link:hover {
@@ -537,12 +542,16 @@
             .option-btn { padding: 1rem; font-size: 0.85rem; }
             .progress-dots { gap: 0.3rem; }
             .dot { width: 10px; height: 10px; }
-            .home-link { top: 0.5rem; left: 0.5rem; }
+            .nav-links { top: 0.5rem; left: 0.5rem; flex-direction: column; gap: 0.5rem; }
+            .home-link { padding: 0.4rem 0.8rem; }
         }
     </style>
 </head>
 <body>
-    <a href="../../index.html" class="home-link">← COURSE HOME</a>
+    <div class="nav-links">
+        <a href="../../presentations/week1-what-is-ai/index.html" class="home-link">← WEEK 1</a>
+        <a href="../../index.html" class="home-link">COURSE HOME</a>
+    </div>
 
     <div class="container">
         <header class="header">

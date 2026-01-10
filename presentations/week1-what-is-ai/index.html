@@ -563,6 +563,8 @@
         .tool-card-v2:nth-child(6) { border-color: #ec4899; }
         .tool-card-v2:nth-child(7) { border-color: #f59e0b; }
         .tool-card-v2:nth-child(8) { border-color: #14b8a6; }
+        .tool-card-v2:nth-child(9) { border-color: #ef4444; }
+        .tool-card-v2:nth-child(10) { border-color: #6366f1; }
 
         .tool-logo-v2 {
             width: 40px;
@@ -877,7 +879,7 @@
                         <div class="tooltip-usecases"><strong>Use for:</strong> Essays, emails, job applications, any professional writing</div>
                     </div>
                 </div>
-                <!-- Midjourney/DALL-E -->
+                <!-- Ideogram -->
                 <div class="tool-card-v2" onclick="window.open('https://ideogram.ai', '_blank')">
                     <div class="tool-logo-v2">
                         <img src="https://www.google.com/s2/favicons?domain=ideogram.ai&sz=64" alt="Ideogram">
@@ -888,6 +890,32 @@
                         <div class="tooltip-title">🖼️ Ideogram</div>
                         <div class="tooltip-desc">Free AI image generator that's great with text in images. Create posters, logos, artwork from text descriptions.</div>
                         <div class="tooltip-usecases"><strong>Use for:</strong> Creating visuals for projects, posters, social media graphics, concept art</div>
+                    </div>
+                </div>
+                <!-- Turnitin -->
+                <div class="tool-card-v2" onclick="window.open('https://www.turnitin.com', '_blank')">
+                    <div class="tool-logo-v2">
+                        <img src="https://www.google.com/s2/favicons?domain=turnitin.com&sz=64" alt="Turnitin">
+                    </div>
+                    <div class="tool-name-v2">Turnitin</div>
+                    <div class="tool-usecase">Plagiarism Check</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">📝 Turnitin</div>
+                        <div class="tooltip-desc">Industry standard plagiarism checker. Pro tip: Use DRAFT MODE to check your work before final submission. Submit → see similarity report → rewrite flagged sections → resubmit.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Checking essays before submission, finding accidental plagiarism, improving citations</div>
+                    </div>
+                </div>
+                <!-- Quetext -->
+                <div class="tool-card-v2" onclick="window.open('https://www.quetext.com', '_blank')">
+                    <div class="tool-logo-v2">
+                        <img src="https://www.google.com/s2/favicons?domain=quetext.com&sz=64" alt="Quetext">
+                    </div>
+                    <div class="tool-name-v2">Quetext</div>
+                    <div class="tool-usecase">Free Plagiarism Check</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">🔍 Quetext</div>
+                        <div class="tooltip-desc">Free plagiarism checker alternative to Turnitin. Great for checking your work before submitting. Shows exact matches and sources.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Quick plagiarism checks, verifying originality, finding unintentional matches</div>
                     </div>
                 </div>
             </div>
@@ -1114,35 +1142,36 @@
         </div>
 
         <!-- Slide 13: Hands-On Activity -->
-        <div class="slide">
-            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Let's <em>Play</em></h2>
-            <div class="activity-section">
-                <h3>Choose Your Challenge</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Pick a game and see how you stack up against your classmates:</p>
-                <div class="activity-list">
-                    <div class="activity-item" style="cursor: pointer;" onclick="window.open('../../activities/ai-or-human/index.html', '_blank')">
-                        <div class="activity-number">🤖</div>
-                        <div class="activity-text">
-                            <strong>AI or Human?</strong> Can you spot machine-made content? 15 tricky examples, leaderboard, streak bonuses. Who's got the best detection skills?
-                        </div>
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Week 1 <em>Activities</em></h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center;">Pick a challenge and compete with your classmates</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1000px;">
+                <a href="../../activities/ai-or-human/index.html" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div class="content-box" style="text-align: center; padding: 2rem 1.5rem; transition: all 0.3s ease; border: 2px solid transparent; cursor: pointer;" onmouseover="this.style.borderColor='var(--accent-violet)'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)';">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                        <h3 style="color: var(--accent-violet); font-size: 1.3rem; margin-bottom: 0.75rem;">AI or Human?</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">Can you spot machine-made content? 15 tricky examples with leaderboard.</p>
+                        <div style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-violet); border-radius: 50px; display: inline-block; font-size: 0.8rem; font-weight: 600;">PLAY NOW →</div>
                     </div>
-                    <div class="activity-item" style="cursor: pointer;" onclick="window.open('../../activities/fact-or-cap/index.html', '_blank')">
-                        <div class="activity-number">🧢</div>
-                        <div class="activity-text">
-                            <strong>Fact or Cap?</strong> AI makes stuff up. A lot. Can you spot the hallucinations? Learn to never trust AI blindly again.
-                        </div>
+                </a>
+                <a href="../../activities/fact-or-cap/index.html" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div class="content-box" style="text-align: center; padding: 2rem 1.5rem; transition: all 0.3s ease; border: 2px solid transparent; cursor: pointer;" onmouseover="this.style.borderColor='var(--accent-amber)'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)';">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🧢</div>
+                        <h3 style="color: var(--accent-amber); font-size: 1.3rem; margin-bottom: 0.75rem;">Fact or Cap?</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">AI hallucinates constantly. Can you spot the made-up facts?</p>
+                        <div style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-amber); border-radius: 50px; display: inline-block; font-size: 0.8rem; font-weight: 600; color: #000;">PLAY NOW →</div>
                     </div>
-                    <div class="activity-item" style="cursor: pointer;" onclick="window.open('../../activities/prompt-fixer/index.html', '_blank')">
-                        <div class="activity-number">🔧</div>
-                        <div class="activity-text">
-                            <strong>Prompt Fixer:</strong> Bad prompts = bad results. Fix broken prompts and level up your prompt engineering skills.
-                        </div>
+                </a>
+                <a href="../../activities/prompt-fixer/index.html" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div class="content-box" style="text-align: center; padding: 2rem 1.5rem; transition: all 0.3s ease; border: 2px solid transparent; cursor: pointer;" onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)';">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔧</div>
+                        <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 0.75rem;">Prompt Fixer</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">Bad prompts = bad results. Level up your prompt engineering.</p>
+                        <div style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-cyan); border-radius: 50px; display: inline-block; font-size: 0.8rem; font-weight: 600; color: #000;">PLAY NOW →</div>
                     </div>
-                </div>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
-                    Click any card to open the game • Compare your scores at the end • Top scorers get bragging rights
-                </p>
+                </a>
             </div>
+            <p class="stat-source" style="margin-top: 2rem;">Click any activity to open in a new tab • Compare scores at the end</p>
         </div>
 
         <!-- Slide 14: Discussion Questions -->
