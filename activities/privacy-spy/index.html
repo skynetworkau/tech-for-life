@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Spy // Find the Risks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0c0c0c;
+            --bg-card: #161616;
+            --bg-profile: #1c1c1c;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-yellow: #eab308;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --text-white: #fafafa;
+            --text-gray: #a1a1a1;
+            --text-muted: #666;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.8rem;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+
+        .home-link:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .logo .privacy { color: var(--accent-red); }
+        .logo .spy { color: var(--text-white); }
+
+        .tagline {
+            color: var(--text-gray);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+        }
+
+        .stat-value.found { color: var(--accent-green); }
+        .stat-value.total { color: var(--accent-yellow); }
+        .stat-value.score { color: var(--accent-blue); }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Game Area */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Profile Card - Looks like social media */
+        .profile-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--bg-profile);
+            border: 4px solid var(--bg-card);
+            position: absolute;
+            bottom: -50px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .profile-body {
+            padding: 60px 24px 24px;
+        }
+
+        .profile-name {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-handle {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-bio {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: var(--text-gray);
+        }
+
+        .profile-bio .risk-item {
+            display: inline;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
+        .profile-bio .risk-item:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .profile-bio .risk-item.found {
+            background: rgba(34, 197, 94, 0.3);
+            color: var(--accent-green);
+        }
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid #333;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        .detail-row .icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .detail-row .risk-item {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+            padding: 0 4px;
+        }
+
+        .detail-row .risk-item:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .detail-row .risk-item.found {
+            background: rgba(34, 197, 94, 0.3);
+            color: var(--accent-green);
+        }
+
+        /* Posts */
+        .posts-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #333;
+        }
+
+        .posts-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .post {
+            background: var(--bg-profile);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-gray);
+        }
+
+        .post-text .risk-item {
+            display: inline;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
+        .post-text .risk-item:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .post-text .risk-item.found {
+            background: rgba(34, 197, 94, 0.3);
+            color: var(--accent-green);
+        }
+
+        .post-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 150px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .post-image .risk-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .post-image .risk-item:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .post-image .risk-item.found {
+            background: rgba(34, 197, 94, 0.3);
+            color: var(--accent-green);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .risks-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .risks-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .risks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .risk-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            background: var(--bg-profile);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .risk-tag.found {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+
+        .risk-tag .check {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .risk-tag.found .check {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+            color: var(--bg-dark);
+        }
+
+        /* Explanation Panel */
+        .explanation-panel {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-green);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .explanation-panel.show { display: block; }
+
+        .explanation-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* Progress */
+        .progress-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .progress-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-profile);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* Next Button */
+        .next-btn {
+            display: none;
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent-green);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-dark);
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .next-btn.show { display: block; }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+        }
+
+        .start-screen p {
+            color: var(--text-gray);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        .risk-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .risk-example {
+            padding: 1rem;
+            background: var(--bg-profile);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .risk-example .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-example .label {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        .start-btn {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.1rem;
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+        }
+
+        .final-score {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 4rem;
+            color: var(--accent-green);
+        }
+
+        .final-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+        }
+
+        .takeaways {
+            background: var(--bg-profile);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .takeaways h3 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-yellow);
+            margin-bottom: 1rem;
+        }
+
+        .takeaways ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .takeaways li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .takeaways li::before {
+            content: "⚠️";
+            position: absolute;
+            left: 0;
+        }
+
+        .play-again-btn {
+            font-family: 'Archivo Black', sans-serif;
+            padding: 1rem 2rem;
+            background: transparent;
+            border: 2px solid var(--accent-red);
+            border-radius: 8px;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .play-again-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">← Back to Course</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="privacy">PRIVACY</span>
+                <span class="spy">SPY</span>
+            </h1>
+            <p class="tagline">Click on personal info that shouldn't be public</p>
+        </header>
+
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <div class="start-screen">
+                <p>People overshare on social media without realising. Your job: find all the personal information that could be used by scammers, stalkers, or identity thieves.</p>
+
+                <div class="risk-examples">
+                    <div class="risk-example">
+                        <div class="icon">📍</div>
+                        <div class="label">Location Data</div>
+                    </div>
+                    <div class="risk-example">
+                        <div class="icon">📅</div>
+                        <div class="label">Birth Date</div>
+                    </div>
+                    <div class="risk-example">
+                        <div class="icon">🏠</div>
+                        <div class="label">Address</div>
+                    </div>
+                    <div class="risk-example">
+                        <div class="icon">💼</div>
+                        <div class="label">Workplace</div>
+                    </div>
+                    <div class="risk-example">
+                        <div class="icon">📱</div>
+                        <div class="label">Phone/Email</div>
+                    </div>
+                    <div class="risk-example">
+                        <div class="icon">🔑</div>
+                        <div class="label">Security Answers</div>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="startGame()">START INVESTIGATING</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value found" id="foundDisplay">0</div>
+                    <div class="stat-label">Found</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value total" id="totalDisplay">0</div>
+                    <div class="stat-label">Total Risks</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value score" id="scoreDisplay">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="profile-card" id="profileCard"></div>
+
+                <div class="sidebar">
+                    <div class="progress-section">
+                        <div class="progress-title">Profile <span id="profileNum">1</span> of <span id="profileTotal">3</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Find all the privacy risks!</div>
+                    </div>
+
+                    <div class="risks-panel">
+                        <div class="risks-title">🎯 Risks to Find</div>
+                        <div class="risks-list" id="risksList"></div>
+                    </div>
+
+                    <div class="explanation-panel" id="explanationPanel">
+                        <div class="explanation-title" id="explanationTitle">Nice find!</div>
+                        <div class="explanation-text" id="explanationText"></div>
+                    </div>
+
+                    <button class="next-btn" id="nextBtn" onclick="nextProfile()">Next Profile →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" class="hidden">
+            <div class="end-screen">
+                <div class="final-score" id="finalScore">0</div>
+                <div class="final-label">Privacy Risks Identified</div>
+
+                <div class="takeaways">
+                    <h3>What You Should Do</h3>
+                    <ul>
+                        <li>Audit your own social media for these same risks</li>
+                        <li>Never share your birthday, address, or phone publicly</li>
+                        <li>Location tags reveal your routine to stalkers</li>
+                        <li>Workplace info enables targeted phishing attacks</li>
+                        <li>Pet names, school names, etc. are common security question answers</li>
+                        <li>Photos can reveal location through landmarks or metadata</li>
+                    </ul>
+                </div>
+
+                <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const profiles = [
+            {
+                avatar: "👩",
+                name: "Sarah Mitchell",
+                handle: "@sarahmitch_23",
+                bio: `Living my best life in <span class="risk-item" data-risk="suburb">Scarborough</span> 🌊 | <span class="risk-item" data-risk="workplace">Barista at The Local Grind</span> | Dog mum to <span class="risk-item" data-risk="pet-name">Cooper</span> 🐕 | <span class="risk-item" data-risk="birthday">Turning 19 on March 15!</span> 🎂`,
+                details: [
+                    { icon: "📍", text: `<span class="risk-item" data-risk="suburb">Scarborough, WA</span>` },
+                    { icon: "🎓", text: `Class of 2024 - <span class="risk-item" data-risk="school">Denmark SHS</span>` },
+                    { icon: "📧", text: `<span class="risk-item" data-risk="email">sarah.mitchell2005@gmail.com</span>` }
+                ],
+                posts: [
+                    {
+                        text: `Can't believe I got into <span class="risk-item" data-risk="uni">UWA</span>! Starting <span class="risk-item" data-risk="course">nursing</span> in Feb 😍`,
+                        meta: "2 days ago • 47 likes",
+                        image: null
+                    },
+                    {
+                        text: `Coffee run before my shift! ☕ Love working <span class="risk-item" data-risk="schedule">every Saturday morning</span>`,
+                        meta: "5 days ago • 23 likes",
+                        image: `📸 <span class="risk-item" data-risk="location-photo">Photo showing café storefront with street number visible</span>`
+                    }
+                ],
+                risks: [
+                    { id: "suburb", label: "Home suburb", explanation: "Knowing someone's suburb narrows down where they live. Combined with other info, stalkers can find exact addresses." },
+                    { id: "workplace", label: "Workplace", explanation: "Scammers can impersonate your employer. Stalkers know where to find you. Criminals know when you're not home." },
+                    { id: "pet-name", label: "Pet's name", explanation: "Pet names are one of the most common security question answers. This info helps hackers reset your passwords." },
+                    { id: "birthday", label: "Birthday", explanation: "Birth dates are used for identity verification by banks and government. Plus exact date + year = potential identity theft." },
+                    { id: "school", label: "School name", explanation: "Another common security question answer. Also helps build a profile for social engineering attacks." },
+                    { id: "email", label: "Email address", explanation: "Public emails get targeted for phishing. Scammers can now send you personalised fake messages that look legitimate." },
+                    { id: "uni", label: "University", explanation: "Scammers can send fake uni emails. Also reveals your location and schedule for much of the year." },
+                    { id: "course", label: "Course/degree", explanation: "Enables targeted phishing - fake placement offers, textbook scams, 'student survey' scams." },
+                    { id: "schedule", label: "Work schedule", explanation: "Regular schedules tell criminals when you're definitely not home. Burglars love this info." },
+                    { id: "location-photo", label: "Location in photo", explanation: "Photos reveal locations through landmarks, street signs, or even EXIF metadata. Delete location data before posting." }
+                ]
+            },
+            {
+                avatar: "👨",
+                name: "Jake Thompson",
+                handle: "@jakethomo",
+                bio: `<span class="risk-item" data-risk="age">18</span> | <span class="risk-item" data-risk="employer">Woolies</span> crew represent 🛒 | Gaming is life 🎮 | <span class="risk-item" data-risk="car">2015 Mazda 3</span> is my baby`,
+                details: [
+                    { icon: "📍", text: `<span class="risk-item" data-risk="location">Albany, Western Australia</span>` },
+                    { icon: "📱", text: `<span class="risk-item" data-risk="phone">0412 XXX XXX</span> (DM for full number)` },
+                    { icon: "🎮", text: `PSN: <span class="risk-item" data-risk="gaming-handle">JakeT_2005</span>` }
+                ],
+                posts: [
+                    {
+                        text: `Finally got my P plates! 🚗 Watch out <span class="risk-item" data-risk="suburb2">Middleton Beach</span> roads lol`,
+                        meta: "1 week ago • 89 likes",
+                        image: `📸 <span class="risk-item" data-risk="license-plate">Photo of car with license plate visible</span>`
+                    },
+                    {
+                        text: `Off to Bali with the boys <span class="risk-item" data-risk="travel-dates">Dec 15-28</span>! First international trip 🌴✈️`,
+                        meta: "3 days ago • 156 likes",
+                        image: null
+                    }
+                ],
+                risks: [
+                    { id: "age", label: "Exact age", explanation: "Combined with name and location, age helps identity thieves. Also indicates you might be easier to scam (young = inexperienced)." },
+                    { id: "employer", label: "Employer", explanation: "Enables fake work emails, roster scams, and superannuation fraud. Criminals can impersonate your manager." },
+                    { id: "car", label: "Car details", explanation: "Make/model + area = easy to locate your vehicle. Thieves target specific cars. Insurance scammers love this info." },
+                    { id: "location", label: "Town/city", explanation: "Combined with other details, this helps narrow down your identity and physical location." },
+                    { id: "phone", label: "Phone number hint", explanation: "Even partial numbers help. Scammers use this to seem legitimate when they call - 'Is this the number ending in XXX?'" },
+                    { id: "gaming-handle", label: "Gaming username", explanation: "Contains birth year! Usernames are often reused. Hackers can find other accounts and attempt password resets." },
+                    { id: "suburb2", label: "Suburb", explanation: "Another location data point. Combined with workplace and car, someone could track your movements." },
+                    { id: "license-plate", label: "License plate", explanation: "Plates can be used to identify your address through illegal databases. Also enables cloning your plates for crime." },
+                    { id: "travel-dates", label: "Travel dates", explanation: "NEVER post when you're away! This is literally telling burglars your house is empty for 2 weeks." }
+                ]
+            },
+            {
+                avatar: "👩‍🦰",
+                name: "Emma Chen",
+                handle: "@emmzchen",
+                bio: `Mum to <span class="risk-item" data-risk="child-name">Lily</span> (3) 👶 | <span class="risk-item" data-risk="relationship">Married to my best friend @michael_chen</span> | <span class="risk-item" data-risk="job-title">HR Manager</span> at <span class="risk-item" data-risk="company">Rio Tinto</span>`,
+                details: [
+                    { icon: "📍", text: `<span class="risk-item" data-risk="address">Living the dream in Karratha</span>` },
+                    { icon: "🏠", text: `Proud owners of <span class="risk-item" data-risk="house-street">12 Banksia Drive</span>` },
+                    { icon: "🎂", text: `Lily's birthday: <span class="risk-item" data-risk="child-bday">October 8</span>` }
+                ],
+                posts: [
+                    {
+                        text: `First day of kindy for my baby! 😭❤️ <span class="risk-item" data-risk="childcare">Little Explorers Early Learning Centre</span> better take good care of her!`,
+                        meta: "1 day ago • 234 likes",
+                        image: `📸 <span class="risk-item" data-risk="child-photo">Photo of child in school uniform at front door</span>`
+                    },
+                    {
+                        text: `Working from home today while hubby's at the <span class="risk-item" data-risk="spouse-workplace">mine site</span> for his <span class="risk-item" data-risk="roster">2 weeks on</span>. Miss him already!`,
+                        meta: "4 days ago • 67 likes",
+                        image: null
+                    }
+                ],
+                risks: [
+                    { id: "child-name", label: "Child's name", explanation: "Children's names are used in social engineering. Scammers can call claiming something happened to your child." },
+                    { id: "relationship", label: "Partner's social", explanation: "Links to spouse's account gives criminals more info. They can cross-reference both profiles for attacks." },
+                    { id: "job-title", label: "Job title", explanation: "HR Manager = high value target for business email compromise. You have access to employee data and finances." },
+                    { id: "company", label: "Company name", explanation: "Large company = sophisticated phishing attacks. Criminals research company structure to impersonate executives." },
+                    { id: "address", label: "Town", explanation: "Remote mining town + specific suburb = very easy to locate. Small communities have less anonymity." },
+                    { id: "house-street", label: "Street address", explanation: "NEVER post your actual address. This is identity theft and stalking gold. Anyone can now find your house." },
+                    { id: "child-bday", label: "Child's birthday", explanation: "Children's DOBs are used for identity fraud. Kids' identities get stolen because parents don't monitor credit." },
+                    { id: "childcare", label: "Childcare centre", explanation: "Extremely dangerous to post. Predators use this info. Anyone could claim to be picking up your child." },
+                    { id: "child-photo", label: "Child photo + home", explanation: "Photos of kids at home reveal where they live. School uniforms identify the school. Major safety risk." },
+                    { id: "spouse-workplace", label: "Spouse's workplace", explanation: "Reveals the family's financial situation and when dad is away. Valuable for targeted scams." },
+                    { id: "roster", label: "Work roster pattern", explanation: "Two weeks on = two weeks when only mum is home. Criminals note these patterns for home invasions." }
+                ]
+            }
+        ];
+
+        let currentProfile = 0;
+        let foundRisks = [];
+        let totalFound = 0;
+        let score = 0;
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            loadProfile();
+        }
+
+        function loadProfile() {
+            const profile = profiles[currentProfile];
+            foundRisks = [];
+
+            document.getElementById('profileNum').textContent = currentProfile + 1;
+            document.getElementById('profileTotal').textContent = profiles.length;
+            document.getElementById('totalDisplay').textContent = profile.risks.length;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = 'Find all the privacy risks!';
+            document.getElementById('nextBtn').classList.remove('show');
+            document.getElementById('explanationPanel').classList.remove('show');
+
+            // Build profile HTML
+            let postsHtml = profile.posts.map(post => `
+                <div class="post">
+                    <p class="post-text">${post.text}</p>
+                    ${post.image ? `<div class="post-image">${post.image}</div>` : ''}
+                    <div class="post-meta">${post.meta}</div>
+                </div>
+            `).join('');
+
+            let detailsHtml = profile.details.map(d => `
+                <div class="detail-row">
+                    <span class="icon">${d.icon}</span>
+                    <span>${d.text}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('profileCard').innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar">${profile.avatar}</div>
+                </div>
+                <div class="profile-body">
+                    <h2 class="profile-name">${profile.name}</h2>
+                    <p class="profile-handle">${profile.handle}</p>
+                    <p class="profile-bio">${profile.bio}</p>
+                    <div class="profile-details">${detailsHtml}</div>
+                    <div class="posts-section">
+                        <div class="posts-title">Recent Posts</div>
+                        ${postsHtml}
+                    </div>
+                </div>
+            `;
+
+            // Build risks list
+            document.getElementById('risksList').innerHTML = profile.risks.map(r => `
+                <div class="risk-tag" id="risk-tag-${r.id}">
+                    <span class="check"></span>
+                    <span>${r.label}</span>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.risk-item').forEach(item => {
+                item.addEventListener('click', () => handleRiskClick(item));
+            });
+        }
+
+        function handleRiskClick(element) {
+            const riskId = element.dataset.risk;
+            if (foundRisks.includes(riskId)) return;
+
+            const profile = profiles[currentProfile];
+            const risk = profile.risks.find(r => r.id === riskId);
+
+            if (risk) {
+                foundRisks.push(riskId);
+                totalFound++;
+                score += 10;
+
+                element.classList.add('found');
+                document.getElementById('risk-tag-' + riskId).classList.add('found');
+
+                document.getElementById('foundDisplay').textContent = foundRisks.length;
+                document.getElementById('scoreDisplay').textContent = score;
+
+                const progress = (foundRisks.length / profile.risks.length) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+
+                // Show explanation
+                document.getElementById('explanationTitle').textContent = '🎯 ' + risk.label;
+                document.getElementById('explanationText').textContent = risk.explanation;
+                document.getElementById('explanationPanel').classList.add('show');
+
+                // Check if all found
+                if (foundRisks.length === profile.risks.length) {
+                    document.getElementById('progressText').textContent = 'All risks found! 🎉';
+                    document.getElementById('nextBtn').classList.add('show');
+                }
+            }
+        }
+
+        function nextProfile() {
+            currentProfile++;
+            if (currentProfile >= profiles.length) {
+                endGame();
+            } else {
+                loadProfile();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+
+            const totalRisks = profiles.reduce((sum, p) => sum + p.risks.length, 0);
+            document.getElementById('finalScore').textContent = totalFound + '/' + totalRisks;
+        }
+
+        function resetGame() {
+            currentProfile = 0;
+            foundRisks = [];
+            totalFound = 0;
+            score = 0;
+
+            document.getElementById('foundDisplay').textContent = '0';
+            document.getElementById('scoreDisplay').textContent = '0';
+
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

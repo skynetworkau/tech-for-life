@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Frenzy // Spot the Fake Links</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-hover: #21262d;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-yellow: #d29922;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --text-white: #f0f6fc;
+            --text-gray: #8b949e;
+            --text-muted: #6e7681;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-hover);
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.75rem;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+
+        .home-link:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            letter-spacing: 0.05em;
+        }
+
+        .logo .phishing { color: var(--accent-red); }
+        .logo .frenzy { color: var(--accent-yellow); }
+
+        .tagline {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Russo One', sans-serif;
+            font-size: 2rem;
+        }
+
+        .stat-value.score { color: var(--accent-yellow); }
+        .stat-value.streak { color: var(--accent-purple); }
+        .stat-value.timer { color: var(--accent-blue); }
+        .stat-value.timer.danger { color: var(--accent-red); animation: pulse 0.5s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Game Area */
+        .game-area {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-hover);
+            border-radius: 12px;
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        /* URL Display */
+        .url-context {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .context-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .context-scenario {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .url-display {
+            background: var(--bg-dark);
+            border: 2px solid var(--bg-hover);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .url-display::before {
+            content: '🔗';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .url-text {
+            font-size: 1.1rem;
+            word-break: break-all;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        .url-text .suspicious {
+            color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        /* Choice Buttons */
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .choice-btn {
+            font-family: 'Russo One', sans-serif;
+            font-size: 1.2rem;
+            padding: 1.5rem;
+            border: 3px solid;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .choice-btn span {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        .choice-btn.legit {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .choice-btn.legit:hover:not(:disabled) {
+            background: rgba(63, 185, 80, 0.1);
+            transform: scale(1.02);
+        }
+
+        .choice-btn.phish {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .choice-btn.phish:hover:not(:disabled) {
+            background: rgba(248, 81, 73, 0.1);
+            transform: scale(1.02);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .choice-btn.correct {
+            background: rgba(63, 185, 80, 0.2) !important;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .choice-btn.wrong {
+            background: rgba(248, 81, 73, 0.2) !important;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.5); }
+            100% { box-shadow: 0 0 0 20px rgba(63, 185, 80, 0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Result Panel */
+        .result-panel {
+            display: none;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-panel.show { display: block; }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-icon { font-size: 1.5rem; }
+        .result-title { font-family: 'Russo One', sans-serif; }
+        .result-title.correct { color: var(--accent-green); }
+        .result-title.wrong { color: var(--accent-red); }
+
+        .result-url {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .result-url .highlight {
+            color: var(--accent-red);
+            font-weight: 700;
+        }
+
+        .result-explanation {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            line-height: 1.7;
+        }
+
+        .result-explanation strong {
+            color: var(--accent-yellow);
+        }
+
+        .next-btn {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--accent-blue);
+            border: none;
+            border-radius: 6px;
+            color: var(--bg-dark);
+            font-family: 'Russo One', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(88, 166, 255, 0.3);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .start-screen p {
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .tips-preview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .tip-item {
+            background: var(--bg-dark);
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .tip-item .icon {
+            margin-right: 0.5rem;
+        }
+
+        .tip-item .text {
+            color: var(--text-gray);
+        }
+
+        .start-btn {
+            font-family: 'Russo One', sans-serif;
+            font-size: 1.2rem;
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .final-score {
+            font-family: 'Russo One', sans-serif;
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .final-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .accuracy-display {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+        }
+
+        .accuracy-display span {
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 6px;
+            font-family: 'Russo One', sans-serif;
+            color: var(--accent-yellow);
+            margin-bottom: 2rem;
+        }
+
+        .key-signs {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .key-signs h3 {
+            font-family: 'Russo One', sans-serif;
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .key-signs ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .key-signs li {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            padding: 0.3rem 0;
+        }
+
+        .key-signs li::before {
+            content: "⚠️ ";
+        }
+
+        .play-again-btn {
+            font-family: 'Russo One', sans-serif;
+            padding: 1rem 2rem;
+            background: transparent;
+            border: 2px solid var(--accent-blue);
+            border-radius: 6px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .play-again-btn:hover {
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .choices { grid-template-columns: 1fr; }
+            .tips-preview { grid-template-columns: 1fr; }
+            .stats-bar { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">← Back to Course</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="phishing">PHISHING</span>
+                <span class="frenzy">FRENZY</span>
+            </h1>
+            <p class="tagline">Spot fake links before time runs out</p>
+        </header>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="game-area">
+            <div class="start-screen">
+                <p>Scammers create fake websites that look real to steal your data. You'll see URLs - decide if they're <strong>LEGIT</strong> or <strong>PHISHING</strong>. Fast answers = bonus points!</p>
+
+                <div class="tips-preview">
+                    <div class="tip-item">
+                        <span class="icon">🔍</span>
+                        <span class="text">Check the domain carefully</span>
+                    </div>
+                    <div class="tip-item">
+                        <span class="icon">🔤</span>
+                        <span class="text">Look for misspellings</span>
+                    </div>
+                    <div class="tip-item">
+                        <span class="icon">➖</span>
+                        <span class="text">Extra hyphens = suspicious</span>
+                    </div>
+                    <div class="tip-item">
+                        <span class="icon">🌐</span>
+                        <span class="text">Weird domains (.xyz, .top)</span>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="startGame()">START SCANNING</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value score" id="scoreDisplay">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value streak" id="streakDisplay">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value timer" id="timerDisplay">10</div>
+                    <div class="stat-label">Seconds</div>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="url-context">
+                    <div class="context-label">📧 You received this link:</div>
+                    <div class="context-scenario" id="scenarioText"></div>
+                </div>
+
+                <div class="url-display">
+                    <div class="url-text" id="urlText"></div>
+                </div>
+
+                <div class="choices">
+                    <button class="choice-btn legit" id="legitBtn" onclick="makeChoice('legit')">
+                        ✓ LEGIT
+                        <span>This link is safe</span>
+                    </button>
+                    <button class="choice-btn phish" id="phishBtn" onclick="makeChoice('phish')">
+                        ✗ PHISH
+                        <span>This is a scam</span>
+                    </button>
+                </div>
+
+                <div class="result-panel" id="resultPanel">
+                    <div class="result-header">
+                        <span class="result-icon" id="resultIcon">✓</span>
+                        <span class="result-title" id="resultTitle">Correct!</span>
+                    </div>
+                    <div class="result-url" id="resultUrl"></div>
+                    <div class="result-explanation" id="resultExplanation"></div>
+                    <button class="next-btn" onclick="nextQuestion()">Next Link →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" class="hidden game-area">
+            <div class="end-screen">
+                <div class="final-score" id="finalScore">0</div>
+                <div class="final-label">Final Score</div>
+                <div class="accuracy-display" id="accuracyDisplay">You caught <span>0/20</span> phishing attempts</div>
+                <div class="rank-badge" id="rankBadge">PHISHING NOVICE</div>
+
+                <div class="key-signs">
+                    <h3>Key Signs of Phishing URLs</h3>
+                    <ul>
+                        <li>Misspelled company names (g00gle, arnazon)</li>
+                        <li>Extra words (secure-paypal-login.com)</li>
+                        <li>Suspicious domains (.xyz, .top, .click)</li>
+                        <li>Subdomains pretending to be real (paypal.scamsite.com)</li>
+                        <li>Random numbers or letters</li>
+                        <li>Too many hyphens</li>
+                        <li>HTTP instead of HTTPS (but HTTPS doesn't mean safe!)</li>
+                    </ul>
+                </div>
+
+                <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                url: "https://www.commbank.com.au/banking/accounts",
+                scenario: "CBA asking you to check your account",
+                isPhish: false,
+                explanation: "This is the <strong>real CommBank URL</strong>. The domain 'commbank.com.au' is correct and uses HTTPS."
+            },
+            {
+                url: "https://www.cornmbank-secure.com/login",
+                scenario: "CBA urgent security alert email",
+                isPhish: true,
+                highlight: "cornmbank",
+                explanation: "PHISHING! Look closely - it says '<strong>cornmbank</strong>' not 'commbank'. The 'm' is replaced with 'rn'. This is a classic phishing trick."
+            },
+            {
+                url: "https://www.paypal.com/au/signin",
+                scenario: "PayPal payment confirmation",
+                isPhish: false,
+                explanation: "This is the <strong>real PayPal URL</strong>. Domain 'paypal.com' with the /au/ path for Australia is legitimate."
+            },
+            {
+                url: "https://paypal-secure-login.com/verify",
+                scenario: "PayPal account verification required",
+                isPhish: true,
+                highlight: "paypal-secure-login.com",
+                explanation: "PHISHING! The real domain is 'paypal.com'. This is '<strong>paypal-secure-login.com</strong>' - a completely different website trying to look official."
+            },
+            {
+                url: "https://www.australia.gov.au/mygov",
+                scenario: "myGov linking your accounts",
+                isPhish: false,
+                explanation: "This is <strong>legitimate</strong>. The 'gov.au' domain is controlled by the Australian government."
+            },
+            {
+                url: "https://mygov-australia.com.au/refund",
+                scenario: "ATO tax refund notification",
+                isPhish: true,
+                highlight: "mygov-australia.com.au",
+                explanation: "PHISHING! Real myGov is at 'my.gov.au'. This is '<strong>mygov-australia.com.au</strong>' - anyone can register .com.au domains!"
+            },
+            {
+                url: "https://www.netflix.com/au/login",
+                scenario: "Netflix payment update needed",
+                isPhish: false,
+                explanation: "This is the <strong>real Netflix URL</strong>. The domain 'netflix.com' is correct."
+            },
+            {
+                url: "https://netflix-billing-update.xyz/account",
+                scenario: "Netflix billing issue - urgent",
+                isPhish: true,
+                highlight: ".xyz",
+                explanation: "PHISHING! Netflix would never use a '<strong>.xyz</strong>' domain. The real domain is netflix.com. Suspicious TLDs like .xyz, .top, .click are red flags."
+            },
+            {
+                url: "https://www.telstra.com.au/mytelstra",
+                scenario: "Telstra bill is ready to view",
+                isPhish: false,
+                explanation: "This is <strong>legitimate</strong>. The domain 'telstra.com.au' is the real Telstra website."
+            },
+            {
+                url: "https://telstra.billing-portal.net/overdue",
+                scenario: "Telstra overdue bill warning",
+                isPhish: true,
+                highlight: "billing-portal.net",
+                explanation: "PHISHING! The real domain is 'telstra.com.au'. Here, '<strong>telstra</strong>' is just a subdomain of 'billing-portal.net' - a scam site."
+            },
+            {
+                url: "https://www.amazon.com.au/gp/orders",
+                scenario: "Amazon order shipped",
+                isPhish: false,
+                explanation: "This is the <strong>real Amazon Australia URL</strong>. The domain 'amazon.com.au' is correct."
+            },
+            {
+                url: "https://arnazon-delivery.com/track/AU789",
+                scenario: "Amazon package delivery update",
+                isPhish: true,
+                highlight: "arnazon",
+                explanation: "PHISHING! Look carefully - it says '<strong>arnazon</strong>' with 'rn' instead of 'm'. Classic letter substitution trick."
+            },
+            {
+                url: "https://www.centrelink.gov.au/",
+                scenario: "Centrelink payment notification",
+                isPhish: false,
+                explanation: "This is <strong>legitimate</strong>. Centrelink uses the 'gov.au' domain which is government-controlled."
+            },
+            {
+                url: "https://centrelink-payment.com/claim-bonus",
+                scenario: "Centrelink bonus payment available",
+                isPhish: true,
+                highlight: "centrelink-payment.com",
+                explanation: "PHISHING! Real Centrelink is at 'centrelink.gov.au'. This '<strong>.com</strong>' domain is fake. Government sites use .gov.au"
+            },
+            {
+                url: "https://www.instagram.com/accounts/login",
+                scenario: "Instagram suspicious login detected",
+                isPhish: false,
+                explanation: "This is the <strong>real Instagram login</strong>. The domain 'instagram.com' is correct."
+            },
+            {
+                url: "https://instagram-verify.co/secure-account",
+                scenario: "Instagram account verification required",
+                isPhish: true,
+                highlight: "instagram-verify.co",
+                explanation: "PHISHING! Real Instagram is 'instagram.com'. This '<strong>instagram-verify.co</strong>' is a fake domain. Instagram never uses separate domains for verification."
+            },
+            {
+                url: "https://www.optus.com.au/myoptus/login",
+                scenario: "Optus account login",
+                isPhish: false,
+                explanation: "This is the <strong>real Optus URL</strong>. The domain 'optus.com.au' is legitimate."
+            },
+            {
+                url: "https://optus-rebate-2024.top/claim",
+                scenario: "Optus data breach compensation",
+                isPhish: true,
+                highlight: ".top",
+                explanation: "PHISHING! The '<strong>.top</strong>' domain is a major red flag. Legitimate companies don't use obscure TLDs for important communications."
+            },
+            {
+                url: "https://www.auspost.com.au/track",
+                scenario: "Australia Post parcel tracking",
+                isPhish: false,
+                explanation: "This is <strong>legitimate</strong>. The domain 'auspost.com.au' is the real Australia Post website."
+            },
+            {
+                url: "https://auspost-delivery-reschedule.click/parcel",
+                scenario: "Missed delivery - reschedule now",
+                isPhish: true,
+                highlight: ".click",
+                explanation: "PHISHING! The '<strong>.click</strong>' domain is extremely suspicious. Real AusPost uses 'auspost.com.au'. Delivery scams are very common!"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let streak = 0;
+        let correct = 0;
+        let timeLeft = 10;
+        let timer = null;
+        let shuffledQuestions = [];
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            shuffledQuestions = shuffle(questions);
+            currentQuestion = 0;
+            score = 0;
+            streak = 0;
+            correct = 0;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestion >= shuffledQuestions.length) {
+                endGame();
+                return;
+            }
+
+            const q = shuffledQuestions[currentQuestion];
+
+            document.getElementById('scenarioText').textContent = q.scenario;
+
+            // Display URL with highlighting if phish
+            let urlHtml = q.url;
+            if (q.isPhish && q.highlight) {
+                urlHtml = q.url.replace(q.highlight, `<span class="suspicious">${q.highlight}</span>`);
+            }
+            document.getElementById('urlText').innerHTML = urlHtml;
+
+            document.getElementById('legitBtn').disabled = false;
+            document.getElementById('phishBtn').disabled = false;
+            document.getElementById('legitBtn').classList.remove('correct', 'wrong');
+            document.getElementById('phishBtn').classList.remove('correct', 'wrong');
+            document.getElementById('resultPanel').classList.remove('show');
+
+            // Start timer
+            timeLeft = 10;
+            updateTimer();
+            if (timer) clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    makeChoice(null);
+                }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const timerEl = document.getElementById('timerDisplay');
+            timerEl.textContent = timeLeft;
+            timerEl.classList.toggle('danger', timeLeft <= 3);
+        }
+
+        function makeChoice(choice) {
+            clearInterval(timer);
+
+            const q = shuffledQuestions[currentQuestion];
+            const correctAnswer = q.isPhish ? 'phish' : 'legit';
+            const isCorrect = choice === correctAnswer;
+
+            document.getElementById('legitBtn').disabled = true;
+            document.getElementById('phishBtn').disabled = true;
+
+            // Highlight correct answer
+            if (q.isPhish) {
+                document.getElementById('phishBtn').classList.add('correct');
+                if (choice === 'legit') document.getElementById('legitBtn').classList.add('wrong');
+            } else {
+                document.getElementById('legitBtn').classList.add('correct');
+                if (choice === 'phish') document.getElementById('phishBtn').classList.add('wrong');
+            }
+
+            // Calculate points
+            if (isCorrect) {
+                correct++;
+                streak++;
+                const timeBonus = timeLeft * 5;
+                const streakBonus = Math.min(streak, 5) * 10;
+                score += 100 + timeBonus + streakBonus;
+            } else {
+                streak = 0;
+            }
+
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('streakDisplay').textContent = streak;
+
+            // Show result
+            setTimeout(() => {
+                const resultPanel = document.getElementById('resultPanel');
+                const resultIcon = document.getElementById('resultIcon');
+                const resultTitle = document.getElementById('resultTitle');
+
+                if (choice === null) {
+                    resultIcon.textContent = '⏱️';
+                    resultTitle.textContent = "Time's Up!";
+                    resultTitle.className = 'result-title wrong';
+                } else if (isCorrect) {
+                    resultIcon.textContent = '✓';
+                    resultTitle.textContent = 'Correct!';
+                    resultTitle.className = 'result-title correct';
+                } else {
+                    resultIcon.textContent = '✗';
+                    resultTitle.textContent = 'Wrong!';
+                    resultTitle.className = 'result-title wrong';
+                }
+
+                // Show URL with all suspicious parts highlighted
+                let urlDisplay = q.url;
+                if (q.highlight) {
+                    urlDisplay = q.url.replace(q.highlight, `<span class="highlight">${q.highlight}</span>`);
+                }
+                document.getElementById('resultUrl').innerHTML = urlDisplay;
+                document.getElementById('resultExplanation').innerHTML = q.explanation;
+
+                resultPanel.classList.add('show');
+            }, 500);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+
+            document.getElementById('finalScore').textContent = score;
+
+            const phishCount = shuffledQuestions.filter(q => q.isPhish).length;
+            document.getElementById('accuracyDisplay').innerHTML =
+                `You correctly identified <span>${correct}/${shuffledQuestions.length}</span> links`;
+
+            const accuracy = correct / shuffledQuestions.length;
+            let rank;
+            if (accuracy >= 0.95) rank = "PHISHING MASTER";
+            else if (accuracy >= 0.85) rank = "SECURITY EXPERT";
+            else if (accuracy >= 0.7) rank = "CAREFUL CLICKER";
+            else if (accuracy >= 0.5) rank = "LEARNING SCANNER";
+            else rank = "PHISHING TARGET";
+
+            document.getElementById('rankBadge').textContent = rank;
+        }
+
+        function resetGame() {
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
