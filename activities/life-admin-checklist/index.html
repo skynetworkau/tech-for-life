@@ -72,6 +72,22 @@
             box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
         }
 
+        .back-btn {
+            background: #3b82f6;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid #3b82f6;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
         h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
@@ -691,6 +707,7 @@
             60% { content: '..'; }
             80%, 100% { content: '...'; }
         }
+
     </style>
 </head>
 <body>
@@ -742,10 +759,11 @@
 
         <!-- Actions -->
         <div class="actions">
-            <button class="btn btn-primary" onclick="shareProgress()">📤 Share Progress</button>
+            <button class="btn btn-primary" onclick="downloadProgress()">💾 Download Progress</button>
+            <button class="btn btn-secondary" onclick="shareProgress()">📤 Share</button>
             <button class="btn btn-secondary" onclick="expandAll()">📂 Expand All</button>
             <button class="btn btn-secondary" onclick="collapseAll()">📁 Collapse All</button>
-            <button class="btn btn-danger" onclick="resetProgress()">🔄 Reset All</button>
+            <button class="btn btn-danger" onclick="resetProgress()">🔄 Reset</button>
         </div>
     </div>
 
@@ -1354,8 +1372,141 @@
             }
         }
 
+        // Download Progress as HTML file
+        function downloadProgress() {
+            const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
+            const completedItems = state.checkedItems.length;
+            const percentage = Math.round((completedItems / totalItems) * 100);
+            const date = new Date().toLocaleDateString('en-AU', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            // Build category HTML
+            let categoriesHTML = '';
+            checklistData.forEach(category => {
+                const catCompleted = category.items.filter(item =>
+                    state.checkedItems.includes(`${category.id}-${item.id}`)
+                ).length;
+                const catTotal = category.items.length;
+
+                let itemsHTML = '';
+                category.items.forEach(item => {
+                    const isChecked = state.checkedItems.includes(`${category.id}-${item.id}`);
+                    const checkbox = isChecked ? '✅' : '⬜';
+                    const strikethrough = isChecked ? 'text-decoration: line-through; opacity: 0.7;' : '';
+                    const linkHTML = item.link ? ` <a href="${item.link}" style="color: #0dcdff;">${item.link}</a>` : '';
+                    itemsHTML += `
+                        <div style="padding: 12px; margin: 8px 0; background: #1a1a2e; border-radius: 8px; ${strikethrough}">
+                            <span style="font-size: 1.2em; margin-right: 10px;">${checkbox}</span>
+                            <strong>${item.text}</strong>
+                            <div style="font-size: 0.85em; color: #888; margin-top: 4px; margin-left: 32px;">
+                                ${item.help}${linkHTML}
+                            </div>
+                        </div>`;
+                });
+
+                categoriesHTML += `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #00ff88; border-bottom: 2px solid #00ff88; padding-bottom: 10px; margin-bottom: 15px;">
+                            ${category.icon} ${category.title}
+                            <span style="float: right; font-size: 0.8em; color: #888;">${catCompleted}/${catTotal}</span>
+                        </h2>
+                        ${itemsHTML}
+                    </div>`;
+            });
+
+            // Build achievements HTML
+            let achievementsHTML = '';
+            achievements.forEach(ach => {
+                const unlocked = state.unlockedAchievements.includes(ach.id);
+                const style = unlocked
+                    ? 'background: #1a1a2e; border: 2px solid #00ff88;'
+                    : 'background: #1a1a2e; opacity: 0.4;';
+                achievementsHTML += `
+                    <div style="${style} padding: 15px; border-radius: 10px; text-align: center; min-width: 120px;">
+                        <div style="font-size: 2em;">${ach.icon}</div>
+                        <div style="font-weight: bold; margin-top: 5px;">${ach.name}</div>
+                        <div style="font-size: 0.8em; color: #888;">${ach.description}</div>
+                    </div>`;
+            });
+
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Life Admin Checklist - ${date}</title>
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+    </style>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f23; color: #e0e0e0; padding: 40px; max-width: 900px; margin: 0 auto;">
+
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-size: 2.5em; background: linear-gradient(135deg, #00ff88, #0dcdff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">
+            🎓 My Life Admin Checklist
+        </h1>
+        <p style="color: #888; font-size: 1.1em;">Saved on ${date}</p>
+    </div>
+
+    <div style="background: #1a1a2e; border-radius: 16px; padding: 30px; margin-bottom: 30px; text-align: center;">
+        <div style="font-size: 4em; font-weight: bold; color: #00ff88;">${percentage}%</div>
+        <div style="font-size: 1.2em; color: #888;">Complete (${completedItems}/${totalItems} tasks)</div>
+        <div style="background: #25253a; height: 20px; border-radius: 10px; margin-top: 20px; overflow: hidden;">
+            <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, #00ff88, #0dcdff); border-radius: 10px;"></div>
+        </div>
+    </div>
+
+    <div style="background: #1a1a2e; border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+        <h2 style="color: #ff0080; margin-bottom: 20px;">🏆 Achievements (${state.unlockedAchievements.length}/${achievements.length})</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            ${achievementsHTML}
+        </div>
+    </div>
+
+    ${categoriesHTML}
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; color: #666; font-size: 0.9em;">
+        <p>Generated from Tech for Life - Life Admin Checklist</p>
+        <p>Keep this file to track your progress! Come back anytime to update.</p>
+    </div>
+</body>
+</html>`;
+
+            // Create and download
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `life-admin-checklist-${new Date().toISOString().split('T')[0]}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('Downloaded!', 'Open the file anytime to see your progress', '💾');
+        }
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script>
+        // Back to Presentation functionality
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from) {
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = `../../presentations/${from}/index.html`;
+                    backBtn.className = 'back-btn';
+                    backBtn.textContent = '← Back to Presentation';
+                    navLinks.insertBefore(backBtn, navLinks.firstChild);
+                }
+            }
+        })();
     </script>
 </body>
 </html>

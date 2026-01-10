@@ -848,7 +848,7 @@
         <div class="slide">
             <h2 class="slide-title" style="font-size: 3rem;">Test Your <em>Passwords</em></h2>
             <p class="slide-subtitle" style="margin-bottom: 2rem;">Try our password strength lab — see how quickly different passwords can be cracked</p>
-            <a href="../../activities/password-lab/index.html" class="activity-link">
+            <a href="../../activities/password-lab/index.html?from=week10-passwords" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="activity-link">
                 🔐 Launch Password Lab
             </a>
             <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">Test passwords • Generate secure ones • See simulated hack attempts</p>
@@ -901,6 +901,12 @@
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
 
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateSlide();
     </script>
 </body>

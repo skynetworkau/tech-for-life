@@ -72,6 +72,26 @@
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
         }
 
+        .back-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: #3b82f6;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
         .examples-section {
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(0, 212, 255, 0.3);
@@ -1203,6 +1223,23 @@ Date: ${new Date().toLocaleDateString('en-AU')}
                 btn.style.color = '';
             }, 2000);
         }
+    </script>
+    <script>
+        // Back to Presentation functionality
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from) {
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = `../../presentations/${from}/index.html`;
+                    backBtn.className = 'back-btn';
+                    backBtn.textContent = '← Back to Presentation';
+                    navLinks.insertBefore(backBtn, navLinks.firstChild);
+                }
+            }
+        })();
     </script>
 </body>
 </html>

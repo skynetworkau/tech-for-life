@@ -2159,5 +2159,22 @@
             resultsScreen.classList.remove('hidden');
         }
     </script>
+    <script>
+        // Back to Presentation functionality
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from) {
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = `../../presentations/${from}/index.html`;
+                    backBtn.className = 'back-btn';
+                    backBtn.textContent = '← BACK TO PRESENTATION';
+                    navLinks.insertBefore(backBtn, navLinks.firstChild);
+                }
+            }
+        })();
+    </script>
 </body>
 </html>

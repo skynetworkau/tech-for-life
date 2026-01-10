@@ -1230,6 +1230,22 @@
             background: var(--matrix-green);
             color: var(--bg-black);
         }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            border: 1px solid #3b82f6;
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
     </style>
 </head>
 <body>
@@ -2715,6 +2731,23 @@
                 if (e.key === 'Enter') evaluateChallenge();
             });
         });
+    </script>
+    <script>
+        // Back to Presentation functionality
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from) {
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = `../../presentations/${from}/index.html`;
+                    backBtn.className = 'back-btn';
+                    backBtn.textContent = '← BACK TO PRESENTATION';
+                    navLinks.insertBefore(backBtn, navLinks.firstChild);
+                }
+            }
+        })();
     </script>
 </body>
 </html>

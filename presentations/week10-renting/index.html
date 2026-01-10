@@ -1198,7 +1198,7 @@
                 <h3 style="color: white; margin-bottom: 16px;">Class Activity</h3>
                 <h2 style="font-size: 40px; margin-bottom: 24px; color: white;">Budget Reality Calculator</h2>
                 <p style="font-size: 22px; color: white; margin-bottom: 24px;">Use the interactive budget calculator to see if YOU can actually afford to move out right now. Input your real/expected income and see the brutal truth.</p>
-                <a href="../../activities/budget-reality/index.html" class="cta-button">
+                <a href="../../activities/budget-reality/index.html?from=week10-renting" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="cta-button">
                     🏠 Launch Budget Reality →
                 </a>
             </div>
@@ -1314,7 +1314,14 @@
         }
 
         // Initialize first slide
-        showSlide(0);
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            showSlide(parseInt(returnSlide));
+            sessionStorage.removeItem('returnToSlide');
+        } else {
+            showSlide(0);
+        }
     </script>
 </body>
 </html>

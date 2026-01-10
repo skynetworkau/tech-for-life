@@ -568,7 +568,7 @@
                 <div class="checklist" style="text-align: center;">
                     <h3>Your Action Plan</h3>
                     <p style="font-size: 1.4rem; margin: 1rem 0;">Complete the Life Admin Checklist and tick off each item as you finish it</p>
-                    <a href="../../activities/life-admin-checklist/index.html" class="checklist-link">✅ Launch Life Admin Checklist →</a>
+                    <a href="../../activities/life-admin-checklist/index.html?from=week7-life-admin" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="checklist-link">✅ Launch Life Admin Checklist →</a>
                 </div>
                 <p class="emphasis" style="margin-top: 2rem;">Don't wait. Start today.</p>
             </div>
@@ -693,6 +693,13 @@
 
         // Initialize
         document.getElementById('totalSlides').textContent = totalSlides;
+
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateUI();
 
         // Prevent space bar from scrolling

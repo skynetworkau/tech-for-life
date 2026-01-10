@@ -826,7 +826,7 @@
                     <p style="font-size: 1.3rem; margin: 1rem 0;">
                         Use the Payslip Decoder tool to calculate gross/net pay, tax withheld, and super contributions for different scenarios.
                     </p>
-                    <a href="../../activities/payslip-decoder/index.html" class="link-button">
+                    <a href="../../activities/payslip-decoder/index.html?from=week8-money" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="link-button">
                         💰 Launch Payslip Decoder →
                     </a>
                 </div>
@@ -945,7 +945,14 @@
         }
 
         // Initialize presentation
-        showSlide(0);
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            showSlide(parseInt(returnSlide));
+            sessionStorage.removeItem('returnToSlide');
+        } else {
+            showSlide(0);
+        }
 
         // Hide keyboard hint after 5 seconds
         setTimeout(() => {

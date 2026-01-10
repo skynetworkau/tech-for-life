@@ -816,7 +816,7 @@
                     </div>
                 </div>
             </div>
-            <a href="../../activities/pathway-quiz/index.html" style="display: inline-block; background: var(--accent-violet); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 1.5rem;">🌏 Launch Pathway Quiz →</a>
+            <a href="../../activities/pathway-quiz/index.html?from=week15-gap-year" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" style="display: inline-block; background: var(--accent-violet); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 1.5rem;">🌏 Launch Pathway Quiz →</a>
         </div>
 
         <!-- Slide 17: Key Takeaways -->
@@ -897,6 +897,12 @@
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
 
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateSlide();
     </script>
 </body>

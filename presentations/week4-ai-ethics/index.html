@@ -1095,7 +1095,7 @@
             <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; max-width: 700px; text-align: center;">
                 <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Prompt Fixer Activity</h3>
                 <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 1.5rem;">Put your critical thinking skills to the test. Review AI prompts and outputs to identify potential issues with bias, hallucinations, and ethical concerns.</p>
-                <a href="../../activities/prompt-fixer/index.html" style="display: inline-block; background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber)); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">🔧 Launch Prompt Fixer →</a>
+                <a href="../../activities/prompt-fixer/index.html?from=week4-ai-ethics" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" style="display: inline-block; background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber)); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">🔧 Launch Prompt Fixer →</a>
             </div>
         </div>
 
@@ -1146,6 +1146,12 @@
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
 
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateSlide();
     </script>
 </body>

@@ -1001,10 +1001,15 @@
         <div class="slide">
             <h2 class="slide-title" style="font-size: 3rem;">Audit Your <em>Footprint</em></h2>
             <p class="slide-subtitle" style="margin-bottom: 2rem;">Complete our interactive audit to discover your digital exposure level and get personalised recommendations.</p>
-            <a href="../../activities/digital-footprint/index.html" class="activity-link">
-                👣 Launch Footprint Finder
-            </a>
-            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">Self-assessment • Privacy audit • Action plan</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <a href="../../activities/digital-footprint/index.html?from=week11-footprint" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="activity-link">
+                    👣 Footprint Finder
+                </a>
+                <a href="../../activities/privacy-spy/index.html?from=week11-footprint" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="activity-link" style="background: linear-gradient(135deg, #ef4444, #a855f7);">
+                    🕵️ Privacy Spy
+                </a>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">Footprint Finder: Full audit • Privacy Spy: Spot the risks in profiles</p>
         </div>
 
         <!-- Slide 18: End -->
@@ -1054,6 +1059,12 @@
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
 
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateSlide();
     </script>
 </body>

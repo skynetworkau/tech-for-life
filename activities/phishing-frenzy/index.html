@@ -62,6 +62,22 @@
             color: var(--accent-green);
         }
 
+        .back-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+            border-radius: 4px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
         /* Header */
         .header {
             text-align: center;
@@ -901,6 +917,23 @@
             document.getElementById('endScreen').classList.add('hidden');
             document.getElementById('startScreen').classList.remove('hidden');
         }
+    </script>
+    <script>
+        // Back to Presentation functionality
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from) {
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = `../../presentations/${from}/index.html`;
+                    backBtn.className = 'back-btn';
+                    backBtn.textContent = '← Back to Presentation';
+                    navLinks.insertBefore(backBtn, navLinks.firstChild);
+                }
+            }
+        })();
     </script>
 </body>
 </html>

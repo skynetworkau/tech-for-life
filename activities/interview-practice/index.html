@@ -69,6 +69,22 @@
             transform: translateY(-2px);
         }
 
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
         .screen {
             display: none;
             animation: fadeIn 0.5s ease;
@@ -862,11 +878,9 @@
                 </div>
 
                 <div class="button-group">
-                    <button class="btn" onclick="restartPractice()">🔄 Practice More Questions</button>
-                    <button class="btn btn-secondary" onclick="goToIntro()">Back to Start</button>
-                    <a href="../../index.html" class="btn btn-secondary" style="text-decoration: none; display: inline-block;">
-                        Home
-                    </a>
+                    <button class="btn" onclick="downloadSummary()">💾 Download Summary</button>
+                    <button class="btn btn-secondary" onclick="restartPractice()">🔄 Practice More</button>
+                    <button class="btn btn-secondary" onclick="goToIntro()">Start Over</button>
                 </div>
             </div>
         </div>
@@ -1324,6 +1338,139 @@
             loadNextQuestion();
         }
 
+        function downloadSummary() {
+            const totalQuestions = state.questionsAsked.length;
+            const avgScore = state.selfAssessmentScores.length > 0
+                ? Math.round(state.selfAssessmentScores.reduce((a, b) => a + b, 0) / state.selfAssessmentScores.length)
+                : 0;
+            const date = new Date().toLocaleDateString('en-AU', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            // Build questions practiced HTML
+            let questionsHTML = '';
+            state.questionsAsked.forEach((qIndex, i) => {
+                const q = questions[qIndex];
+                const score = state.selfAssessmentScores[i] || 'Not rated';
+                questionsHTML += `
+                    <div style="padding: 15px; margin: 10px 0; background: #16213e; border-radius: 8px; border-left: 4px solid #4fc3f7;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">Q${i + 1}: ${q.text}</div>
+                        <div style="color: #888; font-size: 0.9em;">Category: ${q.category} • Self-Rating: ${typeof score === 'number' ? score + '%' : score}</div>
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                            <div style="font-size: 0.85em; color: #4fc3f7; margin-bottom: 5px;">💡 Tips for this question:</div>
+                            <div style="font-size: 0.85em; color: #aaa;">${q.tip}</div>
+                        </div>
+                    </div>`;
+            });
+
+            // Confidence level
+            let confidenceText = 'Building Confidence...';
+            let confidencePercent = Math.min(100, totalQuestions * 15 + avgScore / 2);
+            if (totalQuestions >= 5) {
+                confidenceText = 'Interview Ready!';
+            } else if (totalQuestions >= 3) {
+                confidenceText = 'Getting Stronger!';
+            }
+
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Interview Practice Summary - ${date}</title>
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+    </style>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; padding: 40px; max-width: 800px; margin: 0 auto;">
+
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-size: 2.5em; color: #4fc3f7; margin-bottom: 10px;">
+            🎥 Interview Practice Summary
+        </h1>
+        <p style="color: #888; font-size: 1.1em;">${date}</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+        <div style="background: #1e3a5f; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 3em; font-weight: bold; color: #4fc3f7;">${totalQuestions}</div>
+            <div style="color: #888;">Questions Practiced</div>
+        </div>
+        <div style="background: #1e3a5f; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 3em; font-weight: bold; color: #4fc3f7;">${avgScore}%</div>
+            <div style="color: #888;">Average Self-Rating</div>
+        </div>
+        <div style="background: #1e3a5f; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 3em;">${totalQuestions >= 5 ? '🚀' : totalQuestions >= 3 ? '💪' : '📈'}</div>
+            <div style="color: #888;">${confidenceText}</div>
+        </div>
+    </div>
+
+    ${totalQuestions >= 5 ? `
+    <div style="background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 30px;">
+        <div style="font-size: 1.3em; font-weight: bold;">🏆 Achievement Unlocked: Interview Warrior! 🏆</div>
+        <div style="font-size: 0.9em; opacity: 0.9;">You've completed 5+ practice questions - that's dedication!</div>
+    </div>
+    ` : ''}
+
+    <div style="background: #1e3a5f; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+        <h3 style="color: #4fc3f7; margin-bottom: 20px;">📝 Questions Practiced</h3>
+        ${questionsHTML || '<p style="color: #888;">No questions recorded yet.</p>'}
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+        <div style="background: #1e3a5f; border-radius: 12px; padding: 25px;">
+            <h3 style="color: #22c55e; margin-bottom: 15px;">✅ Your Strengths</h3>
+            <ul style="list-style: none; padding: 0; color: #aaa;">
+                ${totalQuestions >= 3 ? '<li style="margin-bottom: 10px;">• Committed to improvement - practised multiple questions</li>' : ''}
+                ${avgScore >= 70 ? '<li style="margin-bottom: 10px;">• Good critical thinking in self-assessment</li>' : ''}
+                <li style="margin-bottom: 10px;">• Taking initiative to prepare - most candidates don\'t!</li>
+            </ul>
+        </div>
+        <div style="background: #1e3a5f; border-radius: 12px; padding: 25px;">
+            <h3 style="color: #f59e0b; margin-bottom: 15px;">🎯 Areas to Improve</h3>
+            <ul style="list-style: none; padding: 0; color: #aaa;">
+                ${totalQuestions < 5 ? '<li style="margin-bottom: 10px;">• Practise more questions to build confidence</li>' : ''}
+                <li style="margin-bottom: 10px;">• Record yourself answering the same question multiple times</li>
+                <li style="margin-bottom: 10px;">• Research the STAR method for behavioural questions</li>
+                <li style="margin-bottom: 10px;">• Watch recordings and note eye contact, pace, filler words</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="background: #1e3a5f; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+        <h3 style="color: #a855f7; margin-bottom: 15px;">🎬 Before Your Real Interview</h3>
+        <div style="color: #aaa; line-height: 1.8;">
+            ⬜ Research the company and role thoroughly<br>
+            ⬜ Prepare 3-5 questions to ask the interviewer<br>
+            ⬜ Plan your outfit the night before<br>
+            ⬜ Test your tech if it's a video interview<br>
+            ⬜ Prepare STAR method examples from your experience<br>
+            ⬜ Get a good night's sleep<br>
+            ⬜ Arrive 10-15 minutes early
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; color: #666; font-size: 0.9em;">
+        <p>Generated from Tech for Life - AI Interview Practice</p>
+        <p>Denmark Senior High School</p>
+    </div>
+</body>
+</html>`;
+
+            // Create and download
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `interview-practice-summary-${new Date().toISOString().split('T')[0]}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             stopCamera();
@@ -1337,6 +1484,23 @@
                 }
             });
         });
+    </script>
+    <script>
+        // Back to Presentation functionality
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from) {
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = `../../presentations/${from}/index.html`;
+                    backBtn.className = 'back-btn';
+                    backBtn.textContent = '← Back to Presentation';
+                    navLinks.insertBefore(backBtn, navLinks.firstChild);
+                }
+            }
+        })();
     </script>
 </body>
 </html>

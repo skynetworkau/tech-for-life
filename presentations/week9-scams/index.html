@@ -935,10 +935,15 @@
         <div class="slide pattern-bg">
             <h2 class="slide-title" style="font-size: 3rem;">Your Turn</h2>
             <p class="slide-subtitle" style="margin-bottom: 2rem;">Can you spot the scam? Test your skills with real Australian examples.</p>
-            <a href="../../activities/spot-the-scam/index.html" class="activity-link">
-                🕵️ Launch Scam Hunter
-            </a>
-            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">10 scenarios • Australian context • Instant feedback</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <a href="../../activities/spot-the-scam/index.html?from=week9-scams" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="activity-link">
+                    🕵️ Scam Hunter
+                </a>
+                <a href="../../activities/phishing-frenzy/index.html?from=week9-scams" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" class="activity-link" style="background: linear-gradient(135deg, #f85149, #d29922);">
+                    🎣 Phishing Frenzy
+                </a>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">Scam Hunter: Full scenarios • Phishing Frenzy: Spot fake links</p>
         </div>
 
         <!-- Slide 15: Resources -->
@@ -1050,7 +1055,12 @@
             }
         });
 
-        // Initialize
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateSlide();
     </script>
 </body>

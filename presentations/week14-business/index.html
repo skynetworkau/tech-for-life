@@ -1269,7 +1269,7 @@
                     <li>Research pricing for your chosen business idea</li>
                     <li>Plan your first marketing channel (Instagram? Local flyers? Word of mouth?)</li>
                 </ol>
-                <a href="../../activities/business-starter/index.html" style="display: inline-block; background: var(--accent-amber); color: #000; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 1.5rem;">💼 Launch Business Starter →</a>
+                <a href="../../activities/business-starter/index.html?from=week14-business" onclick="sessionStorage.setItem('returnToSlide', currentSlide)" style="display: inline-block; background: var(--accent-amber); color: #000; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 1.5rem;">💼 Launch Business Starter →</a>
             </div>
         </div>
 
@@ -1320,6 +1320,12 @@
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
 
+        // Check if returning from activity
+        const returnSlide = sessionStorage.getItem('returnToSlide');
+        if (returnSlide !== null) {
+            currentSlide = parseInt(returnSlide);
+            sessionStorage.removeItem('returnToSlide');
+        }
         updateSlide();
     </script>
 </body>
