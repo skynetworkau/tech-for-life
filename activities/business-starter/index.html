@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Starter // Launch Your Side Hustle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a12;
+            --bg-card: #12121a;
+            --bg-input: #1a1a24;
+            --bg-hover: #22222e;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --text-white: #f8fafc;
+            --text-gray: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2a2a3a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+
+        .home-link:hover {
+            background: var(--accent-green);
+            color: var(--bg-dark);
+            border-color: var(--accent-green);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0 3rem;
+        }
+
+        .logo {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -1px;
+        }
+
+        .logo .business { color: var(--accent-green); }
+        .logo .starter { color: var(--accent-purple); }
+
+        .tagline {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+
+        /* Progress Steps */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .step-indicator.active {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .step-indicator.completed {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+            color: var(--bg-dark);
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .step-indicator.completed .step-number {
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            color: var(--text-gray);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Business Type Cards */
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .business-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .business-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .business-card.selected {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .business-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .business-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .business-desc {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .business-potential {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--accent-green);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* ABN Form */
+        .abn-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .abn-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .abn-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .abn-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .abn-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .abn-success {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .abn-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            font-family: monospace;
+            letter-spacing: 2px;
+            margin: 1rem 0;
+        }
+
+        /* Structure Choice */
+        .structure-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        @media (max-width: 700px) {
+            .structure-grid { grid-template-columns: 1fr; }
+        }
+
+        .structure-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .structure-card:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .structure-card.selected {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .structure-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .structure-icon {
+            font-size: 2.5rem;
+        }
+
+        .structure-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .structure-tag {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            margin-top: 0.3rem;
+            display: inline-block;
+        }
+
+        .structure-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .structure-list li {
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .structure-list .pro { color: var(--accent-green); }
+        .structure-list .con { color: var(--accent-red); }
+
+        /* Pricing Section */
+        .pricing-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .pricing-calculator {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .pricing-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pricing-label {
+            font-size: 0.95rem;
+        }
+
+        .pricing-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-input {
+            width: 100px;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 1rem;
+            text-align: right;
+        }
+
+        .pricing-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .pricing-unit {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            min-width: 50px;
+        }
+
+        .pricing-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1rem 0;
+        }
+
+        .pricing-result {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .result-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* GST Section */
+        .gst-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .gst-meter {
+            margin: 2rem 0;
+        }
+
+        .gst-bar {
+            height: 30px;
+            background: var(--bg-input);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gst-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-orange));
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .gst-threshold {
+            position: absolute;
+            left: calc(75000 / 150000 * 100%);
+            top: -30px;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            white-space: nowrap;
+        }
+
+        .gst-threshold::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            width: 2px;
+            height: 40px;
+            background: var(--accent-orange);
+            transform: translateX(-50%);
+        }
+
+        .gst-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .gst-status {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .gst-status.safe {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-green);
+        }
+
+        .gst-status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--accent-orange);
+        }
+
+        .gst-status.required {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+        }
+
+        .gst-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gst-message {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .gst-detail {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* Invoice Preview */
+        .invoice-preview {
+            background: #fff;
+            color: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 2rem auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .invoice-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .invoice-tag {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h3 {
+            font-size: 1.3rem;
+            color: var(--accent-purple);
+            margin-bottom: 0.25rem;
+        }
+
+        .invoice-number {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .invoice-section h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #999;
+            margin-bottom: 0.5rem;
+        }
+
+        .invoice-section p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .invoice-table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: #f5f5f5;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .invoice-table th:last-child {
+            text-align: right;
+        }
+
+        .invoice-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .invoice-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .invoice-total {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .invoice-total-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 2rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .invoice-total-row.grand {
+            border-top: 2px solid #1a1a1a;
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .invoice-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        /* Results Section */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .result-card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .result-card-label {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-top: 0.25rem;
+        }
+
+        /* Score Display */
+        .score-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-green) 0deg, var(--accent-green) calc(var(--score) * 3.6deg), var(--bg-input) calc(var(--score) * 3.6deg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .score-inner {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        .score-message {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-detail {
+            color: var(--text-gray);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Checklist */
+        .checklist {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .checklist-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-icon {
+            font-size: 1.2rem;
+        }
+
+        .checklist-icon.done { color: var(--accent-green); }
+        .checklist-icon.pending { color: var(--text-muted); }
+
+        .checklist-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .checklist-text.done { color: var(--text-gray); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            color: var(--bg-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-white);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Tips */
+        .tip-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tip-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+            color: var(--accent-blue);
+        }
+
+        .tip-content p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .info-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .info-card a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .header { padding: 1.5rem 0 2rem; }
+            .step-indicator span:not(.step-number) { display: none; }
+            .abn-panel, .pricing-panel, .gst-panel { padding: 1.5rem; }
+            .invoice-preview { padding: 1.5rem; }
+            .invoice-details { grid-template-columns: 1fr; gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">← Course Home</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="business">BUSINESS</span>
+                <span class="starter">STARTER</span>
+            </h1>
+            <p class="tagline">Launch your side hustle the right way</p>
+        </header>
+
+        <div class="progress-bar">
+            <div class="step-indicator active" id="step1">
+                <span class="step-number">1</span>
+                <span>Idea</span>
+            </div>
+            <div class="step-indicator" id="step2">
+                <span class="step-number">2</span>
+                <span>ABN</span>
+            </div>
+            <div class="step-indicator" id="step3">
+                <span class="step-number">3</span>
+                <span>Structure</span>
+            </div>
+            <div class="step-indicator" id="step4">
+                <span class="step-number">4</span>
+                <span>Pricing</span>
+            </div>
+            <div class="step-indicator" id="step5">
+                <span class="step-number">5</span>
+                <span>GST</span>
+            </div>
+            <div class="step-indicator" id="step6">
+                <span class="step-number">6</span>
+                <span>Ready!</span>
+            </div>
+        </div>
+
+        <!-- Section 1: Choose Business -->
+        <section class="section active" id="section1">
+            <h2 class="section-title">What's your hustle?</h2>
+            <p class="section-subtitle">Pick a business type to get started</p>
+
+            <div class="business-grid">
+                <div class="business-card" data-business="lawn">
+                    <div class="business-icon">🌿</div>
+                    <div class="business-name">Lawn & Garden</div>
+                    <div class="business-desc">Mowing, weeding, hedge trimming, general yard maintenance</div>
+                    <div class="business-potential">$40-80/hour potential</div>
+                </div>
+                <div class="business-card" data-business="tutoring">
+                    <div class="business-icon">📚</div>
+                    <div class="business-name">Tutoring</div>
+                    <div class="business-desc">Academic tutoring, music lessons, language teaching</div>
+                    <div class="business-potential">$35-60/hour potential</div>
+                </div>
+                <div class="business-card" data-business="web">
+                    <div class="business-icon">💻</div>
+                    <div class="business-name">Web & Digital</div>
+                    <div class="business-desc">Websites, social media management, graphic design</div>
+                    <div class="business-potential">$50-150/hour potential</div>
+                </div>
+                <div class="business-card" data-business="photo">
+                    <div class="business-icon">📸</div>
+                    <div class="business-name">Photography</div>
+                    <div class="business-desc">Events, portraits, product photography, photo editing</div>
+                    <div class="business-potential">$100-300/event potential</div>
+                </div>
+                <div class="business-card" data-business="cleaning">
+                    <div class="business-icon">🧹</div>
+                    <div class="business-name">Cleaning</div>
+                    <div class="business-desc">House cleaning, end of lease, car detailing</div>
+                    <div class="business-potential">$35-55/hour potential</div>
+                </div>
+                <div class="business-card" data-business="delivery">
+                    <div class="business-icon">🚗</div>
+                    <div class="business-name">Delivery & Moving</div>
+                    <div class="business-desc">Furniture pickup, small moves, marketplace deliveries</div>
+                    <div class="business-potential">$50-80/hour potential</div>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-icon">💡</div>
+                <div class="tip-content">
+                    <h4>Start with what you know</h4>
+                    <p>The best side hustles use skills you already have. You don't need fancy equipment to start - many successful businesses began with just a phone and social media.</p>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="btn btn-primary" id="btn1" disabled onclick="nextSection(2)">
+                    Choose & Continue →
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 2: ABN Registration -->
+        <section class="section" id="section2">
+            <h2 class="section-title">Get Your ABN</h2>
+            <p class="section-subtitle">Your Australian Business Number - it's free and takes 5 minutes</p>
+
+            <div class="abn-panel" id="abnForm">
+                <div class="abn-header">
+                    <div class="abn-logo">🏛️</div>
+                    <div>
+                        <div class="abn-title">ABN Registration</div>
+                        <div class="abn-subtitle">Australian Business Register (Simulated)</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Your full name (as per ID)</label>
+                    <input type="text" class="form-input" id="fullName" placeholder="e.g. Sarah Johnson">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date of birth</label>
+                        <input type="date" class="form-input" id="dob">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tax File Number</label>
+                        <input type="text" class="form-input" id="tfn" placeholder="XXX XXX XXX" maxlength="11">
+                        <div class="form-hint">You'll need your real TFN when applying</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Business name (or your name)</label>
+                    <input type="text" class="form-input" id="businessName" placeholder="e.g. Sarah's Garden Services">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Main business activity</label>
+                    <input type="text" class="form-input" id="businessActivity" readonly>
+                </div>
+
+                <div class="tip-box">
+                    <div class="tip-icon">🆓</div>
+                    <div class="tip-content">
+                        <h4>ABN registration is FREE</h4>
+                        <p>Apply at <strong>abr.gov.au</strong> - never pay a third party to do it. Takes about 5 minutes and you usually get it instantly.</p>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="btn btn-secondary" onclick="prevSection(1)">← Back</button>
+                    <button class="btn btn-primary" onclick="submitABN()">Submit Application →</button>
+                </div>
+            </div>
+
+            <div class="abn-panel abn-success" id="abnSuccess" style="display: none;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">ABN Approved!</h3>
+                <p style="color: var(--text-gray); margin-bottom: 1rem;">Your simulated ABN is:</p>
+                <div class="abn-number" id="generatedABN"></div>
+                <p style="font-size: 0.9rem; color: var(--text-gray);">
+                    This is a simulated ABN for learning purposes.<br>
+                    Real ABNs are 11 digits and verify your business identity.
+                </p>
+                <div class="button-row">
+                    <button class="btn btn-primary" onclick="nextSection(3)">Continue to Structure →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Business Structure -->
+        <section class="section" id="section3">
+            <h2 class="section-title">Choose Your Structure</h2>
+            <p class="section-subtitle">How do you want to operate?</p>
+
+            <div class="structure-grid">
+                <div class="structure-card" data-structure="sole">
+                    <div class="structure-header">
+                        <div class="structure-icon">👤</div>
+                        <div>
+                            <div class="structure-name">Sole Trader</div>
+                            <span class="structure-tag">Recommended for starters</span>
+                        </div>
+                    </div>
+                    <ul class="structure-list">
+                        <li><span class="pro">✓</span> Free and simple to set up</li>
+                        <li><span class="pro">✓</span> You control everything</li>
+                        <li><span class="pro">✓</span> Easy tax return (personal)</li>
+                        <li><span class="pro">✓</span> Keep all the profits</li>
+                        <li><span class="con">✗</span> You're personally liable</li>
+                        <li><span class="con">✗</span> Pay tax at personal rate</li>
+                    </ul>
+                    <p style="font-size: 0.85rem; color: var(--text-gray); margin-top: 1rem;">
+                        <strong>Best for:</strong> Side hustles, freelancing, testing an idea, businesses under $100k/year
+                    </p>
+                </div>
+
+                <div class="structure-card" data-structure="pty">
+                    <div class="structure-header">
+                        <div class="structure-icon">🏢</div>
+                        <div>
+                            <div class="structure-name">Pty Ltd Company</div>
+                            <span class="structure-tag" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">For serious growth</span>
+                        </div>
+                    </div>
+                    <ul class="structure-list">
+                        <li><span class="pro">✓</span> Limited personal liability</li>
+                        <li><span class="pro">✓</span> Flat 25% company tax rate</li>
+                        <li><span class="pro">✓</span> Looks more professional</li>
+                        <li><span class="pro">✓</span> Easier to raise money/sell</li>
+                        <li><span class="con">✗</span> Costs ~$500+ to set up</li>
+                        <li><span class="con">✗</span> More paperwork & compliance</li>
+                    </ul>
+                    <p style="font-size: 0.85rem; color: var(--text-gray); margin-top: 1rem;">
+                        <strong>Best for:</strong> Businesses earning $100k+, higher risk ventures, multiple partners
+                    </p>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-icon">🔄</div>
+                <div class="tip-content">
+                    <h4>You can change later</h4>
+                    <p>Most people start as a sole trader and convert to a company when they grow. Don't overcomplicate it at the start.</p>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="btn btn-secondary" onclick="prevSection(2)">← Back</button>
+                <button class="btn btn-primary" id="btn3" disabled onclick="nextSection(4)">Continue →</button>
+            </div>
+        </section>
+
+        <!-- Section 4: Pricing & Invoice -->
+        <section class="section" id="section4">
+            <h2 class="section-title">Set Your Prices</h2>
+            <p class="section-subtitle">Figure out what to charge and see a sample invoice</p>
+
+            <div class="pricing-panel">
+                <div class="pricing-calculator">
+                    <div class="pricing-row">
+                        <div class="pricing-label">Your hourly rate</div>
+                        <div class="pricing-value">
+                            <span style="color: var(--accent-green);">$</span>
+                            <input type="number" class="pricing-input" id="hourlyRate" value="50" oninput="calculatePricing()">
+                            <span class="pricing-unit">/hour</span>
+                        </div>
+                    </div>
+                    <div class="pricing-row">
+                        <div class="pricing-label">Hours per week</div>
+                        <div class="pricing-value">
+                            <input type="number" class="pricing-input" id="hoursWeek" value="10" oninput="calculatePricing()">
+                            <span class="pricing-unit">hours</span>
+                        </div>
+                    </div>
+                    <div class="pricing-row">
+                        <div class="pricing-label">Weeks per year working</div>
+                        <div class="pricing-value">
+                            <input type="number" class="pricing-input" id="weeksYear" value="40" oninput="calculatePricing()">
+                            <span class="pricing-unit">weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="pricing-divider"></div>
+
+                    <div class="pricing-result">
+                        <div class="result-title">Estimated Annual Revenue</div>
+                        <div class="result-amount" id="annualRevenue">$20,000</div>
+                        <div class="result-note">Before tax and expenses</div>
+                    </div>
+                </div>
+
+                <div class="tip-box" style="margin-top: 1.5rem;">
+                    <div class="tip-icon">💰</div>
+                    <div class="tip-content">
+                        <h4>Don't underprice yourself!</h4>
+                        <p>Remember you'll pay for: equipment, transport, phone, insurance, tax (15-32%), super (if you want it), and time finding clients. $50/hour as a sole trader equals roughly $35/hour employed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="text-align: center; margin: 2.5rem 0 1rem;">Sample Invoice Preview</h3>
+
+            <div class="invoice-preview">
+                <div class="invoice-header">
+                    <div>
+                        <div class="invoice-brand" id="invoiceBrand">Your Business</div>
+                        <div class="invoice-tag">ABN: <span id="invoiceABN">XX XXX XXX XXX</span></div>
+                    </div>
+                    <div class="invoice-title">
+                        <h3>INVOICE</h3>
+                        <div class="invoice-number">#001</div>
+                    </div>
+                </div>
+
+                <div class="invoice-details">
+                    <div class="invoice-section">
+                        <h4>Bill To</h4>
+                        <p>
+                            Sample Client<br>
+                            123 Customer Street<br>
+                            Perth WA 6000
+                        </p>
+                    </div>
+                    <div class="invoice-section">
+                        <h4>Invoice Details</h4>
+                        <p>
+                            Date: <span id="invoiceDate"></span><br>
+                            Due: 14 days from date<br>
+                            Payment: Bank Transfer
+                        </p>
+                    </div>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="invoiceDesc">Service description</td>
+                            <td>2 hrs</td>
+                            <td id="invoiceRate">$50.00</td>
+                            <td id="invoiceSubtotal">$100.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="invoice-total">
+                    <div class="invoice-total-row">
+                        <span>Subtotal</span>
+                        <span id="invoiceTotalSub">$100.00</span>
+                    </div>
+                    <div class="invoice-total-row" id="gstRow" style="display: none;">
+                        <span>GST (10%)</span>
+                        <span id="invoiceGST">$10.00</span>
+                    </div>
+                    <div class="invoice-total-row grand">
+                        <span>TOTAL</span>
+                        <span id="invoiceTotal">$100.00</span>
+                    </div>
+                </div>
+
+                <div class="invoice-footer">
+                    <p>Thank you for your business!</p>
+                    <p style="margin-top: 0.5rem;">Bank: Commonwealth • BSB: 066-000 • Account: 1234 5678</p>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>📋 What must be on an invoice?</h4>
+                    <p>Your ABN, business name, date, invoice number, description of work, amount, and payment details. Without an ABN, clients must withhold 47% of payment!</p>
+                </div>
+                <div class="info-card">
+                    <h4>🧾 Free invoicing tools</h4>
+                    <p>Use <a href="https://invoice-generator.com" target="_blank">Invoice Generator</a>, <a href="https://www.canva.com" target="_blank">Canva</a>, or <a href="https://www.wave.com" target="_blank">Wave</a>. Square also offers free invoicing with their app.</p>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="btn btn-secondary" onclick="prevSection(3)">← Back</button>
+                <button class="btn btn-primary" onclick="nextSection(5)">Continue to GST →</button>
+            </div>
+        </section>
+
+        <!-- Section 5: GST -->
+        <section class="section" id="section5">
+            <h2 class="section-title">Understanding GST</h2>
+            <p class="section-subtitle">The $75,000 threshold you need to know</p>
+
+            <div class="gst-panel">
+                <p style="margin-bottom: 1.5rem; color: var(--text-gray);">
+                    GST (Goods and Services Tax) is a 10% tax added to most goods and services. You <strong>must</strong> register for GST if your business turnover exceeds $75,000 per year.
+                </p>
+
+                <div class="gst-meter">
+                    <div class="gst-threshold">$75k threshold</div>
+                    <div class="gst-bar">
+                        <div class="gst-fill" id="gstFill" style="width: 26.6%;">
+                            <span id="gstFillText">$20,000</span>
+                        </div>
+                    </div>
+                    <div class="gst-labels">
+                        <span>$0</span>
+                        <span>$150,000</span>
+                    </div>
+                </div>
+
+                <div class="gst-status safe" id="gstStatus">
+                    <div class="gst-icon">✅</div>
+                    <div class="gst-message">GST Registration: Optional</div>
+                    <div class="gst-detail">Your projected turnover is under $75,000. You don't need to register for GST, but you can if you want to claim GST credits on business purchases.</div>
+                </div>
+
+                <div class="info-grid" style="margin-top: 2rem;">
+                    <div class="info-card">
+                        <h4>🤔 Not registered for GST?</h4>
+                        <p>You <strong>cannot</strong> charge GST on your invoices. Keep it simple - just charge your rate without adding 10%.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>📊 Registered for GST?</h4>
+                        <p>You must charge 10% GST and lodge BAS (Business Activity Statement) quarterly. You can claim GST back on business expenses.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>⏰ When to register</h4>
+                        <p>Register when you hit $75k, or expect to in the next 12 months. Register online at ato.gov.au through your myGov account.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>💡 Voluntary registration</h4>
+                        <p>Some people register early if they have lots of business expenses (to claim GST credits) or want to look more established.</p>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="btn btn-secondary" onclick="prevSection(4)">← Back</button>
+                    <button class="btn btn-primary" onclick="showResults()">See My Results →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Results -->
+        <section class="section" id="section6">
+            <h2 class="section-title">You're Ready to Launch! 🚀</h2>
+            <p class="section-subtitle">Here's your Business Ready summary</p>
+
+            <div class="score-section">
+                <div class="score-circle" style="--score: 85;">
+                    <div class="score-inner">
+                        <div class="score-value" id="finalScore">85</div>
+                        <div class="score-label">Business Ready</div>
+                    </div>
+                </div>
+                <div class="score-message">Looking good! You know the basics.</div>
+                <div class="score-detail">You've learned how to register an ABN, choose a business structure, set pricing, and understand GST. That's more than most people know!</div>
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-card-icon">💼</div>
+                    <div class="result-card-value" id="resultBusiness">-</div>
+                    <div class="result-card-label">Your Business</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-card-icon">📋</div>
+                    <div class="result-card-value" id="resultStructure">-</div>
+                    <div class="result-card-label">Structure</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-card-icon">💰</div>
+                    <div class="result-card-value" id="resultRevenue">-</div>
+                    <div class="result-card-label">Est. Annual Revenue</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-card-icon">🧾</div>
+                    <div class="result-card-value" id="resultGST">-</div>
+                    <div class="result-card-label">GST Status</div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-title">📝 Your Next Steps</div>
+                <div class="checklist-item">
+                    <span class="checklist-icon done">✓</span>
+                    <span class="checklist-text done">Chose your business type</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon done">✓</span>
+                    <span class="checklist-text done">Learned about ABN registration</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon done">✓</span>
+                    <span class="checklist-text done">Selected a business structure</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon done">✓</span>
+                    <span class="checklist-text done">Set your pricing</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon done">✓</span>
+                    <span class="checklist-text done">Understood GST requirements</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon pending">○</span>
+                    <span class="checklist-text">Apply for real ABN at abr.gov.au</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon pending">○</span>
+                    <span class="checklist-text">Set up a separate business bank account</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon pending">○</span>
+                    <span class="checklist-text">Create social media profiles for your business</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-icon pending">○</span>
+                    <span class="checklist-text">Get your first client!</span>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>🌐 Free resources</h4>
+                    <p>
+                        <a href="https://business.gov.au" target="_blank">business.gov.au</a> - Official Australian business guide<br>
+                        <a href="https://abr.gov.au" target="_blank">abr.gov.au</a> - Register your ABN for free<br>
+                        <a href="https://ato.gov.au" target="_blank">ato.gov.au</a> - Tax information for small business
+                    </p>
+                </div>
+                <div class="info-card">
+                    <h4>📱 Useful tools</h4>
+                    <p>
+                        <strong>Invoicing:</strong> Wave, Canva, Square<br>
+                        <strong>Accounting:</strong> Xero, MYOB, QuickBooks<br>
+                        <strong>Payments:</strong> Square, PayPal, Stripe<br>
+                        <strong>Design:</strong> Canva (free tier is great)
+                    </p>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="btn btn-secondary" onclick="startOver()">Start Over</button>
+                <button class="btn btn-primary" onclick="saveResults()">📥 Save My Plan</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            businessType: null,
+            businessName: '',
+            structure: null,
+            abn: null,
+            hourlyRate: 50,
+            hoursWeek: 10,
+            weeksYear: 40
+        };
+
+        const businessTypes = {
+            lawn: { name: 'Lawn & Garden Services', activity: 'Gardening services' },
+            tutoring: { name: 'Tutoring Services', activity: 'Educational support services' },
+            web: { name: 'Web & Digital Services', activity: 'Computer design and web development services' },
+            photo: { name: 'Photography Services', activity: 'Photography services' },
+            cleaning: { name: 'Cleaning Services', activity: 'Domestic cleaning services' },
+            delivery: { name: 'Delivery & Moving Services', activity: 'Road freight transport' }
+        };
+
+        // Section Navigation
+        function updateSteps(currentStep) {
+            for (let i = 1; i <= 6; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                if (i < currentStep) {
+                    step.classList.add('completed');
+                } else if (i === currentStep) {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        function showSection(num) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section${num}`).classList.add('active');
+            updateSteps(num);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextSection(num) {
+            showSection(num);
+        }
+
+        function prevSection(num) {
+            showSection(num);
+        }
+
+        // Business Selection
+        document.querySelectorAll('.business-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.business-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                state.businessType = card.dataset.business;
+                document.getElementById('btn1').disabled = false;
+
+                // Pre-fill ABN form
+                const type = businessTypes[state.businessType];
+                document.getElementById('businessActivity').value = type.activity;
+            });
+        });
+
+        // ABN Form
+        function submitABN() {
+            const name = document.getElementById('fullName').value.trim();
+            const businessName = document.getElementById('businessName').value.trim();
+
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+
+            if (!businessName) {
+                alert('Please enter a business name');
+                return;
+            }
+
+            state.businessName = businessName;
+
+            // Generate fake ABN
+            let abn = '';
+            for (let i = 0; i < 11; i++) {
+                abn += Math.floor(Math.random() * 10);
+            }
+            state.abn = abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+
+            document.getElementById('generatedABN').textContent = state.abn;
+            document.getElementById('abnForm').style.display = 'none';
+            document.getElementById('abnSuccess').style.display = 'block';
+
+            // Update invoice preview
+            document.getElementById('invoiceBrand').textContent = state.businessName;
+            document.getElementById('invoiceABN').textContent = state.abn;
+        }
+
+        // Structure Selection
+        document.querySelectorAll('.structure-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.structure-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                state.structure = card.dataset.structure;
+                document.getElementById('btn3').disabled = false;
+            });
+        });
+
+        // Pricing Calculator
+        function calculatePricing() {
+            state.hourlyRate = parseInt(document.getElementById('hourlyRate').value) || 0;
+            state.hoursWeek = parseInt(document.getElementById('hoursWeek').value) || 0;
+            state.weeksYear = parseInt(document.getElementById('weeksYear').value) || 0;
+
+            const annual = state.hourlyRate * state.hoursWeek * state.weeksYear;
+            document.getElementById('annualRevenue').textContent = '$' + annual.toLocaleString();
+
+            // Update invoice
+            document.getElementById('invoiceRate').textContent = '$' + state.hourlyRate.toFixed(2);
+            document.getElementById('invoiceSubtotal').textContent = '$' + (state.hourlyRate * 2).toFixed(2);
+            document.getElementById('invoiceTotalSub').textContent = '$' + (state.hourlyRate * 2).toFixed(2);
+            document.getElementById('invoiceTotal').textContent = '$' + (state.hourlyRate * 2).toFixed(2);
+
+            // Update invoice description
+            const type = businessTypes[state.businessType];
+            document.getElementById('invoiceDesc').textContent = type ? type.activity : 'Professional services';
+
+            // Update GST
+            updateGST(annual);
+        }
+
+        function updateGST(annual) {
+            const percentage = Math.min((annual / 150000) * 100, 100);
+            document.getElementById('gstFill').style.width = percentage + '%';
+            document.getElementById('gstFillText').textContent = '$' + annual.toLocaleString();
+
+            const status = document.getElementById('gstStatus');
+
+            if (annual >= 75000) {
+                status.className = 'gst-status required';
+                status.innerHTML = `
+                    <div class="gst-icon">⚠️</div>
+                    <div class="gst-message">GST Registration: Required</div>
+                    <div class="gst-detail">Your projected turnover exceeds $75,000. You must register for GST and lodge quarterly BAS returns.</div>
+                `;
+                document.getElementById('gstRow').style.display = 'flex';
+                document.getElementById('invoiceGST').textContent = '$' + (state.hourlyRate * 2 * 0.1).toFixed(2);
+                document.getElementById('invoiceTotal').textContent = '$' + (state.hourlyRate * 2 * 1.1).toFixed(2);
+            } else if (annual >= 50000) {
+                status.className = 'gst-status warning';
+                status.innerHTML = `
+                    <div class="gst-icon">👀</div>
+                    <div class="gst-message">GST Registration: Watch This</div>
+                    <div class="gst-detail">You're getting close to the $75,000 threshold. Keep tracking your revenue - you might need to register soon.</div>
+                `;
+                document.getElementById('gstRow').style.display = 'none';
+            } else {
+                status.className = 'gst-status safe';
+                status.innerHTML = `
+                    <div class="gst-icon">✅</div>
+                    <div class="gst-message">GST Registration: Optional</div>
+                    <div class="gst-detail">Your projected turnover is under $75,000. You don't need to register for GST, but you can if you want to claim GST credits on business purchases.</div>
+                `;
+                document.getElementById('gstRow').style.display = 'none';
+            }
+        }
+
+        function showResults() {
+            const annual = state.hourlyRate * state.hoursWeek * state.weeksYear;
+
+            // Update results
+            document.getElementById('resultBusiness').textContent = businessTypes[state.businessType]?.name || 'Your Business';
+            document.getElementById('resultStructure').textContent = state.structure === 'sole' ? 'Sole Trader' : 'Pty Ltd';
+            document.getElementById('resultRevenue').textContent = '$' + annual.toLocaleString();
+            document.getElementById('resultGST').textContent = annual >= 75000 ? 'Required' : 'Optional';
+
+            // Calculate score
+            let score = 70;
+            if (state.businessType) score += 5;
+            if (state.abn) score += 5;
+            if (state.structure) score += 5;
+            if (state.hourlyRate >= 40) score += 5;
+            if (state.hoursWeek >= 5) score += 5;
+            if (annual >= 10000) score += 5;
+
+            document.getElementById('finalScore').textContent = Math.min(score, 100);
+            document.querySelector('.score-circle').style.setProperty('--score', Math.min(score, 100));
+
+            nextSection(6);
+        }
+
+        function startOver() {
+            state = {
+                businessType: null,
+                businessName: '',
+                structure: null,
+                abn: null,
+                hourlyRate: 50,
+                hoursWeek: 10,
+                weeksYear: 40
+            };
+
+            document.querySelectorAll('.business-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.structure-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('btn1').disabled = true;
+            document.getElementById('btn3').disabled = true;
+            document.getElementById('abnForm').style.display = 'block';
+            document.getElementById('abnSuccess').style.display = 'none';
+            document.getElementById('fullName').value = '';
+            document.getElementById('businessName').value = '';
+            document.getElementById('tfn').value = '';
+            document.getElementById('dob').value = '';
+            document.getElementById('businessActivity').value = '';
+            document.getElementById('hourlyRate').value = 50;
+            document.getElementById('hoursWeek').value = 10;
+            document.getElementById('weeksYear').value = 40;
+
+            calculatePricing();
+            showSection(1);
+        }
+
+        function saveResults() {
+            const annual = state.hourlyRate * state.hoursWeek * state.weeksYear;
+            const text = `
+=== BUSINESS STARTER PLAN ===
+
+Business: ${businessTypes[state.businessType]?.name || 'Your Business'}
+Business Name: ${state.businessName}
+ABN (simulated): ${state.abn}
+Structure: ${state.structure === 'sole' ? 'Sole Trader' : 'Pty Ltd Company'}
+
+PRICING:
+- Hourly Rate: $${state.hourlyRate}
+- Hours/Week: ${state.hoursWeek}
+- Weeks/Year: ${state.weeksYear}
+- Est. Annual Revenue: $${annual.toLocaleString()}
+
+GST STATUS: ${annual >= 75000 ? 'Registration Required (over $75k)' : 'Optional (under $75k)'}
+
+NEXT STEPS:
+1. Apply for real ABN at abr.gov.au (FREE)
+2. Set up a separate business bank account
+3. Create social media profiles
+4. Get your first client!
+
+USEFUL LINKS:
+- business.gov.au - Official Australian business guide
+- abr.gov.au - Register your ABN
+- ato.gov.au - Tax information
+
+Generated by Business Starter - Tech for Life
+            `.trim();
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Business Plan',
+                    text: text
+                }).catch(() => copyText(text));
+            } else {
+                copyText(text);
+            }
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Business plan copied to clipboard!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Business plan copied to clipboard!');
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set today's date on invoice
+            const today = new Date();
+            document.getElementById('invoiceDate').textContent = today.toLocaleDateString('en-AU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            calculatePricing();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Calculator // Do You Need It?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0c0c14;
+            --bg-card: #14141e;
+            --bg-input: #1c1c28;
+            --bg-hover: #242432;
+            --accent-teal: #14b8a6;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --text-white: #f1f5f9;
+            --text-gray: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2a2a3a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+
+        .home-link:hover {
+            background: var(--accent-teal);
+            color: var(--bg-dark);
+            border-color: var(--accent-teal);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0 2.5rem;
+        }
+
+        .logo {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo .insurance { color: var(--accent-teal); }
+        .logo .calc { color: var(--accent-orange); }
+
+        .tagline {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* Main Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Input Panel */
+        .input-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: sticky;
+            top: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-prefix {
+            padding: 0.9rem 1rem;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--accent-teal);
+            font-weight: 600;
+        }
+
+        .input-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Radio Options */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            border-color: var(--accent-teal);
+        }
+
+        .radio-option.selected {
+            border-color: var(--accent-teal);
+            background: rgba(20, 184, 166, 0.1);
+        }
+
+        .radio-option input {
+            display: none;
+        }
+
+        .radio-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .radio-option.selected .radio-circle {
+            border-color: var(--accent-teal);
+            background: var(--accent-teal);
+        }
+
+        .radio-circle::after {
+            content: '✓';
+            color: var(--bg-dark);
+            font-size: 12px;
+            opacity: 0;
+        }
+
+        .radio-option.selected .radio-circle::after {
+            opacity: 1;
+        }
+
+        .radio-text {
+            font-size: 0.9rem;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Score Card */
+        .score-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .score-ring {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--accent-teal) 0deg,
+                var(--accent-teal) calc(var(--score, 0) * 3.6deg),
+                var(--bg-input) calc(var(--score, 0) * 3.6deg)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            transition: background 0.5s ease;
+        }
+
+        .score-inner {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        .score-message {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-detail {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Insurance Cards */
+        .insurance-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .insurance-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .insurance-card.recommended {
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.15);
+        }
+
+        .insurance-card.warning {
+            border-color: var(--accent-orange);
+        }
+
+        .insurance-card.danger {
+            border-color: var(--accent-red);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+        }
+
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag-recommended {
+            background: rgba(20, 184, 166, 0.2);
+            color: var(--accent-teal);
+        }
+
+        .tag-optional {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .tag-required {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        .tag-wait {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .card-body {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .stat-value.green { color: var(--accent-green); }
+        .stat-value.orange { color: var(--accent-orange); }
+        .stat-value.red { color: var(--accent-red); }
+        .stat-value.teal { color: var(--accent-teal); }
+
+        /* Medicare Levy Surcharge Section */
+        .mls-section {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .mls-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mls-bar {
+            margin: 1.5rem 0;
+        }
+
+        .mls-track {
+            height: 20px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mls-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-orange), var(--accent-red));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .mls-marker {
+            position: absolute;
+            top: -25px;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .mls-marker::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            width: 2px;
+            height: 30px;
+            background: var(--text-muted);
+            transform: translateX(-50%);
+        }
+
+        .mls-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .mls-result {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .mls-result.safe {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--accent-green);
+        }
+
+        .mls-result.warning {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid var(--accent-orange);
+        }
+
+        .mls-result.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+        }
+
+        .mls-result-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mls-result-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .mls-result-detail {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* LHC Section */
+        .lhc-section {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .lhc-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lhc-subtitle {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lhc-calculator {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .lhc-box {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .lhc-box-label {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .lhc-box-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .lhc-box-value.green { color: var(--accent-green); }
+        .lhc-box-value.orange { color: var(--accent-orange); }
+        .lhc-box-value.red { color: var(--accent-red); }
+
+        .lhc-box-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Car Insurance */
+        .car-section {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .car-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .car-options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .car-option {
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .car-option.recommended {
+            border-color: var(--accent-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        .car-option-icon {
+            font-size: 2rem;
+        }
+
+        .car-option-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .car-option-content p {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        .car-option-price {
+            text-align: right;
+        }
+
+        .car-option-price .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        .car-option-price .period {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Tips Section */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .tip-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+
+        .tip-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tip-card p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .tip-card a {
+            color: var(--accent-teal);
+            text-decoration: none;
+        }
+
+        .tip-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* Age Display */
+        .age-display {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-input);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .age-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            line-height: 1;
+        }
+
+        .age-label {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .input-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .card-stats { flex-direction: column; gap: 0.75rem; }
+            .lhc-calculator { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="home-link">← Course Home</a>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <span class="insurance">INSURANCE</span>
+                <span class="calc">CALCULATOR</span>
+            </h1>
+            <p class="tagline">Figure out what insurance you actually need</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <h2 class="panel-title">📋 Your Details</h2>
+
+                <div class="age-display">
+                    <div class="age-number" id="ageDisplay">18</div>
+                    <div class="age-label">years old</div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Your age</label>
+                    <input type="range" class="input-field" id="ageSlider" min="17" max="65" value="18" style="padding: 0.5rem;" oninput="updateCalculations()">
+                    <div class="input-hint">Slide to adjust your age</div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Expected annual income</label>
+                    <div class="input-row">
+                        <span class="input-prefix">$</span>
+                        <input type="number" class="input-field" id="incomeInput" value="45000" placeholder="45000" oninput="updateCalculations()">
+                    </div>
+                    <div class="input-hint">Before tax (gross income)</div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Do you own a car?</label>
+                    <div class="radio-group">
+                        <div class="radio-option selected" onclick="selectOption(this, 'car', 'yes')">
+                            <div class="radio-circle"></div>
+                            <span class="radio-text">Yes, I own a car</span>
+                        </div>
+                        <div class="radio-option" onclick="selectOption(this, 'car', 'no')">
+                            <div class="radio-circle"></div>
+                            <span class="radio-text">No car</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Living situation</label>
+                    <div class="radio-group">
+                        <div class="radio-option selected" onclick="selectOption(this, 'living', 'parents')">
+                            <div class="radio-circle"></div>
+                            <span class="radio-text">Living with parents</span>
+                        </div>
+                        <div class="radio-option" onclick="selectOption(this, 'living', 'renting')">
+                            <div class="radio-circle"></div>
+                            <span class="radio-text">Renting</span>
+                        </div>
+                        <div class="radio-option" onclick="selectOption(this, 'living', 'own')">
+                            <div class="radio-circle"></div>
+                            <span class="radio-text">Own my home</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Car value (if applicable)</label>
+                    <div class="input-row">
+                        <span class="input-prefix">$</span>
+                        <input type="number" class="input-field" id="carValue" value="8000" placeholder="8000" oninput="updateCalculations()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel">
+                <!-- Score Card -->
+                <div class="score-card">
+                    <div class="score-ring" id="scoreRing" style="--score: 65;">
+                        <div class="score-inner">
+                            <div class="score-value" id="scoreValue">65</div>
+                            <div class="score-label">Insurance Score</div>
+                        </div>
+                    </div>
+                    <div class="score-message" id="scoreMessage">You're in good shape!</div>
+                    <div class="score-detail" id="scoreDetail">Based on your age and income, here's what you need to know about insurance.</div>
+                </div>
+
+                <!-- Medicare Levy Surcharge -->
+                <div class="mls-section">
+                    <h3 class="mls-title">🏥 Medicare Levy Surcharge (MLS)</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 1rem;">
+                        If you earn over $93,000 and don't have private hospital cover, you pay an extra 1-1.5% tax.
+                    </p>
+
+                    <div class="mls-bar">
+                        <div class="mls-track">
+                            <div class="mls-fill" id="mlsFill" style="width: 48%;"></div>
+                            <div class="mls-marker" style="left: 62%;">$93k</div>
+                            <div class="mls-marker" style="left: 73%;">$108k</div>
+                            <div class="mls-marker" style="left: 93%;">$144k</div>
+                        </div>
+                        <div class="mls-labels">
+                            <span>$0</span>
+                            <span id="incomeMarker">Your income: $45,000</span>
+                            <span>$150k+</span>
+                        </div>
+                    </div>
+
+                    <div class="mls-result safe" id="mlsResult">
+                        <div class="mls-result-icon">✅</div>
+                        <div class="mls-result-title">No MLS Penalty</div>
+                        <div class="mls-result-detail">Your income is below $93,000, so you don't need private health insurance to avoid the surcharge.</div>
+                    </div>
+                </div>
+
+                <!-- LHC Section -->
+                <div class="lhc-section">
+                    <h3 class="lhc-title">📅 Lifetime Health Cover (LHC) Loading</h3>
+                    <p class="lhc-subtitle">If you don't get private hospital cover before age 31, you pay 2% extra for each year you wait.</p>
+
+                    <div class="lhc-calculator">
+                        <div class="lhc-box">
+                            <div class="lhc-box-label">Your age</div>
+                            <div class="lhc-box-value teal" id="lhcAge">18</div>
+                        </div>
+                        <div class="lhc-box">
+                            <div class="lhc-box-label">Years until 31</div>
+                            <div class="lhc-box-value green" id="lhcYears">13</div>
+                            <div class="lhc-box-note" id="lhcYearsNote">No rush yet</div>
+                        </div>
+                        <div class="lhc-box">
+                            <div class="lhc-box-label">Current LHC loading</div>
+                            <div class="lhc-box-value green" id="lhcLoading">0%</div>
+                            <div class="lhc-box-note">Extra you'd pay</div>
+                        </div>
+                        <div class="lhc-box">
+                            <div class="lhc-box-label">If you wait 10 years</div>
+                            <div class="lhc-box-value orange" id="lhcFuture">0%</div>
+                            <div class="lhc-box-note" id="lhcFutureNote">At age 28</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Insurance Card -->
+                <div class="insurance-grid">
+                    <div class="insurance-card" id="healthCard">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <span class="card-icon">🏥</span>
+                                <span class="card-name">Private Health Insurance</span>
+                            </div>
+                            <span class="card-tag tag-optional" id="healthTag">Optional</span>
+                        </div>
+                        <div class="card-body" id="healthBody">
+                            At your age and income level, private health insurance is optional. Medicare covers most essentials. Consider it when you earn over $93k or turn 31.
+                        </div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <div class="stat-label">Basic hospital cover</div>
+                                <div class="stat-value teal">~$80-120/mo</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">With extras</div>
+                                <div class="stat-value teal">~$150-200/mo</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Potential MLS saving</div>
+                                <div class="stat-value green" id="mlsSaving">$0/yr</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Car Insurance Section -->
+                <div class="car-section" id="carSection">
+                    <h3 class="car-title">🚗 Car Insurance Explained</h3>
+
+                    <div class="car-options">
+                        <div class="car-option">
+                            <div class="car-option-icon">📋</div>
+                            <div class="car-option-content">
+                                <h4>CTP (Compulsory Third Party)</h4>
+                                <p>Built into your rego. Covers injuries you cause to other people. You MUST have this.</p>
+                            </div>
+                            <div class="car-option-price">
+                                <div class="price">Included</div>
+                                <div class="period">in rego</div>
+                            </div>
+                        </div>
+
+                        <div class="car-option" id="tppOption">
+                            <div class="car-option-icon">🛡️</div>
+                            <div class="car-option-content">
+                                <h4>Third Party Property</h4>
+                                <p>Covers damage you cause to OTHER people's cars/property. Not your own car.</p>
+                            </div>
+                            <div class="car-option-price">
+                                <div class="price" id="tppPrice">~$300</div>
+                                <div class="period">/year</div>
+                            </div>
+                        </div>
+
+                        <div class="car-option recommended" id="compOption">
+                            <div class="car-option-icon">⭐</div>
+                            <div class="car-option-content">
+                                <h4>Comprehensive</h4>
+                                <p>Covers damage to your car too - theft, accidents, fire, storms, vandalism.</p>
+                            </div>
+                            <div class="car-option-price">
+                                <div class="price" id="compPrice">~$1,200</div>
+                                <div class="period">/year (under 25)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-input); border-radius: 12px;">
+                        <h4 style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>💡</span> Our recommendation for you:
+                        </h4>
+                        <p style="font-size: 0.9rem; color: var(--text-gray);" id="carRecommendation">
+                            With a car worth $8,000, comprehensive insurance makes sense. One accident could write off your car, and young drivers pay high premiums because they're statistically riskier.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Renters Insurance -->
+                <div class="insurance-card" id="rentersCard" style="display: none;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="card-icon">🏠</span>
+                            <span class="card-name">Contents/Renters Insurance</span>
+                        </div>
+                        <span class="card-tag tag-recommended">Recommended</span>
+                    </div>
+                    <div class="card-body">
+                        Covers your belongings if they're stolen, damaged by fire, or destroyed by storm. Your landlord's insurance doesn't cover YOUR stuff.
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <div class="stat-label">Typical cost</div>
+                            <div class="stat-value teal">$15-30/mo</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Coverage amount</div>
+                            <div class="stat-value teal">$20-50k</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <h4>🔍 Compare before you buy</h4>
+                        <p>Use <a href="https://www.comparethemarket.com.au" target="_blank">Compare the Market</a>, <a href="https://www.iselect.com.au" target="_blank">iSelect</a>, or <a href="https://www.finder.com.au" target="_blank">Finder</a> to compare health insurance prices.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>📱 Check existing cover</h4>
+                        <p>Your super fund likely includes basic life insurance and income protection. Check before paying for separate policies.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>💰 Increase your excess</h4>
+                        <p>A higher excess (the amount you pay first in a claim) means lower premiums. Good if you're a safe driver.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>📅 Pay annually</h4>
+                        <p>Most insurers charge less if you pay yearly instead of monthly. Can save 10-15%.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            age: 18,
+            income: 45000,
+            hasCar: true,
+            living: 'parents',
+            carValue: 8000
+        };
+
+        function selectOption(element, type, value) {
+            const group = element.parentElement;
+            group.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+
+            if (type === 'car') {
+                state.hasCar = value === 'yes';
+            } else if (type === 'living') {
+                state.living = value;
+            }
+
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            // Get values
+            state.age = parseInt(document.getElementById('ageSlider').value) || 18;
+            state.income = parseInt(document.getElementById('incomeInput').value) || 0;
+            state.carValue = parseInt(document.getElementById('carValue').value) || 0;
+
+            // Update age display
+            document.getElementById('ageDisplay').textContent = state.age;
+
+            // Calculate scores and results
+            updateMLS();
+            updateLHC();
+            updateHealthRecommendation();
+            updateCarInsurance();
+            updateRentersInsurance();
+            updateScore();
+        }
+
+        function updateMLS() {
+            const income = state.income;
+            const fillPercent = Math.min((income / 150000) * 100, 100);
+            document.getElementById('mlsFill').style.width = fillPercent + '%';
+            document.getElementById('incomeMarker').textContent = `Your income: $${income.toLocaleString()}`;
+
+            const result = document.getElementById('mlsResult');
+
+            if (income < 93000) {
+                result.className = 'mls-result safe';
+                result.innerHTML = `
+                    <div class="mls-result-icon">✅</div>
+                    <div class="mls-result-title">No MLS Penalty</div>
+                    <div class="mls-result-detail">Your income is below $93,000, so you don't need private health insurance to avoid the surcharge.</div>
+                `;
+                document.getElementById('mlsSaving').textContent = '$0/yr';
+            } else if (income < 108000) {
+                const penalty = income * 0.01;
+                result.className = 'mls-result warning';
+                result.innerHTML = `
+                    <div class="mls-result-icon">⚠️</div>
+                    <div class="mls-result-title">1% MLS Penalty Zone</div>
+                    <div class="mls-result-detail">Without private hospital cover, you'll pay an extra <strong>$${Math.round(penalty).toLocaleString()}/year</strong> in tax. Private health insurance might be cheaper!</div>
+                `;
+                document.getElementById('mlsSaving').textContent = '$' + Math.round(penalty).toLocaleString() + '/yr';
+            } else if (income < 144000) {
+                const penalty = income * 0.0125;
+                result.className = 'mls-result danger';
+                result.innerHTML = `
+                    <div class="mls-result-icon">🔴</div>
+                    <div class="mls-result-title">1.25% MLS Penalty Zone</div>
+                    <div class="mls-result-detail">Without private hospital cover, you'll pay an extra <strong>$${Math.round(penalty).toLocaleString()}/year</strong> in tax. Getting health insurance would likely save you money!</div>
+                `;
+                document.getElementById('mlsSaving').textContent = '$' + Math.round(penalty).toLocaleString() + '/yr';
+            } else {
+                const penalty = income * 0.015;
+                result.className = 'mls-result danger';
+                result.innerHTML = `
+                    <div class="mls-result-icon">🔴</div>
+                    <div class="mls-result-title">1.5% MLS Penalty Zone</div>
+                    <div class="mls-result-detail">Without private hospital cover, you'll pay an extra <strong>$${Math.round(penalty).toLocaleString()}/year</strong> in tax. Private health insurance is almost certainly cheaper!</div>
+                `;
+                document.getElementById('mlsSaving').textContent = '$' + Math.round(penalty).toLocaleString() + '/yr';
+            }
+        }
+
+        function updateLHC() {
+            const age = state.age;
+            const yearsUntil31 = Math.max(0, 31 - age);
+            const loading = age > 31 ? Math.min((age - 31) * 2, 70) : 0;
+            const futureAge = Math.min(age + 10, 65);
+            const futureLoading = futureAge > 31 ? Math.min((futureAge - 31) * 2, 70) : 0;
+
+            document.getElementById('lhcAge').textContent = age;
+
+            const yearsEl = document.getElementById('lhcYears');
+            const yearsNote = document.getElementById('lhcYearsNote');
+
+            if (yearsUntil31 > 0) {
+                yearsEl.textContent = yearsUntil31;
+                yearsEl.className = 'lhc-box-value green';
+                yearsNote.textContent = yearsUntil31 > 5 ? 'No rush yet' : 'Getting closer!';
+            } else {
+                yearsEl.textContent = '0';
+                yearsEl.className = 'lhc-box-value orange';
+                yearsNote.textContent = 'Deadline passed';
+            }
+
+            const loadingEl = document.getElementById('lhcLoading');
+            loadingEl.textContent = loading + '%';
+            loadingEl.className = loading === 0 ? 'lhc-box-value green' : loading < 20 ? 'lhc-box-value orange' : 'lhc-box-value red';
+
+            document.getElementById('lhcFuture').textContent = futureLoading + '%';
+            document.getElementById('lhcFutureNote').textContent = `At age ${futureAge}`;
+        }
+
+        function updateHealthRecommendation() {
+            const age = state.age;
+            const income = state.income;
+
+            const tag = document.getElementById('healthTag');
+            const body = document.getElementById('healthBody');
+
+            if (income >= 93000) {
+                tag.textContent = 'Recommended';
+                tag.className = 'card-tag tag-recommended';
+                body.textContent = `With income over $93,000, private health insurance will likely save you money. The Medicare Levy Surcharge penalty is more expensive than basic hospital cover.`;
+            } else if (age >= 29) {
+                tag.textContent = 'Consider Soon';
+                tag.className = 'card-tag tag-wait';
+                body.textContent = `You're approaching 31 - the LHC loading deadline. Getting hospital cover before you turn 31 avoids paying 2% extra per year for life. Worth considering now.`;
+            } else if (age >= 31) {
+                tag.textContent = 'Loading Applies';
+                tag.className = 'card-tag tag-required';
+                const loading = Math.min((age - 31) * 2, 70);
+                body.textContent = `You're past 31, so you'll pay ${loading}% LHC loading on top of premiums for the first 10 years. Still worth getting to prevent the loading increasing further.`;
+            } else {
+                tag.textContent = 'Optional';
+                tag.className = 'card-tag tag-optional';
+                body.textContent = `At your age and income level, private health insurance is optional. Medicare covers most essentials. Consider it when you earn over $93k or approach 31.`;
+            }
+        }
+
+        function updateCarInsurance() {
+            const carSection = document.getElementById('carSection');
+            carSection.style.display = state.hasCar ? 'block' : 'none';
+
+            if (!state.hasCar) return;
+
+            const age = state.age;
+            const carValue = state.carValue;
+
+            // Rough premium estimates (young drivers pay WAY more)
+            const ageFactor = age < 25 ? 2.5 : age < 30 ? 1.5 : 1;
+            const tppBase = 200 + (age < 25 ? 150 : 50);
+            const compBase = (carValue * 0.08) + (age < 25 ? 600 : 200);
+
+            document.getElementById('tppPrice').textContent = '~$' + Math.round(tppBase);
+            document.getElementById('compPrice').textContent = '~$' + Math.round(compBase).toLocaleString();
+
+            const recommendation = document.getElementById('carRecommendation');
+            const compOption = document.getElementById('compOption');
+            const tppOption = document.getElementById('tppOption');
+
+            if (carValue > 5000) {
+                compOption.classList.add('recommended');
+                tppOption.classList.remove('recommended');
+                recommendation.textContent = `With a car worth $${carValue.toLocaleString()}, comprehensive insurance makes sense. One accident could write off your car${age < 25 ? ', and young drivers pay high premiums because they\'re statistically riskier' : ''}.`;
+            } else if (carValue > 0) {
+                compOption.classList.remove('recommended');
+                tppOption.classList.add('recommended');
+                recommendation.textContent = `With a car worth $${carValue.toLocaleString()}, Third Party Property might be enough. Comprehensive premiums could cost more than the car is worth. Just make sure you can afford to replace the car if it's written off.`;
+            }
+        }
+
+        function updateRentersInsurance() {
+            const card = document.getElementById('rentersCard');
+            card.style.display = state.living === 'renting' ? 'block' : 'none';
+        }
+
+        function updateScore() {
+            let score = 50;
+
+            // Age factors
+            if (state.age < 31) score += 15;
+            else if (state.age < 40) score += 5;
+
+            // Income factors
+            if (state.income < 93000) score += 15;
+            else if (state.income < 108000) score -= 5;
+            else score -= 10;
+
+            // Car factors
+            if (state.hasCar) {
+                if (state.carValue < 3000) score += 5;
+                else if (state.carValue > 15000) score -= 5;
+            } else {
+                score += 10;
+            }
+
+            // Living situation
+            if (state.living === 'parents') score += 10;
+            else if (state.living === 'renting') score += 0;
+            else score -= 5;
+
+            score = Math.max(30, Math.min(95, score));
+
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('scoreRing').style.setProperty('--score', score);
+
+            const message = document.getElementById('scoreMessage');
+            const detail = document.getElementById('scoreDetail');
+
+            if (score >= 80) {
+                message.textContent = "You're in great shape!";
+                detail.textContent = "At your age and income, insurance needs are minimal. Focus on car insurance if you drive, and revisit health insurance when you approach 31 or hit $93k income.";
+            } else if (score >= 60) {
+                message.textContent = "Looking good, some things to consider";
+                detail.textContent = "You've got the basics covered. Pay attention to the recommendations above - there might be a few areas where insurance makes sense.";
+            } else {
+                message.textContent = "Some action needed";
+                detail.textContent = "Based on your situation, there are some insurance decisions worth making soon. Check the highlighted sections above.";
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCalculations();
+        });
+    </script>
+</body>
+</html>

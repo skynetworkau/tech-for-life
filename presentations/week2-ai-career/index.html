@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Your Career // Week 2 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card:nth-child(1) { border-color: var(--accent-emerald); }
+        .stat-card:nth-child(2) { border-color: var(--accent-violet); }
+        .stat-card:nth-child(3) { border-color: var(--accent-blue); }
+        .stat-card:nth-child(4) { border-color: var(--accent-cyan); }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1100px;
+            width: 100%;
+            align-items: start;
+        }
+
+        .content-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .content-box h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-violet);
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .content-box li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .content-box li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Industry Grid */
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .industry-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .industry-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .industry-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .industry-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Skills List */
+        .skills-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-emerald);
+        }
+
+        .skill-icon {
+            font-size: 2rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .skill-content {
+            flex: 1;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+
+        .skill-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Comparison Layout */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .comparison-side {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .comparison-vs {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            color: var(--accent-violet);
+        }
+
+        .comparison-label {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        .comparison-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Activity Section */
+        .activity-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .activity-section h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-violet);
+        }
+
+        .activity-number {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-violet);
+            min-width: 40px;
+        }
+
+        .activity-text {
+            color: var(--text-secondary);
+        }
+
+        /* Takeaways Grid */
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .takeaway-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            border-top: 4px solid var(--accent-violet);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .takeaway-icon {
+            font-size: 2rem;
+        }
+
+        .takeaway-text {
+            flex: 1;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Australian Context */
+        .aussie-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 900px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .aussie-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .aussie-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .aussie-content {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .industry-grid { grid-template-columns: 1fr; }
+            .comparison { grid-template-columns: 1fr; }
+            .comparison-vs { display: none; }
+            .takeaways-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">AI & Your <em>Career</em></h1>
+            <p class="slide-subtitle">Robots, jobs, and the flexible future you're about to navigate</p>
+            <p class="stat-source">Week 2 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: The Robot Revolution -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Robot Revolution is <em>NOW</em></h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-number">750,000+</div>
+                    <div class="stat-label">Robots in Amazon warehouses worldwide</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🤖</div>
+                    <div class="stat-number">Tesla Optimus</div>
+                    <div class="stat-label">Humanoid robot already working in factories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚛</div>
+                    <div class="stat-number">Autonomous</div>
+                    <div class="stat-label">Self-driving trucks on highways in USA & Australia</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🛴</div>
+                    <div class="stat-number">Delivery Bots</div>
+                    <div class="stat-label">Robot deliveries on sidewalks and campuses</div>
+                </div>
+            </div>
+            <p class="stat-source">This isn't science fiction. It's happening right now.</p>
+        </div>
+
+        <!-- Slide 3: Jobs Being Disrupted -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Jobs Being <em>Disrupted</em></h2>
+            <div class="industry-grid">
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">📊</div>
+                    <div class="industry-title">Data Entry & Admin</div>
+                    <div class="industry-desc">Heavily automated. AI can process forms, invoices, and data entry tasks instantly.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">💰</div>
+                    <div class="industry-title">Accounting & Bookkeeping</div>
+                    <div class="industry-desc">AI doing more basic tasks. Accountants shifting to advisory roles.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">💬</div>
+                    <div class="industry-title">Customer Service</div>
+                    <div class="industry-desc">Chatbots handling routine enquiries. Humans for complex issues.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">⚖️</div>
+                    <div class="industry-title">Legal Research</div>
+                    <div class="industry-desc">AI reading and analysing contracts faster than junior lawyers.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">🩺</div>
+                    <div class="industry-title">Radiology</div>
+                    <div class="industry-desc">AI reading scans with high accuracy. Radiologists supervise and handle complex cases.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">🛒</div>
+                    <div class="industry-title">Retail Checkout</div>
+                    <div class="industry-desc">Self-service kiosks and cashier-less stores spreading rapidly.</div>
+                </div>
+            </div>
+            <p class="stat-source">McKinsey estimates 30% of work activities could be automated by 2030</p>
+        </div>
+
+        <!-- Slide 4: But Also NEW Jobs Created -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">But Also <em>NEW</em> Jobs Created</h2>
+            <div class="industry-grid">
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">🎯</div>
+                    <div class="industry-title">AI Trainers & Prompt Engineers</div>
+                    <div class="industry-desc">Teaching AI systems and crafting effective prompts for optimal results.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">🔧</div>
+                    <div class="industry-title">Robot Maintenance Technicians</div>
+                    <div class="industry-desc">Robots break down. Someone needs to fix them.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">⚖️</div>
+                    <div class="industry-title">AI Ethics Officers</div>
+                    <div class="industry-desc">Ensuring AI systems are fair, safe, and responsible.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">🏷️</div>
+                    <div class="industry-title">Data Annotation Specialists</div>
+                    <div class="industry-desc">Labelling data to train AI models. Growing industry.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">🧠</div>
+                    <div class="industry-title">Machine Learning Engineers</div>
+                    <div class="industry-desc">Building and optimising AI systems. High demand, high pay.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">🛡️</div>
+                    <div class="industry-title">AI Safety Researchers</div>
+                    <div class="industry-desc">Making sure AI doesn't go rogue. Seriously.</div>
+                </div>
+            </div>
+            <p class="stat-source">World Economic Forum: 97 million new jobs created by 2025 due to AI</p>
+        </div>
+
+        <!-- Slide 5: AI in EVERY Industry -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI in <em>Every</em> Industry</h2>
+            <div class="industry-grid">
+                <div class="industry-card" style="border-color: var(--accent-amber);">
+                    <div class="industry-icon">🔨</div>
+                    <div class="industry-title">Trades</div>
+                    <div class="industry-desc">Drone inspections, AI fault diagnostics, AR instruction overlays</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-cyan);">
+                    <div class="industry-icon">🏥</div>
+                    <div class="industry-title">Healthcare</div>
+                    <div class="industry-desc">AI diagnosis, robotic surgery, personalised treatment plans</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">🌾</div>
+                    <div class="industry-title">Agriculture</div>
+                    <div class="industry-desc">Autonomous tractors, crop monitoring drones, AI soil analysis</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-violet);">
+                    <div class="industry-icon">🛍️</div>
+                    <div class="industry-title">Retail</div>
+                    <div class="industry-desc">Inventory AI, personalised shopping, demand forecasting</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">🎨</div>
+                    <div class="industry-title">Creative</div>
+                    <div class="industry-desc">AI-assisted design, video editing tools, content generation</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-blue);">
+                    <div class="industry-icon">⛏️</div>
+                    <div class="industry-title">Mining (WA!)</div>
+                    <div class="industry-desc">Autonomous trucks, predictive maintenance, ore analysis</div>
+                </div>
+            </div>
+            <p class="stat-source">No industry is immune. AI is everywhere.</p>
+        </div>
+
+        <!-- Slide 6: Your Parents' Career vs Yours -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Parents' Career <em>vs</em> Yours</h2>
+            <div class="comparison">
+                <div class="comparison-side">
+                    <div class="comparison-label">Your Parents</div>
+                    <div class="comparison-text">
+                        One job, one company for 30+ years was normal.<br><br>
+                        Linear career path.<br><br>
+                        Loyalty rewarded with job security.
+                    </div>
+                </div>
+                <div class="comparison-vs">vs</div>
+                <div class="comparison-side">
+                    <div class="comparison-label">You</div>
+                    <div class="comparison-text">
+                        Average 12 different jobs, 5 different careers.<br><br>
+                        Non-linear, exploratory path.<br><br>
+                        Adaptability is your security.
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem; text-align: center; max-width: 700px;">
+                This is actually GOOD news. You can pivot, change direction, and explore. Skills transfer across industries. You're not locked in.
+            </p>
+        </div>
+
+        <!-- Slide 7: The Skills That WON'T Be Automated -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Skills That <em>Won't</em> Be Automated</h2>
+            <div class="skills-list">
+                <div class="skill-item">
+                    <div class="skill-icon">💡</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Creativity & Original Thinking</div>
+                        <div class="skill-desc">AI can remix patterns, but true innovation comes from humans</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🧩</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Complex Problem Solving</div>
+                        <div class="skill-desc">Real-world problems with no clear answer need human judgment</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">❤️</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Emotional Intelligence</div>
+                        <div class="skill-desc">Understanding people, empathy, relationship building</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🤲</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Physical Dexterity in Unpredictable Environments</div>
+                        <div class="skill-desc">Tradies, nurses, chefs—hands-on work in changing conditions</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">👥</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Leadership & Negotiation</div>
+                        <div class="skill-desc">Influencing people, managing conflict, building consensus</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">⚖️</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Ethics & Judgment</div>
+                        <div class="skill-desc">Making moral decisions, weighing values, accountability</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: How to Future-Proof Yourself -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How to <em>Future-Proof</em> Yourself</h2>
+            <div class="content-box" style="max-width: 800px;">
+                <ul style="display: flex; flex-direction: column; gap: 1rem;">
+                    <li style="font-size: 1.1rem; padding: 1rem 0 1rem 2.5rem;">Learn to work WITH AI, not against it</li>
+                    <li style="font-size: 1.1rem; padding: 1rem 0 1rem 2.5rem;">Focus on skills, not specific job titles</li>
+                    <li style="font-size: 1.1rem; padding: 1rem 0 1rem 2.5rem;">Be adaptable and willing to keep learning</li>
+                    <li style="font-size: 1.1rem; padding: 1rem 0 1rem 2.5rem;">Understand how AI works (basic literacy)</li>
+                    <li style="font-size: 1.1rem; padding: 1rem 0 1rem 2.5rem;">Build human connections and networks</li>
+                    <li style="font-size: 1.1rem; padding: 1rem 0 1rem 2.5rem;">Develop the uniquely human skills AI can't replicate</li>
+                </ul>
+            </div>
+            <p class="stat-source">The future belongs to those who adapt, not those who resist</p>
+        </div>
+
+        <!-- Slide 9: AI in Uni -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI at <em>University</em></h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div class="content-box">
+                    <h3>How Unis Are Using AI</h3>
+                    <ul>
+                        <li>AI tutoring systems for personalised learning</li>
+                        <li>Research assistants analysing massive datasets</li>
+                        <li>Automated grading for objective assessments</li>
+                        <li>Virtual lab simulations</li>
+                        <li>Career pathway recommendations</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>What Unis Expect From You</h3>
+                    <ul>
+                        <li>AI detection tools monitoring submissions</li>
+                        <li>Academic integrity policies updated for AI</li>
+                        <li>Assessments shifting to AI-proof formats</li>
+                        <li>Courses including AI literacy requirements</li>
+                        <li>Critical thinking valued more than memorisation</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Universities are adapting. Your approach needs to adapt too.</p>
+        </div>
+
+        <!-- Slide 10: AI in Trades -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI in <em>Trades</em></h2>
+            <div class="content-box" style="max-width: 800px;">
+                <h3 style="text-align: center; margin-bottom: 2rem;">Not Replacing Tradies — Augmenting Them</h3>
+                <ul style="display: flex; flex-direction: column; gap: 1rem;">
+                    <li style="font-size: 1.05rem; padding: 1rem 0 1rem 2.5rem;">
+                        <strong>AR Glasses:</strong> Overlay wiring diagrams, instructions, and measurements in real-time
+                    </li>
+                    <li style="font-size: 1.05rem; padding: 1rem 0 1rem 2.5rem;">
+                        <strong>AI Diagnostics:</strong> Scan equipment and instantly identify faults or issues
+                    </li>
+                    <li style="font-size: 1.05rem; padding: 1rem 0 1rem 2.5rem;">
+                        <strong>Drone Surveys:</strong> Inspect roofs, buildings, and sites without scaffolding
+                    </li>
+                    <li style="font-size: 1.05rem; padding: 1rem 0 1rem 2.5rem;">
+                        <strong>3D Printing:</strong> Print replacement parts on-site instead of waiting for delivery
+                    </li>
+                    <li style="font-size: 1.05rem; padding: 1rem 0 1rem 2.5rem;">
+                        <strong>You Still Need Human Hands:</strong> AI can't crawl under a house or fit a pipe yet
+                    </li>
+                </ul>
+            </div>
+            <p class="stat-source">Skilled trades are AI-resistant. But AI will make you a better tradie.</p>
+        </div>
+
+        <!-- Slide 11: AI in Business -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Starting Your <em>Own Business</em></h2>
+            <div class="content-box" style="max-width: 800px;">
+                <h3 style="text-align: center; margin-bottom: 1.5rem;">AI Makes Small Business Easier Than Ever</h3>
+                <div class="industry-grid" style="margin-top: 2rem;">
+                    <div class="industry-card" style="border-color: var(--accent-violet);">
+                        <div class="industry-icon">📋</div>
+                        <div class="industry-title">Admin & Invoicing</div>
+                        <div class="industry-desc">AI handles bookkeeping, invoices, and tax calculations automatically</div>
+                    </div>
+                    <div class="industry-card" style="border-color: var(--accent-blue);">
+                        <div class="industry-icon">📢</div>
+                        <div class="industry-title">Marketing</div>
+                        <div class="industry-desc">AI creates ads, writes copy, designs graphics, and targets customers</div>
+                    </div>
+                    <div class="industry-card" style="border-color: var(--accent-cyan);">
+                        <div class="industry-icon">💬</div>
+                        <div class="industry-title">Customer Service</div>
+                        <div class="industry-desc">Chatbots answer FAQs 24/7 while you focus on the important stuff</div>
+                    </div>
+                    <div class="industry-card" style="border-color: var(--accent-emerald);">
+                        <div class="industry-icon">📊</div>
+                        <div class="industry-title">Analytics</div>
+                        <div class="industry-desc">AI tracks sales trends, inventory, and customer behaviour</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Lower barriers to entry. You can start a business from your bedroom.</p>
+        </div>
+
+        <!-- Slide 12: The Gig Economy & Flexibility -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The <em>Gig Economy</em></h2>
+            <div class="content-box" style="max-width: 800px;">
+                <h3 style="text-align: center; margin-bottom: 2rem;">Side Hustles & Portfolio Careers Are Normal Now</h3>
+                <div class="stats-grid" style="margin-top: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon">💼</div>
+                        <div class="stat-label">Multiple income streams are the new normal</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌏</div>
+                        <div class="stat-label">Work remotely from anywhere with internet</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-label">Freelancing platforms connect you to global clients</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚖️</div>
+                        <div class="stat-label">Balance work and life on your terms</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">36% of Australian workers have a side hustle (2025 data)</p>
+        </div>
+
+        <!-- Slide 13: Real Australian Examples -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI in <em>Australia</em></h2>
+            <div class="aussie-card">
+                <div class="aussie-icon">🇦🇺</div>
+                <div class="aussie-title">Australian Companies Leading AI Innovation</div>
+                <div class="aussie-content">
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.75rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            <strong>Rio Tinto (WA):</strong> Autonomous trucks and trains moving ore across the Pilbara
+                        </li>
+                        <li style="padding: 0.75rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            <strong>Atlassian:</strong> Australian software giant using AI for project management tools
+                        </li>
+                        <li style="padding: 0.75rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            <strong>Canva:</strong> Sydney-based design platform with powerful AI tools used by millions
+                        </li>
+                        <li style="padding: 0.75rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            <strong>Commonwealth Bank:</strong> AI fraud detection saving customers millions
+                        </li>
+                        <li style="padding: 0.75rem 0; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0; color: var(--accent-emerald);">✓</span>
+                            <strong>WA Farmers:</strong> AI drones monitoring crops across massive properties
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">AI is creating thousands of new jobs in Australia right now</p>
+        </div>
+
+        <!-- Slide 14: What Employers Actually Want in 2026 -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Employers <em>Actually Want</em></h2>
+            <div class="skills-list">
+                <div class="skill-item">
+                    <div class="skill-icon">🤖</div>
+                    <div class="skill-content">
+                        <div class="skill-name">AI Literacy</div>
+                        <div class="skill-desc">Knowing when and how to use AI tools effectively</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🧠</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Critical Thinking</div>
+                        <div class="skill-desc">Checking AI output, spotting errors, questioning results</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🔄</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Adaptability & Learning Agility</div>
+                        <div class="skill-desc">Picking up new tools and skills quickly as things change</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🤝</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Collaboration Skills</div>
+                        <div class="skill-desc">Working with diverse teams, communicating clearly, giving feedback</div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🎯</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Problem-Solving Mindset</div>
+                        <div class="skill-desc">Finding creative solutions to new challenges</div>
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">LinkedIn's 2026 Most In-Demand Skills Report</p>
+        </div>
+
+        <!-- Slide 15: The Opportunity -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">This is an <em>Opportunity</em></h2>
+            <div class="content-box" style="max-width: 800px; text-align: center; padding: 3rem;">
+                <div style="font-size: 1.3rem; color: var(--text-secondary); line-height: 1.8;">
+                    <p style="margin-bottom: 1.5rem;">
+                        This is the <strong style="color: var(--text-primary);">most exciting time</strong> to enter the workforce.
+                    </p>
+                    <p style="margin-bottom: 1.5rem;">
+                        You have <strong style="color: var(--text-primary);">more flexibility</strong> than any generation before you.
+                    </p>
+                    <p style="margin-bottom: 1.5rem;">
+                        <strong style="color: var(--text-primary);">Lower barriers</strong> to starting businesses and creative projects.
+                    </p>
+                    <p style="margin-bottom: 1.5rem;">
+                        <strong style="color: var(--text-primary);">Global opportunities</strong> available from your bedroom.
+                    </p>
+                    <p style="margin-top: 2rem; font-size: 1.5rem; color: var(--accent-violet);">
+                        Be optimistic, but be prepared.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Your Challenge -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your <em>Challenge</em></h2>
+            <div class="activity-section">
+                <h3>Three Tasks for This Week</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-number">1</div>
+                        <div class="activity-text">
+                            <strong>Research:</strong> Pick one job you're interested in. How is AI changing it? What new skills does it require?
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-number">2</div>
+                        <div class="activity-text">
+                            <strong>Discover:</strong> Find 3 NEW job titles that didn't exist 5 years ago. What do they do?
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-number">3</div>
+                        <div class="activity-text">
+                            <strong>Interview:</strong> Ask a parent or older relative about their career path. How does it compare to what yours might look like?
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+                    We'll share findings next class
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 17: Key Takeaways -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key <em>Takeaways</em></h2>
+            <div class="takeaways-grid">
+                <div class="takeaway-card">
+                    <div class="takeaway-icon">🔄</div>
+                    <div class="takeaway-text">
+                        AI is changing jobs, not just eliminating them. New opportunities emerge constantly.
+                    </div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-icon">💪</div>
+                    <div class="takeaway-text">
+                        Career flexibility is your superpower. Embrace change and pivoting.
+                    </div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-icon">🎯</div>
+                    <div class="takeaway-text">
+                        Skills matter more than specific job titles. Focus on transferable abilities.
+                    </div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-icon">🌟</div>
+                    <div class="takeaway-text">
+                        You have more options than any previous generation. Use them wisely.
+                    </div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-icon">🤝</div>
+                    <div class="takeaway-text">
+                        Learn to work with AI, not against it. It's a tool, not a threat.
+                    </div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-icon">🧠</div>
+                    <div class="takeaway-text">
+                        Develop uniquely human skills that AI can't replicate yet.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: End Slide -->
+        <div class="slide">
+            <h1 class="slide-title">Your Career, <em>Your Terms</em></h1>
+            <p class="slide-subtitle">The future of work is flexible, exciting, and full of possibilities. Are you ready?</p>
+            <p class="stat-source">Questions? Let's discuss.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 18</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

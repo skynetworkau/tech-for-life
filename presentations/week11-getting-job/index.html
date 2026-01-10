@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting a Job - Year 12 Tech for Life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222222;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        #presentation {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateX(100px);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100px);
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .meta {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .content {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .list-item {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-cyan);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .list-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .list-item h4 {
+            color: var(--accent-cyan);
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .list-item p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.1));
+            border: 2px solid var(--accent-cyan);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .highlight-box h3 {
+            margin-top: 0;
+        }
+
+        .stat {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge.warning {
+            background: #f59e0b;
+        }
+
+        .badge.success {
+            background: #10b981;
+        }
+
+        ul.bullet-list {
+            list-style: none;
+            font-size: 1.3rem;
+            line-height: 2;
+        }
+
+        ul.bullet-list li {
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        ul.bullet-list li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #333;
+            text-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+        }
+
+        .card h4 {
+            color: var(--accent-blue);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        #controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border: 1px solid #333;
+            z-index: 100;
+        }
+
+        button {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        button:disabled:hover {
+            background: var(--bg-card);
+            color: var(--accent-cyan);
+            transform: scale(1);
+        }
+
+        #slide-counter {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .link-box {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .link-box a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .link-box a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tip {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: var(--accent-blue);
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #f59e0b;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .subtitle { font-size: 1.2rem; }
+            .slide { padding: 2rem 1.5rem; }
+            .two-column, .grid-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+
+    <div id="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>Getting a Job</h1>
+            <p class="subtitle">How to actually get hired in 2026</p>
+            <p class="meta">Year 12 Digital Technologies | Tech for Life</p>
+            <p class="meta" style="margin-top: 2rem; font-size: 1rem;">Press Enter, Arrow Keys, or PageDown to navigate</p>
+        </div>
+
+        <!-- Slide 2: Where Jobs Are Posted -->
+        <div class="slide">
+            <div class="content">
+                <h2>Where Jobs Are Posted</h2>
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="emoji">🔍</div>
+                        <h4>SEEK</h4>
+                        <p>Australia's largest job board. Filter by location, salary, industry.</p>
+                    </div>
+                    <div class="card">
+                        <div class="emoji">🌏</div>
+                        <h4>Indeed</h4>
+                        <p>Global platform with Australian listings. Upload resume once.</p>
+                    </div>
+                    <div class="card">
+                        <div class="emoji">💼</div>
+                        <h4>LinkedIn</h4>
+                        <p>Professional network. Set profile to "Open to Work".</p>
+                    </div>
+                    <div class="card">
+                        <div class="emoji">📋</div>
+                        <h4>Jora</h4>
+                        <p>Aggregates jobs from multiple sources. Good for broad searches.</p>
+                    </div>
+                    <div class="card">
+                        <div class="emoji">🏢</div>
+                        <h4>Company Websites</h4>
+                        <p>Apply directly to companies you want to work for.</p>
+                    </div>
+                    <div class="card">
+                        <div class="emoji">🎓</div>
+                        <h4>GradConnection</h4>
+                        <p>Graduate programs, internships, entry-level roles.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Hidden Job Market -->
+        <div class="slide">
+            <div class="content">
+                <h2>The Hidden Job Market</h2>
+                <div class="highlight-box">
+                    <div class="stat">70%</div>
+                    <h3>of jobs are never advertised publicly</h3>
+                    <p class="subtitle">They're filled through referrals, networking, and internal hires</p>
+                </div>
+                <div class="two-column">
+                    <div>
+                        <h3>Why networking matters</h3>
+                        <ul class="bullet-list">
+                            <li>Employers trust referrals more than strangers</li>
+                            <li>You hear about roles before they're posted</li>
+                            <li>Someone can vouch for your character</li>
+                            <li>Builds relationships for your career</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>How to network (for real)</h3>
+                        <ul class="bullet-list">
+                            <li>Tell family/friends you're job hunting</li>
+                            <li>Connect with people on LinkedIn</li>
+                            <li>Attend industry events/meetups</li>
+                            <li>Join professional groups on socials</li>
+                            <li>Ask for informational interviews</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: ATS -->
+        <div class="slide">
+            <div class="content">
+                <h2>Applicant Tracking Systems</h2>
+                <p class="subtitle">A robot reads your resume before a human does</p>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h3>What is an ATS?</h3>
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); line-height: 1.8;">
+                        Software that scans resumes for keywords, qualifications, and formatting.
+                        It ranks candidates automatically. If your resume isn't ATS-friendly,
+                        <strong style="color: var(--accent-cyan);">it might never reach a human recruiter</strong>.
+                    </p>
+                </div>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div class="list-item">
+                        <h4>ATS scans for</h4>
+                        <p>Keywords from job description, required skills, job titles, education, certifications, years of experience</p>
+                    </div>
+                    <div class="list-item">
+                        <h4>ATS rejects</h4>
+                        <p>Complex formatting, images/logos, tables, headers/footers, unusual fonts, graphics and charts</p>
+                    </div>
+                </div>
+
+                <div class="warning" style="margin-top: 2rem;">
+                    <strong>Reality check:</strong> 75% of resumes never make it past the ATS. You need to optimise for both robots AND humans.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Resume Basics -->
+        <div class="slide">
+            <div class="content">
+                <h2>Resume Basics</h2>
+                <div class="two-column">
+                    <div>
+                        <h3>What to include</h3>
+                        <div class="list-item">
+                            <h4>Contact info</h4>
+                            <p>Name, phone, email, LinkedIn (if you have one), location (city/suburb)</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Professional summary</h4>
+                            <p>2-3 sentences about who you are and what you're looking for</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Work experience</h4>
+                            <p>Job title, company, dates, bullet points of achievements (not just duties)</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Education</h4>
+                            <p>School name, qualifications, expected completion date</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Skills</h4>
+                            <p>Relevant technical and soft skills (match the job description)</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>What to skip</h3>
+                        <div class="list-item">
+                            <h4>Photo of yourself</h4>
+                            <p>Not standard in Australia (unless acting/modelling)</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Age or date of birth</h4>
+                            <p>Illegal to discriminate, so don't include it</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Hobbies (usually)</h4>
+                            <p>Only if directly relevant to the role</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>"References available on request"</h4>
+                            <p>They'll ask if they need them</p>
+                        </div>
+
+                        <div class="tip" style="margin-top: 1.5rem;">
+                            <strong>Length:</strong> 1-2 pages max. For school leavers, 1 page is fine.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Beating the ATS -->
+        <div class="slide">
+            <div class="content">
+                <h2>Beating the ATS</h2>
+                <p class="subtitle">How to make sure your resume gets read by a human</p>
+
+                <div class="grid-3" style="margin-top: 2rem;">
+                    <div class="card">
+                        <h4>Use keywords</h4>
+                        <p>Copy exact phrases from the job ad. If they want "customer service", use those exact words.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Simple formatting</h4>
+                        <p>Standard fonts (Arial, Calibri, Times). No tables, text boxes, or columns.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Standard sections</h4>
+                        <p>Use headings like "Work Experience", "Education", "Skills" - not creative names.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Spell out acronyms</h4>
+                        <p>Write "Bachelor of Science (BSc)" not just "BSc".</p>
+                    </div>
+                    <div class="card">
+                        <h4>File format</h4>
+                        <p>.docx or PDF (check what they ask for). Name it: FirstName_LastName_Resume.pdf</p>
+                    </div>
+                    <div class="card">
+                        <h4>Tailor every time</h4>
+                        <p>Customize your resume for each job. Copy-paste won't cut it.</p>
+                    </div>
+                </div>
+
+                <div class="tip" style="margin-top: 2rem;">
+                    <strong>Pro tip:</strong> AI tools like ChatGPT can help optimize your resume for ATS, but don't let them write it for you. Your experience and voice need to be authentic.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Cover Letters -->
+        <div class="slide">
+            <div class="content">
+                <h2>Cover Letters</h2>
+                <p class="subtitle">Still needed in 2026?</p>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div>
+                        <h3>When to write one</h3>
+                        <ul class="bullet-list">
+                            <li>When it's specifically requested</li>
+                            <li>For competitive roles (many applicants)</li>
+                            <li>When you need to explain something (career change, gap in work)</li>
+                            <li>When you have a connection to the company</li>
+                            <li>For professional/corporate roles</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>When to skip it</h3>
+                        <ul class="bullet-list">
+                            <li>Casual/retail jobs (unless asked)</li>
+                            <li>When the application doesn't have a field for it</li>
+                            <li>If you're applying to many jobs quickly</li>
+                            <li>When instructions say "resume only"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h3>The 3-paragraph structure</h3>
+                    <div class="two-column">
+                        <div>
+                            <span class="badge">Para 1</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Why you're excited about THIS company/role</p>
+                        </div>
+                        <div>
+                            <span class="badge">Para 2</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">What you bring (2-3 relevant achievements)</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <span class="badge">Para 3</span>
+                        <p style="margin-top: 0.5rem; color: var(--text-secondary);">Call to action (keen to discuss further)</p>
+                    </div>
+                </div>
+
+                <div class="warning" style="margin-top: 1.5rem;">
+                    <strong>Warning:</strong> Don't just regurgitate your resume. A cover letter should tell a story about why you're a great fit.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Video Interviews -->
+        <div class="slide">
+            <div class="content">
+                <h2>Video Interviews</h2>
+                <p class="subtitle">The new normal in 2026</p>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div>
+                        <h3>Technical setup</h3>
+                        <div class="list-item">
+                            <h4>Lighting</h4>
+                            <p>Face a window or use a lamp in front of you. Avoid backlighting.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Background</h4>
+                            <p>Clean, neutral wall. Remove distractions. Blur if needed.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Camera angle</h4>
+                            <p>Eye level. Stack books under laptop if needed.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Audio</h4>
+                            <p>Use headphones/earbuds to avoid echo. Test beforehand.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Interview tips</h3>
+                        <div class="list-item">
+                            <h4>Eye contact</h4>
+                            <p>Look at the camera, not the screen. Feels more natural.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Dress code</h4>
+                            <p>Same as in-person. Yes, wear proper pants.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Notes nearby</h4>
+                            <p>Keep key points on sticky notes around your screen. Don't read verbatim.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Test run</h4>
+                            <p>Do a practice call with a friend. Check everything works.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip" style="margin-top: 2rem;">
+                    <strong>Pro tip:</strong> Some companies use AI to analyze your video interviews (facial expressions, word choice). Be yourself, but be professional.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: What Employers Want -->
+        <div class="slide">
+            <div class="content">
+                <h2>What Employers Actually Want</h2>
+                <p class="subtitle">It's not always about technical skills</p>
+
+                <div style="margin-top: 3rem;">
+                    <div class="list-item">
+                        <h4>1. Reliability</h4>
+                        <p>Show up on time. Do what you say you'll do. Follow through. This beats talent every time for entry-level roles.</p>
+                    </div>
+
+                    <div class="list-item">
+                        <h4>2. Positive attitude</h4>
+                        <p>Willingness to help, team player, doesn't complain constantly. No one wants to work with someone who brings the vibe down.</p>
+                    </div>
+
+                    <div class="list-item">
+                        <h4>3. Willingness to learn</h4>
+                        <p>You won't know everything - that's fine. What matters is being coachable and asking questions when you don't understand.</p>
+                    </div>
+
+                    <div class="list-item">
+                        <h4>4. Communication skills</h4>
+                        <p>Can you write a clear email? Talk to customers/colleagues respectfully? Listen properly? Hugely underrated skill.</p>
+                    </div>
+
+                    <div class="list-item">
+                        <h4>5. Problem-solving</h4>
+                        <p>When something goes wrong, do you panic or figure it out? Can you think on your feet?</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h3>Remember</h3>
+                    <p style="font-size: 1.2rem; color: var(--text-secondary);">
+                        For your first job, employers expect to train you. They're hiring for <strong style="color: var(--accent-cyan);">potential and character</strong>, not perfection.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: References -->
+        <div class="slide">
+            <div class="content">
+                <h2>References</h2>
+                <p class="subtitle">Who to ask and how to prepare them</p>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div>
+                        <h3>Good references</h3>
+                        <ul class="bullet-list">
+                            <li>Previous managers/supervisors</li>
+                            <li>Teachers (if first job)</li>
+                            <li>Sports coaches (if relevant)</li>
+                            <li>Volunteer coordinators</li>
+                            <li>Family friends (if professional)</li>
+                        </ul>
+
+                        <div class="tip" style="margin-top: 2rem;">
+                            <strong>How many?</strong> Usually 2-3 references. Have them ready before you apply.
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Avoid using</h3>
+                        <ul class="bullet-list">
+                            <li>Family members (parents, siblings)</li>
+                            <li>Friends your own age</li>
+                            <li>People who don't know your work</li>
+                            <li>Anyone who might give a lukewarm reference</li>
+                        </ul>
+
+                        <div class="warning" style="margin-top: 2rem;">
+                            <strong>Always ask first!</strong> Don't list someone as a reference without permission.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h3>How to prepare your references</h3>
+                    <ul class="bullet-list">
+                        <li>Ask if they're comfortable being a reference (give them an out)</li>
+                        <li>Tell them what jobs you're applying for</li>
+                        <li>Remind them of your achievements/projects together</li>
+                        <li>Give them a heads up when you've listed them</li>
+                        <li>Thank them afterwards (text/email is fine)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Minimum Wage & Rights -->
+        <div class="slide">
+            <div class="content">
+                <h2>Know Your Rights</h2>
+                <p class="subtitle">Australian minimum wage & Fair Work basics</p>
+
+                <div class="highlight-box">
+                    <div class="two-column">
+                        <div>
+                            <div class="stat">$24.10</div>
+                            <h3>per hour (casual)</h3>
+                            <p style="color: var(--text-secondary);">National Minimum Wage as of July 2024 (+ casual loading)</p>
+                        </div>
+                        <div>
+                            <div class="stat">$20.08</div>
+                            <h3>per hour (permanent)</h3>
+                            <p style="color: var(--text-secondary);">Permanent/part-time rate (but you get leave entitlements)</p>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                        Actual rates may be higher depending on your industry award (retail, hospitality, etc.)
+                    </p>
+                </div>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div>
+                        <h3>Your rights include</h3>
+                        <div class="list-item">
+                            <h4>Fair pay</h4>
+                            <p>At least minimum wage for your age/industry. Check Fair Work website.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Safe workplace</h4>
+                            <p>Employer must provide safe environment, training, and equipment.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Breaks</h4>
+                            <p>Rest breaks during shifts (usually 30min unpaid for 5+ hour shift).</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="list-item">
+                            <h4>Payslips</h4>
+                            <p>Must be provided within 1 day of pay. Keep them all.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Super (if you earn $450+/month)</h4>
+                            <p>Employer pays 11.5% on top of your wage into super fund.</p>
+                        </div>
+                        <div class="list-item">
+                            <h4>Protection from discrimination</h4>
+                            <p>Can't be discriminated against for age, gender, race, disability, etc.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="link-box" style="margin-top: 2rem;">
+                    <p style="margin-bottom: 0.5rem; color: var(--text-secondary);">Check your pay and rights:</p>
+                    <a href="https://www.fairwork.gov.au" target="_blank">www.fairwork.gov.au</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Your First Week -->
+        <div class="slide">
+            <div class="content">
+                <h2>Your First Week</h2>
+                <p class="subtitle">What to expect and how to make a good impression</p>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div>
+                        <h3>What to expect</h3>
+                        <ul class="bullet-list">
+                            <li>Paperwork (TFN, super, bank details)</li>
+                            <li>Workplace induction/safety training</li>
+                            <li>Meeting lots of new people (you'll forget names, that's normal)</li>
+                            <li>Feeling overwhelmed and confused</li>
+                            <li>Making mistakes (everyone does)</li>
+                            <li>Not being very productive yet</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>How to impress</h3>
+                        <ul class="bullet-list">
+                            <li>Show up 5-10 minutes early</li>
+                            <li>Ask questions when you don't understand</li>
+                            <li>Take notes (bring a notebook)</li>
+                            <li>Offer to help teammates</li>
+                            <li>Put your phone away during work</li>
+                            <li>Say thank you when people help you</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h3>Things that will get you fired quickly</h3>
+                    <div class="grid-3">
+                        <div>
+                            <span class="badge warning">Don't</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Show up late without notice</p>
+                        </div>
+                        <div>
+                            <span class="badge warning">Don't</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Be on your phone constantly</p>
+                        </div>
+                        <div>
+                            <span class="badge warning">Don't</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Complain about everything</p>
+                        </div>
+                        <div>
+                            <span class="badge warning">Don't</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Ignore safety rules</p>
+                        </div>
+                        <div>
+                            <span class="badge warning">Don't</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Gossip about coworkers</p>
+                        </div>
+                        <div>
+                            <span class="badge warning">Don't</span>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">Lie or make excuses</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Summary & Activity -->
+        <div class="slide">
+            <div class="content">
+                <h2>Summary + Activity</h2>
+
+                <div class="two-column" style="margin-top: 2rem;">
+                    <div>
+                        <h3>Key takeaways</h3>
+                        <ul class="bullet-list">
+                            <li>70% of jobs aren't advertised - network!</li>
+                            <li>Optimize your resume for ATS robots</li>
+                            <li>Tailor your application every time</li>
+                            <li>Video interviews are standard now</li>
+                            <li>Employers want reliability & attitude</li>
+                            <li>Know your rights (Fair Work)</li>
+                            <li>First impressions matter in week 1</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Useful resources</h3>
+                        <div class="link-box">
+                            <p style="margin-bottom: 0.5rem; color: var(--text-secondary);">Resume checker:</p>
+                            <a href="https://www.jobscan.co" target="_blank">Jobscan.co</a>
+                            <p style="margin: 1rem 0 0.5rem; color: var(--text-secondary);">Practice interviews:</p>
+                            <a href="https://www.pramp.com" target="_blank">Pramp.com</a>
+                            <p style="margin: 1rem 0 0.5rem; color: var(--text-secondary);">Know your pay:</p>
+                            <a href="https://www.fairwork.gov.au/pay-calculator" target="_blank">Fair Work Pay Calculator</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h3>Activity: Resume Review</h3>
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); line-height: 1.8;">
+                        Create or update your resume using what you've learned today.
+                        Run it through an ATS checker (Jobscan has a free version).
+                        Then swap with a classmate and give feedback using the criteria we discussed.
+                    </p>
+                </div>
+
+                <p class="meta" style="margin-top: 3rem;">Questions?</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button id="prevBtn">← Previous</button>
+        <span id="slide-counter"></span>
+        <button id="nextBtn">Next →</button>
+    </div>
+
+    <script>
+        // Presentation state
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        // UI elements
+        const progressBar = document.getElementById('progress-bar');
+        const slideCounter = document.getElementById('slide-counter');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Update UI
+        function updateUI() {
+            // Update slides
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Update counter
+            slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+            // Update buttons
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        // Navigation functions
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateUI();
+            }
+        }
+
+        // Event listeners
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case 'PageDown':
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                case 'PageUp':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    currentSlide = 0;
+                    updateUI();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    currentSlide = totalSlides - 1;
+                    updateUI();
+                    break;
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide();
+            if (touchEndX > touchStartX + 50) prevSlide();
+        }
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>

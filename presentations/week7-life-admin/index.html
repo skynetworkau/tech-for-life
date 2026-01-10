@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Admin Setup - Year 12 Tech for Life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #f5f5f5;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #06b6d4);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .slides-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 120px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #10b981;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #06b6d4;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: #a3a3a3;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 300;
+        }
+
+        .content {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .big-text {
+            font-size: 2rem;
+            line-height: 1.6;
+            text-align: center;
+            color: #e5e5e5;
+            margin: 2rem 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        li {
+            font-size: 1.8rem;
+            line-height: 1.8;
+            margin: 1.5rem 0;
+            padding-left: 3rem;
+            position: relative;
+            color: #e5e5e5;
+        }
+
+        li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        .highlight {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .warning {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .urgent {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .callout {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .callout p {
+            font-size: 1.6rem;
+            line-height: 1.6;
+            color: #e5e5e5;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .timeline-item h4 {
+            color: #10b981;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-item ul {
+            margin: 0;
+        }
+
+        .timeline-item li {
+            font-size: 1.3rem;
+            margin: 0.8rem 0;
+            padding-left: 2rem;
+        }
+
+        .timeline-item li::before {
+            font-size: 1.5rem;
+        }
+
+        .checklist {
+            background: rgba(6, 182, 212, 0.1);
+            border: 2px solid #06b6d4;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .checklist h3 {
+            color: #06b6d4;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .checklist-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            color: #0a0a0a;
+            padding: 1.2rem 3rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .checklist-link:hover {
+            transform: scale(1.05);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #10b981;
+            color: #10b981;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #10b981;
+            color: #0a0a0a;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-size: 1.2rem;
+            color: #a3a3a3;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .card h4 {
+            color: #10b981;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            color: #d4d4d4;
+        }
+
+        .emphasis {
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            color: #10b981;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 1200px) {
+            .slide {
+                padding: 60px 80px;
+            }
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.8rem; }
+            li { font-size: 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 40px;
+            }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .timeline {
+                grid-template-columns: 1fr;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="slides-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="content">
+                <h1>Life Admin Setup</h1>
+                <p class="subtitle">The stuff you MUST sort before you leave school</p>
+                <div class="callout" style="margin-top: 3rem;">
+                    <p style="text-align: center; font-size: 1.8rem;">
+                        <span class="urgent">Deadline: December 2026</span><br>
+                        Before you finish Year 12, get your adult life sorted
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Why This Matters Now -->
+        <div class="slide">
+            <div class="content">
+                <h2>Why This Matters NOW</h2>
+                <p class="big-text">Once you leave school, <span class="warning">no one reminds you</span></p>
+                <ul>
+                    <li>No teacher checking you've submitted forms</li>
+                    <li>No parent making sure you've done the paperwork</li>
+                    <li>No school admin chasing you up</li>
+                    <li><span class="highlight">You're on your own</span></li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p>Sort it now while you have support, structure, and time. Don't wait until you need it urgently.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: myGov Account -->
+        <div class="slide">
+            <div class="content">
+                <h2>myGov Account</h2>
+                <h3>Your gateway to government services</h3>
+                <ul>
+                    <li><span class="highlight">Create it before December!</span></li>
+                    <li>Links to: Tax Office, Centrelink, Medicare, Child Support</li>
+                    <li>You'll need it for tax returns, healthcare, study payments</li>
+                    <li>Use a proper email address you'll keep forever</li>
+                    <li>Set up two-factor authentication immediately</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Action:</strong> Go to my.gov.au → Create account → Link your Medicare and ATO</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Tax File Number -->
+        <div class="slide">
+            <div class="content">
+                <h2>Tax File Number (TFN)</h2>
+                <h3>Essential for ANY job</h3>
+                <ul>
+                    <li><span class="urgent">Takes up to 28 days to arrive</span></li>
+                    <li>You CANNOT start a job properly without it</li>
+                    <li>Without it, you get taxed at the highest rate (47%!)</li>
+                    <li>Apply through myGov or ATO website</li>
+                    <li>Keep it secure - it's like your financial ID</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Timeline:</strong> Apply in September → Receive in October → Ready for December holiday jobs</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Medicare Card -->
+        <div class="slide">
+            <div class="content">
+                <h2>Medicare Card in Your Own Name</h2>
+                <h3>Not just on parents' card anymore</h3>
+                <ul>
+                    <li>You can get your own card from age 15</li>
+                    <li>Essential for doctor visits, prescriptions, hospitals</li>
+                    <li>Needed for university health services</li>
+                    <li>Can be used as ID for some services</li>
+                    <li>Apply through myGov → Medicare section</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Why separate?</strong> Privacy, independence, and you'll need it when you move out or travel</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Bank Account -->
+        <div class="slide">
+            <div class="content">
+                <h2>Bank Account</h2>
+                <h3>Time to be financially independent</h3>
+                <ul>
+                    <li>Open an account in YOUR name only</li>
+                    <li>Get a debit card for online purchases</li>
+                    <li>Set up internet banking and the mobile app</li>
+                    <li>Learn to check your balance and transactions</li>
+                    <li>Consider a savings account for goals</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Pro tip:</strong> Most banks offer fee-free accounts for students. Compare features before choosing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: USI -->
+        <div class="slide">
+            <div class="content">
+                <h2>USI (Unique Student Identifier)</h2>
+                <h3>Needed for ANY training or uni</h3>
+                <ul>
+                    <li>Required for TAFE, university, apprenticeships, traineeships</li>
+                    <li>Links all your qualifications together forever</li>
+                    <li>Free to create, takes 5 minutes</li>
+                    <li>You'll need ID documents (passport, driver's licence, etc.)</li>
+                    <li>Create it at usi.gov.au</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Important:</strong> Many institutions won't enrol you without it. Don't wait until enrolment day!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Driver's Licence or Proof of Age -->
+        <div class="slide">
+            <div class="content">
+                <h2>Driver's Licence or Proof of Age Card</h2>
+                <h3>Your primary ID</h3>
+                <ul>
+                    <li>Most common form of photo ID in Australia</li>
+                    <li>Needed for: Jobs, bank accounts, signing leases, travel</li>
+                    <li>If not driving, get a Proof of Age card from Transport WA</li>
+                    <li>Keep it current - check expiry dates</li>
+                    <li>Learn where to keep it safe</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Reality check:</strong> You'll be asked for photo ID constantly. Have it ready.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Professional Email -->
+        <div class="slide">
+            <div class="content">
+                <h2>Professional Email Address</h2>
+                <h3>firstname.lastname@gmail.com<br>NOT coolkid99@hotmail.com</h3>
+                <ul>
+                    <li>Create a professional email for adult life</li>
+                    <li>Format: firstname.lastname@ or initial.lastname@</li>
+                    <li>Use it for: Job applications, university, government services</li>
+                    <li>Keep your fun email separate for friends and shopping</li>
+                    <li>Check it daily - important stuff comes via email</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>First impression:</strong> david.smith@gmail.com gets the job. sk8rboi2008@hotmail.com doesn't.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Phone Plan -->
+        <div class="slide">
+            <div class="content">
+                <h2>Phone Plan in Your Own Name</h2>
+                <h3>Leave the family plan</h3>
+                <ul>
+                    <li>Time to get your own mobile plan</li>
+                    <li>Builds credit history when you pay bills on time</li>
+                    <li>Prepaid or monthly plan - you choose</li>
+                    <li>Learn to manage data and costs</li>
+                    <li>Keep the same number - just change account holder</li>
+                </ul>
+                <div class="callout" style="margin-top: 2rem;">
+                    <p><strong>Adult skill:</strong> Managing a phone bill is practice for managing all your bills</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Timeline -->
+        <div class="slide">
+            <div class="content">
+                <h2>Key Timeline</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>September</h4>
+                        <ul>
+                            <li>Create professional email</li>
+                            <li>Set up myGov account</li>
+                            <li>Apply for TFN</li>
+                            <li>Apply for USI</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>October</h4>
+                        <ul>
+                            <li>TFN should arrive</li>
+                            <li>Apply for Medicare card</li>
+                            <li>Open bank account</li>
+                            <li>Get driver's licence/POA</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>November</h4>
+                        <ul>
+                            <li>Set up own phone plan</li>
+                            <li>Double-check all accounts</li>
+                            <li>Save important numbers</li>
+                            <li>Test all logins work</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="emphasis">By December: You're fully set up for adult life</p>
+            </div>
+        </div>
+
+        <!-- Slide 12: Summary + Activity -->
+        <div class="slide">
+            <div class="content">
+                <h2>Time to Get It Done</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>The Essentials (Do First)</h4>
+                        <ul>
+                            <li>myGov account</li>
+                            <li>Tax File Number</li>
+                            <li>USI</li>
+                            <li>Professional email</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>The Important (Do Soon)</h4>
+                        <ul>
+                            <li>Medicare card</li>
+                            <li>Bank account</li>
+                            <li>Photo ID</li>
+                            <li>Phone plan</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="checklist" style="text-align: center;">
+                    <h3>Your Action Plan</h3>
+                    <p style="font-size: 1.4rem; margin: 1rem 0;">Complete the Life Admin Checklist and tick off each item as you finish it</p>
+                    <a href="#" class="checklist-link">Download Life Admin Checklist</a>
+                </div>
+                <p class="emphasis" style="margin-top: 2rem;">Don't wait. Start today.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn">← Previous</button>
+        <button class="nav-btn" id="nextBtn">Next →</button>
+    </div>
+
+    <script>
+        // Presentation state
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        // Update UI elements
+        function updateUI() {
+            // Update slides
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Update counter
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        // Navigation functions
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateUI();
+            }
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateUI();
+            }
+        }
+
+        // Event listeners for buttons
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'PageDown':
+                case ' ':
+                case 'Enter':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                case 'PageUp':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(0);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(totalSlides - 1);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevSlide();
+            }
+        }
+
+        // Initialize
+        document.getElementById('totalSlides').textContent = totalSlides;
+        updateUI();
+
+        // Prevent space bar from scrolling
+        window.addEventListener('keydown', (e) => {
+            if (e.key === ' ' && e.target === document.body) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

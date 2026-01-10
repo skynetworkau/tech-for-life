@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starting a Business in Australia // Week 14 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.8rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-top: 0.75rem;
+        }
+
+        .card li {
+            padding: 0.4rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .card li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .column-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .column-content h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+
+        .column-content li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .info-box h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .info-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .info-box li::before {
+            content: "✓";
+            color: var(--accent-emerald);
+            font-weight: bold;
+        }
+
+        /* Warning boxes */
+        .warning-box {
+            background: rgba(244, 63, 94, 0.1);
+            border: 2px solid var(--accent-rose);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        .warning-box h3 {
+            color: var(--accent-rose);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-box ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .warning-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .warning-box li::before {
+            content: "✗";
+            color: var(--accent-rose);
+            font-weight: bold;
+        }
+
+        /* Comparison table */
+        .comparison-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .comparison-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-col {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .comparison-col.highlight {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid var(--accent-violet);
+        }
+
+        .comparison-col h4 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-col p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-cell {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-cell.heading {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Steps container */
+        .steps-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .step-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid var(--accent-violet);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        .highlight-box h3 {
+            color: var(--accent-violet);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Invoice example */
+        .invoice-example {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .invoice-example .invoice-header {
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .invoice-example .invoice-line {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .invoice-example .invoice-line strong {
+            color: var(--text-primary);
+        }
+
+        /* Tools grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .tool-card h4 {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .tool-card .tool-options {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .comparison-header, .comparison-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Starting a <em>Business</em></h1>
+            <p class="slide-subtitle">Everything Year 12 students need to know to start their own business in Australia — from ABN to GST to marketing</p>
+            <p class="stat-source">Week 14 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why Start a Business? -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why Start a <em>Business</em>?</h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Be Your Own Boss</h3>
+                    <p>You make the decisions. Set your own schedule. Choose your clients. Work on projects you care about.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Flexibility</h3>
+                    <p>Work around school, uni, or another job. Take time off when you need it. Scale up or down as life changes.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Unlimited Income Potential</h3>
+                    <p>No hourly cap. Your earnings grow with your effort. Price your own services. Keep all the profits.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Build Something You're Proud Of</h3>
+                    <p>Create a brand. Develop skills. Solve real problems. Build a portfolio that shows what you can do.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Tax Advantages</h3>
+                    <p>Claim business expenses. Reduce taxable income. Keep more of what you earn through legal deductions.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Side Hustle While Employed</h3>
+                    <p>Test ideas without quitting your job. Build gradually. Transition when you're ready (or keep both!).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Side Hustle Ideas -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Side Hustle Ideas for <em>Year 12</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Lawn Mowing / Garden Care</h3>
+                    <p>Low startup cost. Regular repeat customers. Charge $30-60 per lawn. Easy to find clients locally.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Tutoring Younger Students</h3>
+                    <p>Charge $25-50/hour. Use your school knowledge. Build through word-of-mouth. Online or in-person.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Social Media Management</h3>
+                    <p>Help local businesses with Instagram, Facebook. $300-500/month per client. You already know the platforms.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Photography / Videography</h3>
+                    <p>Start with a phone camera. Events, portraits, real estate. Build a portfolio. Charge per shoot.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Web Design</h3>
+                    <p>Use Wix, Squarespace, or code your own. $500-2000 per website. Local businesses need websites.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Handyman Services</h3>
+                    <p>Furniture assembly, minor repairs, tech setup. Charge hourly. Great if you're practical.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: More Side Hustles -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">More <em>Business Ideas</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Service-Based</h3>
+                    <ul>
+                        <li>Pet sitting / dog walking ($20-40 per visit)</li>
+                        <li>Car washing / detailing ($50-150 per car)</li>
+                        <li>House cleaning ($30-50/hour)</li>
+                        <li>Event setup / pack down</li>
+                        <li>Moving help (labour hire)</li>
+                        <li>Computer repair / tech support</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Selling Online</h3>
+                    <ul>
+                        <li>Etsy (crafts, digital products, art)</li>
+                        <li>eBay / Facebook Marketplace (flipping items)</li>
+                        <li>Redbubble (designs on merch)</li>
+                        <li>Gumroad (digital downloads)</li>
+                        <li>Depop / Vinted (vintage clothes)</li>
+                        <li>Amazon handmade products</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Pick something you enjoy and are already good at — or want to learn</p>
+        </div>
+
+        <!-- Slide 5: What is an ABN? -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What is an <em>ABN</em>?</h2>
+            <div class="info-box">
+                <h3>ABN = Australian Business Number</h3>
+                <ul>
+                    <li>11-digit unique identifier for your business</li>
+                    <li>Required to invoice businesses (they need it for their tax records)</li>
+                    <li>Lets you claim GST credits (if GST registered)</li>
+                    <li>Makes you look professional and legitimate</li>
+                    <li>FREE to apply at abr.gov.au</li>
+                    <li>Takes 5 minutes online (instant approval for most)</li>
+                    <li>You can get one at ANY age (no minimum age requirement)</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">You don't NEED an ABN to run a small business, but you'll look more professional and avoid tax withholding issues.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Sole Trader Explained -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Sole Trader <em>Explained</em></h2>
+            <div class="info-box">
+                <h3>The simplest business structure</h3>
+                <p><strong>What it means:</strong> You ARE the business. There's no legal separation between you and the business entity.</p>
+                <ul>
+                    <li>Use your personal Tax File Number (TFN) for business tax</li>
+                    <li>No setup costs or registration fees (except ABN, which is free)</li>
+                    <li>No separate bank account required (but recommended for clarity)</li>
+                    <li>Business income goes straight on your personal tax return</li>
+                    <li>Full control — you make all decisions</li>
+                </ul>
+                <p style="margin-top: 1.5rem; color: var(--accent-amber); font-weight: 600;">⚠️ Personal liability: You're personally responsible for all business debts. If the business owes money, creditors can come after your personal assets.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Company (Pty Ltd) Explained -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Company (Pty Ltd) <em>Explained</em></h2>
+            <div class="info-box">
+                <h3>A separate legal entity</h3>
+                <p><strong>What it means:</strong> The company exists separately from you. It can own assets, enter contracts, and be sued in its own name.</p>
+                <ul>
+                    <li>Limited liability — your personal assets are protected if the business fails</li>
+                    <li>Complex setup: $500+ to register with ASIC</li>
+                    <li>Separate tax return (company tax rate: 25% for small businesses)</li>
+                    <li>More paperwork: AGMs, director duties, ASIC reporting</li>
+                    <li>Better for: large businesses, investors, high-risk ventures</li>
+                </ul>
+                <p style="margin-top: 1.5rem; color: var(--accent-rose); font-weight: 600;">For most side hustles and small businesses, a company is overkill. Start as a sole trader.</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Sole Trader vs Company Comparison -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Sole Trader vs <em>Company</em></h2>
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-col">
+                        <h4>Feature</h4>
+                    </div>
+                    <div class="comparison-col highlight">
+                        <h4>Sole Trader</h4>
+                        <p>Recommended to start</p>
+                    </div>
+                    <div class="comparison-col">
+                        <h4>Company (Pty Ltd)</h4>
+                        <p>For larger operations</p>
+                    </div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Setup Cost</div>
+                    <div class="comparison-cell" style="color: var(--accent-emerald);">$0 (free ABN)</div>
+                    <div class="comparison-cell">$500+ (ASIC fees)</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Complexity</div>
+                    <div class="comparison-cell" style="color: var(--accent-emerald);">Very simple</div>
+                    <div class="comparison-cell">Complex (directors, meetings, reporting)</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Tax</div>
+                    <div class="comparison-cell">Personal tax rate (on your tax return)</div>
+                    <div class="comparison-cell">25% company rate (separate return)</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Liability</div>
+                    <div class="comparison-cell">Unlimited (personal assets at risk)</div>
+                    <div class="comparison-cell" style="color: var(--accent-emerald);">Limited (protected)</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Best For</div>
+                    <div class="comparison-cell" style="color: var(--accent-emerald);">Side hustles, small businesses</div>
+                    <div class="comparison-cell">High-risk businesses, investors</div>
+                </div>
+            </div>
+            <p class="stat-source">You can always convert from sole trader to company later as you grow</p>
+        </div>
+
+        <!-- Slide 9: GST Explained -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">GST — Goods & Services <em>Tax</em></h2>
+            <div class="info-box">
+                <h3>The 10% tax on most goods and services</h3>
+                <p><strong>Key rule:</strong> You only need to register for GST if your business earns $75,000+ per year.</p>
+                <ul>
+                    <li>Below $75k: GST registration is optional (most side hustles don't need it)</li>
+                    <li>If registered: Charge 10% GST on invoices, lodge BAS quarterly, claim GST credits on business purchases</li>
+                    <li>If NOT registered: Simpler — no BAS to lodge, but can't claim GST credits</li>
+                    <li>GST is paid by the customer, you collect and pass it to the ATO</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">For most Year 12 side hustles earning under $75k, skip GST registration to keep it simple.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Tax as a Sole Trader -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Tax as a <em>Sole Trader</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>How It Works</h3>
+                    <ul>
+                        <li>Business income goes on your personal tax return</li>
+                        <li>Pay tax at your marginal rate (0% up to $18,200, then 19%, 32.5%, etc.)</li>
+                        <li>Claim business expenses to reduce taxable income</li>
+                        <li>Tax return due 31 October (or later with accountant)</li>
+                        <li>If earning over ~$4,000, may need to pay quarterly PAYG instalments</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Golden Rules</h3>
+                    <ul>
+                        <li>Keep receipts for EVERYTHING you spend on the business</li>
+                        <li>Set aside 25-30% of income for tax (in a separate account)</li>
+                        <li>Use accounting software or spreadsheets to track income/expenses</li>
+                        <li>Don't mix personal and business money (separate bank account)</li>
+                        <li>Consider hiring an accountant for your first tax return</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: What You Can Claim as Deductions -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What You Can <em>Claim</em> as Deductions</h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Equipment & Tools</h3>
+                    <p>Laptop, phone, camera, lawn mower, tools — anything used for the business. If also used personally, claim business %.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Phone & Internet</h3>
+                    <p>Claim the % used for business. E.g., 50% business use = claim 50% of monthly bill. Keep records of usage.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Vehicle Costs</h3>
+                    <p>Fuel, insurance, rego for business travel. Use logbook method or cents per km (78c/km for 2025). Keep records.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Home Office</h3>
+                    <p>If you work from home, claim a portion of rent/mortgage, electricity, internet. Use ATO's fixed rate method (67c/hour).</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Marketing & Advertising</h3>
+                    <p>Website hosting, business cards, Facebook ads, Google ads, signage, flyers — all deductible.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Subscriptions & Software</h3>
+                    <p>Xero, Adobe Creative Cloud, Canva Pro, domain names, email hosting, Zoom — claim 100% if business-only.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: More Deductions -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">More <em>Deductions</em></h2>
+            <div class="info-box">
+                <h3>Other things you can claim</h3>
+                <ul>
+                    <li>Professional development: courses, books, workshops related to your business</li>
+                    <li>Bank fees for business accounts</li>
+                    <li>Accounting and bookkeeping fees</li>
+                    <li>Business insurance</li>
+                    <li>Postage and delivery costs</li>
+                    <li>Stationery and office supplies</li>
+                    <li>Protective clothing / uniforms (with business logo)</li>
+                </ul>
+                <p style="margin-top: 1.5rem; color: var(--accent-amber); font-weight: 600;">⚠️ The golden rule: You can only claim expenses that are directly related to earning business income. Keep all receipts for 5 years.</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Setting Up Your Business -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Setting Up Your <em>Business</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Apply for ABN (free, 5 minutes)</h4>
+                        <p>Go to abr.gov.au → Apply for ABN → Answer questions → Instant approval. You'll need your TFN.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Open a Business Bank Account</h4>
+                        <p>Separate business from personal money. Makes tax time easier. Most banks offer free business accounts for sole traders.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Create an Invoice Template</h4>
+                        <p>Use Canva, Word, or accounting software. Include: name, ABN, services, amount, payment terms.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Set Up Accounting (Xero, MYOB, or Spreadsheet)</h4>
+                        <p>Track income and expenses from day 1. Makes tax time painless. Even a simple spreadsheet works.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Get Insurance if Needed</h4>
+                        <p>Public liability insurance (~$200-400/year) protects you if you damage property or injure someone.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>Start Finding Customers!</h4>
+                        <p>Word of mouth, social media, local community groups, flyers — just start talking about your business.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Invoicing Basics -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Invoicing <em>Basics</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>What Must Be On An Invoice</h3>
+                    <ul>
+                        <li>Your name/business name and ABN</li>
+                        <li>Your contact details (email, phone)</li>
+                        <li>Customer name and details</li>
+                        <li>Invoice date and unique invoice number</li>
+                        <li>Description of goods/services provided</li>
+                        <li>Amount charged (include GST if registered)</li>
+                        <li>Payment terms (e.g., due in 14 days)</li>
+                        <li>Payment method (bank details, PayPal, etc.)</li>
+                    </ul>
+                </div>
+                <div class="invoice-example">
+                    <div class="invoice-header">INVOICE #001</div>
+                    <div class="invoice-line"><strong>From:</strong> Alex's Lawn Care</div>
+                    <div class="invoice-line">ABN: 12 345 678 910</div>
+                    <div class="invoice-line">alex@lawncare.com.au</div>
+                    <div class="invoice-line" style="margin-top: 1rem;"><strong>To:</strong> John Smith</div>
+                    <div class="invoice-line">123 Main St, Perth WA 6000</div>
+                    <div class="invoice-line" style="margin-top: 1rem;"><strong>Date:</strong> 10 January 2026</div>
+                    <div class="invoice-line"><strong>Due:</strong> 24 January 2026</div>
+                    <div class="invoice-line" style="margin-top: 1rem;"><strong>Services:</strong></div>
+                    <div class="invoice-line">Lawn mowing & edge trimming</div>
+                    <div class="invoice-line" style="margin-top: 1rem;"><strong>Amount:</strong> $45.00</div>
+                    <div class="invoice-line" style="margin-top: 1rem;"><strong>Pay to:</strong> BSB 123-456</div>
+                    <div class="invoice-line">Account: 12345678</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Tools for Running a Business -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Tools for Running a <em>Business</em></h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h4>Accounting</h4>
+                    <p>Track income, expenses, and invoices</p>
+                    <div class="tool-options">Xero, MYOB, Wave (free), QuickBooks</div>
+                </div>
+                <div class="tool-card">
+                    <h4>Payments</h4>
+                    <p>Accept card payments and online payments</p>
+                    <div class="tool-options">Square, Stripe, PayPal, Zai</div>
+                </div>
+                <div class="tool-card">
+                    <h4>Invoicing</h4>
+                    <p>Create and send professional invoices</p>
+                    <div class="tool-options">Xero, Invoice Ninja, Canva templates</div>
+                </div>
+                <div class="tool-card">
+                    <h4>Design</h4>
+                    <p>Graphics, logos, marketing materials</p>
+                    <div class="tool-options">Canva (free), Adobe, Figma</div>
+                </div>
+                <div class="tool-card">
+                    <h4>Scheduling</h4>
+                    <p>Let clients book appointments online</p>
+                    <div class="tool-options">Calendly, Acuity, Google Calendar</div>
+                </div>
+                <div class="tool-card">
+                    <h4>Communication</h4>
+                    <p>Stay in touch with clients professionally</p>
+                    <div class="tool-options">WhatsApp Business, Gmail, Slack</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Marketing Yourself -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Marketing <em>Yourself</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Word of Mouth (Still #1)</h3>
+                    <p>Tell friends, family, neighbours. Do great work — happy customers tell others. Ask for referrals.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Social Media</h3>
+                    <p>Instagram, TikTok, Facebook. Show your work. Share tips. Engage with followers. Free marketing.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Google My Business</h3>
+                    <p>Free local listing. Shows up in Google Maps. Get reviews. Essential for local services.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Website</h3>
+                    <p>Carrd, Squarespace, Wix. Simple one-pager works. Include portfolio, pricing, contact form.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Flyers in Local Area</h3>
+                    <p>Letterbox drops, noticeboards, community centres. Cheap and effective for local services.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Facebook Community Groups</h3>
+                    <p>Join local community groups. Offer value first. Respond to requests. Build reputation.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: More Marketing Tips -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">More Marketing <em>Tips</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Build Social Proof</h3>
+                    <ul>
+                        <li>Collect reviews and testimonials</li>
+                        <li>Share before/after photos</li>
+                        <li>Case studies of happy customers</li>
+                        <li>Show your process on social media</li>
+                        <li>Ask customers to tag you in posts</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Consistency is Key</h3>
+                    <ul>
+                        <li>Post regularly (even if small updates)</li>
+                        <li>Reply to messages quickly</li>
+                        <li>Be professional in all interactions</li>
+                        <li>Deliver on time, every time</li>
+                        <li>Build a reputation you're proud of</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Marketing is about being helpful and visible — not being salesy</p>
+        </div>
+
+        <!-- Slide 18: Pricing Your Services -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Pricing Your <em>Services</em></h2>
+            <div class="info-box">
+                <h3>How to work out what to charge</h3>
+                <ul>
+                    <li>Research competitors — what do they charge for similar services?</li>
+                    <li>Don't undervalue yourself — your time is worth money</li>
+                    <li>Factor in: time, materials, travel, skill level, and tax (remember to set aside 25-30%)</li>
+                    <li>Start slightly lower to build reputation, then raise prices as you get busy</li>
+                    <li>Consider packages vs hourly rates (e.g., $200/month for social media vs $50/hour)</li>
+                    <li>Be transparent — no hidden fees, clear pricing upfront</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">Example: Lawn mowing — $40 for small, $55 for medium, $70 for large. Clear, simple, fair.</p>
+            </div>
+        </div>
+
+        <!-- Slide 19: Real Young Business Owners -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real Young <em>Entrepreneurs</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Alex (17, Perth)</h3>
+                    <p>Started lawn mowing in Year 11. Now has 15 regular customers. Earns $400/week. Saves for uni and a car.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Emma (18, Melbourne)</h3>
+                    <p>Tutors maths online. Charges $40/hour. 10 students per week. Fits around her uni schedule.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Jack (19, Sydney)</h3>
+                    <p>Social media management for 3 local cafes. $400/month per client. Built entirely through Instagram.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Sophie (17, Brisbane)</h3>
+                    <p>Sells handmade jewellery on Etsy. $800/month passive income. Started with $50 in materials.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Liam (18, Adelaide)</h3>
+                    <p>Freelance photographer. Shoots events and portraits. $200-500 per shoot. Built portfolio on Instagram.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Mia (19, Hobart)</h3>
+                    <p>Web design for small businesses. $1000-2000 per site. 2-3 sites per month. Totally self-taught.</p>
+                </div>
+            </div>
+            <p class="stat-source">All of these started small. None needed a huge idea — just consistency and good work.</p>
+        </div>
+
+        <!-- Slide 20: Common Mistakes to Avoid -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Common Mistakes to <em>Avoid</em></h2>
+            <div class="warning-box">
+                <h3>Don't make these errors</h3>
+                <ul>
+                    <li>Not separating personal and business money (makes tax impossible)</li>
+                    <li>Not keeping receipts (can't claim deductions without proof)</li>
+                    <li>Underpricing services (you'll burn out working for peanuts)</li>
+                    <li>Not chasing unpaid invoices (be polite but firm — you deserve to be paid)</li>
+                    <li>Forgetting to save for tax (set aside 25-30% of every payment)</li>
+                    <li>No written agreements (always confirm scope, price, and deadline in writing)</li>
+                    <li>Giving up too early (most businesses take 6-12 months to gain momentum)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 21: Your Challenge -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your <em>Challenge</em></h2>
+            <div class="highlight-box">
+                <h3>Complete these three tasks</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.7;">Over the next week, work through these practical exercises to get your business thinking started.</p>
+            </div>
+            <div class="steps-container" style="margin-top: 2rem;">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Brainstorm 3 Business Ideas You Could Start</h4>
+                        <p>What are you good at? What do people in your area need? What could you start with minimal money?</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Practice Applying for an ABN (Walkthrough)</h4>
+                        <p>Go to abr.gov.au and click through the ABN application (don't submit unless you're ready). See how easy it is.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Create a Simple Invoice Template</h4>
+                        <p>Use Canva, Word, or Google Docs. Include all required fields. Make it look professional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Key Takeaways -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key <em>Takeaways</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>ABN is Free and Easy</h3>
+                    <p>5 minutes online. Instant approval. No age limit. Makes you look professional. Get one at abr.gov.au.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Start as Sole Trader</h3>
+                    <p>Simplest structure. No setup costs. Use your TFN. You can always upgrade to a company later.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Keep Business Money Separate</h3>
+                    <p>Open a separate bank account. Track every expense. Makes tax time easy. No mixing personal and business.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Save for Tax</h3>
+                    <p>Set aside 25-30% of every payment. Put it in a separate account. Don't touch it until tax time.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>GST Only If Over $75k</h3>
+                    <p>Most side hustles don't need GST registration. Keeps it simple. Register later if you grow.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>You Can Start TODAY</h3>
+                    <p>No special qualifications needed. Pick a skill. Find a customer. Send an invoice. It's that simple.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Resources -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Helpful <em>Resources</em></h2>
+            <div class="info-box">
+                <h3>Where to Learn More</h3>
+                <ul>
+                    <li><strong>ABN Registration:</strong> abr.gov.au (Australian Business Register)</li>
+                    <li><strong>Tax Help:</strong> ato.gov.au/Business (ATO small business resources)</li>
+                    <li><strong>Business Advice:</strong> business.gov.au (government startup guides)</li>
+                    <li><strong>Free Accounting:</strong> Wave Apps (wave.com) — completely free for sole traders</li>
+                    <li><strong>Invoice Templates:</strong> Canva.com (search "invoice template")</li>
+                    <li><strong>Local Support:</strong> Small Business Development Corporation (WA) — sbdc.com.au</li>
+                </ul>
+                <p style="margin-top: 2rem; color: var(--text-secondary);">
+                    If you're serious about starting a business, consider talking to an accountant for your first year. They'll save you money in the long run.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 24: Action Time -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 3rem; margin-bottom: 2rem;">Take Action <em>Now</em></h2>
+            <div class="highlight-box">
+                <h3>Your Tasks for This Session</h3>
+                <p style="margin-bottom: 1.5rem; color: var(--text-secondary); line-height: 1.7;">Work through the challenge tasks. Brainstorm business ideas. Explore the ABN application. Create an invoice template.</p>
+                <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Priority order:</p>
+                <ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Brainstorm 3 business ideas</li>
+                    <li>Visit abr.gov.au and explore the ABN application process</li>
+                    <li>Create a simple invoice template in Canva or Word</li>
+                    <li>Research pricing for your chosen business idea</li>
+                    <li>Plan your first marketing channel (Instagram? Local flyers? Word of mouth?)</li>
+                </ol>
+                <p style="margin-top: 1.5rem; color: var(--text-primary);">Questions? Let's discuss.</p>
+            </div>
+        </div>
+
+        <!-- Slide 25: End -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Your Business, Your <em>Rules</em></h1>
+            <p class="slide-subtitle">Starting a business is easier than you think. The hardest part is just beginning. What are you waiting for?</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 25</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

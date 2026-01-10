@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trades & Apprenticeships // Week 13 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.8rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-top: 0.75rem;
+        }
+
+        .card li {
+            padding: 0.4rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .card li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .column-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .column-content h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+
+        .column-content li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .info-box h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .info-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .info-box li::before {
+            content: "✓";
+            color: var(--accent-emerald);
+            font-weight: bold;
+        }
+
+        /* Comparison table */
+        .comparison-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .comparison-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-col {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .comparison-col.highlight {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid var(--accent-violet);
+        }
+
+        .comparison-col h4 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-col p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-cell {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-cell.heading {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Steps container */
+        .steps-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .step-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid var(--accent-violet);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        .highlight-box h3 {
+            color: var(--accent-violet);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Wage progression table */
+        .wage-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .wage-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 2rem;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+        }
+
+        .wage-row:last-child {
+            border-bottom: none;
+        }
+
+        .wage-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wage-amount {
+            font-size: 1.1rem;
+            color: var(--accent-emerald);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .comparison-header, .comparison-row { grid-template-columns: 1fr; }
+            .wage-row { grid-template-columns: 1fr; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Trades & <em>Apprenticeships</em></h1>
+            <p class="slide-subtitle">Everything Year 12 students need to know about TAFE, apprenticeships, and trades careers in WA</p>
+            <p class="stat-source">Week 13 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why Consider Trades? -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why Consider <em>Trades</em>?</h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Earn While You Learn</h3>
+                    <p>Get paid from day one. No waiting 3-4 years to start earning. You're working and studying at the same time.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>No HECS Debt</h3>
+                    <p>TAFE is much cheaper than uni. No massive student loans hanging over your head for years.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>High Demand = Job Security</h3>
+                    <p>Trades are in short supply across WA. You'll always have work. Employers are desperate for skilled tradespeople.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Good Money (Especially in WA Mining)</h3>
+                    <p>Qualified tradies earn $70k-$150k+. FIFO mining jobs pay even more. Overtime pushes earnings higher.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Physical, Hands-On Work</h3>
+                    <p>If you hate sitting at a desk all day, trades offer variety, movement, and practical problem-solving.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Can Start Your Own Business</h3>
+                    <p>Once qualified, you can work for yourself. Set your own rates. Be your own boss. Build something you're proud of.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: In-Demand Trades in WA 2026 -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">In-Demand Trades in <em>WA 2026</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Electricians</h3>
+                    <p>Residential, commercial, industrial work. Essential in construction and mining. High demand across the state.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Plumbers</h3>
+                    <p>Domestic and commercial plumbing. Gas fitting. Drainage. Always needed. Great for self-employment.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Carpenters</h3>
+                    <p>Building houses, fit-outs, formwork. Construction booming in WA. Transferable skills for renovation work.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Diesel Mechanics / Fitters</h3>
+                    <p>Mining machinery, trucks, heavy equipment. Huge demand in mining regions. Excellent FIFO opportunities.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Air Con / Refrigeration</h3>
+                    <p>Essential in WA's hot climate. Commercial and residential. Service, installation, maintenance work.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Welders & Bricklayers</h3>
+                    <p>Welders: mining, construction, fabrication. Bricklayers: housing boom driving demand. Both highly paid.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Apprenticeship vs Traineeship -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Apprenticeship vs <em>Traineeship</em></h2>
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-col highlight">
+                        <h4>Apprenticeship</h4>
+                        <p>For trade qualifications</p>
+                    </div>
+                    <div class="comparison-col">
+                        <h4>Traineeship</h4>
+                        <p>For vocational qualifications</p>
+                    </div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Duration</div>
+                    <div class="comparison-cell heading">Duration</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell">3-4 years typically</div>
+                    <div class="comparison-cell">1-2 years typically</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Qualification</div>
+                    <div class="comparison-cell heading">Qualification</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell">Certificate III or IV in a trade</div>
+                    <div class="comparison-cell">Certificate II or III in a field</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Training</div>
+                    <div class="comparison-cell heading">Training</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell">Work 4 days, TAFE 1 day (or block release)</div>
+                    <div class="comparison-cell">Work full-time with scheduled TAFE</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell heading">Earning</div>
+                    <div class="comparison-cell heading">Earning</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell" style="color: var(--accent-emerald);">Get paid the whole time</div>
+                    <div class="comparison-cell" style="color: var(--accent-emerald);">Get paid the whole time</div>
+                </div>
+            </div>
+            <p class="stat-source">Both: on-the-job training + formal study + earn while you learn</p>
+        </div>
+
+        <!-- Slide 5: How Apprenticeships Work -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How Apprenticeships <em>Work</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Find an Employer Who'll Take You On</h4>
+                        <p>Apply to companies directly, or go through a Group Training Organisation (GTO). They're actively looking for apprentices.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Sign a Training Contract</h4>
+                        <p>Legal agreement between you, employer, and TAFE. Outlines pay, conditions, training requirements.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Work 4 Days, Study 1 Day (Often Block Release)</h4>
+                        <p>Spend most time on the job learning practical skills. Attend TAFE for theory (either weekly or in blocks).</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>TAFE for Theory, Workplace for Practical</h4>
+                        <p>TAFE teaches principles, calculations, regulations. Work teaches real-world application and skills.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Get Paid the Whole Time</h4>
+                        <p>Earn a wage from day one. Increases each year. Paid even when attending TAFE.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Apprentice Wages -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Apprentice <em>Wages</em></h2>
+            <div class="wage-table">
+                <div class="wage-row">
+                    <div class="wage-label">Year 1 Apprentice</div>
+                    <div class="wage-amount">~$15-17/hour (building trades)</div>
+                </div>
+                <div class="wage-row">
+                    <div class="wage-label">Year 2 Apprentice</div>
+                    <div class="wage-amount">~$17-20/hour</div>
+                </div>
+                <div class="wage-row">
+                    <div class="wage-label">Year 3 Apprentice</div>
+                    <div class="wage-amount">~$20-23/hour</div>
+                </div>
+                <div class="wage-row">
+                    <div class="wage-label">Year 4 Apprentice</div>
+                    <div class="wage-amount">~$23-27/hour</div>
+                </div>
+                <div class="wage-row" style="border-top: 2px solid var(--accent-violet); margin-top: 1rem; padding-top: 1.5rem;">
+                    <div class="wage-label">Qualified Tradesperson</div>
+                    <div class="wage-amount" style="font-size: 1.3rem;">$35-50+/hour</div>
+                </div>
+                <div class="wage-row">
+                    <div class="wage-label">Mining Rates</div>
+                    <div class="wage-amount" style="color: var(--accent-amber);">Even higher ($100k-$150k+ yearly)</div>
+                </div>
+            </div>
+            <p class="stat-source">Wages vary by trade and award. Overtime common in many trades.</p>
+        </div>
+
+        <!-- Slide 7: Finding an Apprenticeship -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Finding an <em>Apprenticeship</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Group Training Organisations (GTOs)</h3>
+                    <p>They employ you as an apprentice, then host you out to companies. Handle support and paperwork.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Apply Directly to Companies</h3>
+                    <p>Email your resume to local builders, electricians, plumbers. Many advertise on their websites.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>SEEK, Indeed, Gumtree</h3>
+                    <p>Job boards have dedicated apprenticeship sections. Set up alerts for trades you're interested in.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Word of Mouth</h3>
+                    <p>Ask family, friends, teachers. Someone always knows a tradesperson looking for an apprentice.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Career Expos</h3>
+                    <p>Attend local career expos. Speak to employers face-to-face. Make a good impression.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Try Before: Work Experience</h3>
+                    <p>Do work experience in Year 11-12. Shows commitment. Employer might take you on after school.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Group Training Organisations -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Group Training <em>Organisations</em></h2>
+            <div class="info-box">
+                <h3>What are GTOs and why use them?</h3>
+                <p>GTOs employ you as an apprentice and then place you with host companies for on-the-job training. They handle the admin and provide support throughout your apprenticeship.</p>
+                <ul>
+                    <li>They employ you directly (you're their employee)</li>
+                    <li>Host you out to different companies for work experience</li>
+                    <li>Handle all paperwork, contracts, and TAFE enrolment</li>
+                    <li>Provide support if you have issues with a host employer</li>
+                    <li>Good for variety: work with multiple companies in different settings</li>
+                    <li>Backup safety net: if host company closes, GTO finds you another placement</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600;">Examples in WA: MEGT, Apprenticeships WA, Group Training SW, WAGIN, MAS National</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: TAFE in WA -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">TAFE in <em>WA</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>TAFE Colleges in WA</h3>
+                    <ul>
+                        <li>North Metropolitan TAFE (Perth northern suburbs)</li>
+                        <li>South Metropolitan TAFE (Perth southern suburbs)</li>
+                        <li>Central Regional TAFE (Geraldton, Kalgoorlie)</li>
+                        <li>South Regional TAFE (Bunbury, Albany, Esperance)</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>What TAFE Offers</h3>
+                    <ul>
+                        <li>Certificates I-IV (trade qualifications)</li>
+                        <li>Diplomas and Advanced Diplomas</li>
+                        <li>Apprenticeship and traineeship training</li>
+                        <li>Can articulate into university (pathway option)</li>
+                        <li>Much cheaper than uni (often free for apprentices)</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">TAFE WA is the largest training provider in the state</p>
+        </div>
+
+        <!-- Slide 10: What You'll Need -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What You'll <em>Need</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>White Card</h3>
+                    <p>Construction safety induction. Required for all construction sites. ~$70, one-day course. Get it before applying.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Driver's Licence</h3>
+                    <p>Highly recommended (almost essential). You'll need to get to job sites, pick up materials, drive work vehicles.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Own Tools</h3>
+                    <p>Many trades require you to have basic tools. Employer often helps with tool allowance or provides initially.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Steel Cap Boots</h3>
+                    <p>Safety footwear mandatory on most sites. Invest in good quality boots ($100-200). Your feet will thank you.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Appropriate PPE</h3>
+                    <p>Hi-vis clothing, hard hat, safety glasses, gloves. Some provided by employer, some you'll buy yourself.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Physical Fitness</h3>
+                    <p>Trades are physically demanding. Lifting, climbing, standing all day. Build strength and endurance.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Career Progression -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Career <em>Progression</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Apprentice (3-4 years)</h4>
+                        <p>Learning the trade. Getting paid while gaining skills. Building experience and confidence.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Qualified Tradesperson</h4>
+                        <p>Fully licensed. Working independently. Good hourly rate. Can work anywhere in Australia.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Leading Hand</h4>
+                        <p>Supervising small teams. Higher pay. More responsibility. Coordinating work on site.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Foreman / Supervisor</h4>
+                        <p>Managing larger projects. Running job sites. Coordinating trades. Significant pay increase.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Start Your Own Business / Specialise</h4>
+                        <p>Work for yourself. Build your own team. Or: add specialisations, become a trainer, move into management.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Mining Industry -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Mining <em>Industry</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>FIFO Lifestyle</h3>
+                    <ul>
+                        <li>Fly In Fly Out — live anywhere, work up north</li>
+                        <li>Typical roster: 2 weeks on, 1 week off (varies)</li>
+                        <li>Flights and accommodation paid for</li>
+                        <li>Long hours but great pay</li>
+                        <li>Time away from family and friends</li>
+                        <li>Not for everyone — lifestyle trade-offs</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>The Money</h3>
+                    <ul>
+                        <li>Very high wages: $100k-$150k+ common</li>
+                        <li>Overtime rates push earnings even higher</li>
+                        <li>Entry trades: diesel fitter, electrician, boilermaker</li>
+                        <li>Experienced tradies can earn $200k+</li>
+                        <li>Save quickly for house deposit, car, travel</li>
+                        <li>Tax-effective if you plan it right</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">WA mining is booming. Huge demand for trades across Pilbara and Goldfields.</p>
+        </div>
+
+        <!-- Slide 13: Pre-Apprenticeship Programs -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Pre-Apprenticeship <em>Programs</em></h2>
+            <div class="info-box">
+                <h3>Taste the trade before committing</h3>
+                <p>Pre-apprenticeship programs are short Certificate II courses that introduce you to a trade. They help you figure out if it's right for you AND make you more attractive to employers.</p>
+                <ul>
+                    <li>Usually Certificate II level (entry qualification)</li>
+                    <li>Taste of the trade before signing 3-4 year contract</li>
+                    <li>Significantly improves your chances of getting an apprenticeship</li>
+                    <li>Shows commitment and genuine interest to employers</li>
+                    <li>Available at TAFE and private training providers</li>
+                    <li>Some available in Year 11-12 through VET programs at school</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">Ask your school careers counsellor about VET (Vocational Education and Training) options.</p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Common Questions -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Common <em>Questions</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Can I change trades?</h3>
+                    <p>Yes, but you may lose time and have to start over. Try before you commit through work experience.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>What if employer goes bust?</h3>
+                    <p>If you're with a GTO, they find you a new host. If employed directly, you may need to find a new employer.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Can I go to uni later?</h3>
+                    <p>Absolutely. Many trade qualifications articulate into uni degrees. Pathways exist in engineering, construction management, etc.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Is it too physical?</h3>
+                    <p>Depends on the trade. Some are very physical (bricklaying), others less so (air con, electrical). Choose what suits you.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>What about women in trades?</h3>
+                    <p>Growing demand and support. Many programs encourage women. Same pay, same opportunities. Diversity valued.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Do I need good grades?</h3>
+                    <p>Not necessarily. Employers value attitude, reliability, and willingness to learn over ATAR scores.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Your Challenge -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your <em>Challenge</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Research One Trade You're Interested In</h4>
+                        <p>Look up what the trade involves day-to-day. What skills are needed? What's the work environment like?</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Find Out Apprentice Wages for That Trade</h4>
+                        <p>Check the relevant award or enterprise agreement. What would you earn each year? What about when qualified?</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Look Up GTOs in Your Area</h4>
+                        <p>Search for Group Training Organisations in WA. Check their websites. See what trades they support.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Check TAFE Courses Available</h4>
+                        <p>Visit the TAFE WA website. Search for your trade. See what qualifications are offered and where.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Key Takeaways -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key <em>Takeaways</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Earn While You Learn</h3>
+                    <p>Get paid from day one. No waiting years to start earning. Income increases every year of your apprenticeship.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>No HECS Debt</h3>
+                    <p>TAFE is much cheaper than university. Often free for apprentices. No massive loans to pay back.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>High Demand in WA</h3>
+                    <p>Trades are desperately needed. Construction boom. Mining expansion. Job security guaranteed.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Multiple Pathways In</h3>
+                    <p>Direct employer, GTOs, pre-apprenticeships, VET in schools. Lots of ways to get started.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Can Lead to Business Ownership</h3>
+                    <p>Work for yourself once qualified. Set your own rates. Build your own team. Be your own boss.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Trades are NOT a Second Choice</h3>
+                    <p>Uni isn't for everyone. Trades offer great careers, job security, and excellent money. Be proud of your choice.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: End -->
+        <div class="slide gradient-bg">
+            <h1 class="slide-title">Build Your <em>Future</em></h1>
+            <p class="slide-subtitle">Trades offer real skills, real jobs, and real money. Start exploring your options today.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 17</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

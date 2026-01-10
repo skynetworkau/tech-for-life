@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Uni Pathway // Week 12 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0c0c0c;
+            --bg-secondary: #161616;
+            --bg-card: #1e1e1e;
+            --accent-indigo: #6366f1;
+            --accent-pink: #ec4899;
+            --accent-orange: #f97316;
+            --accent-green: #22c55e;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --text-primary: #fafafa;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-indigo), var(--accent-pink));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-pink);
+            color: var(--accent-pink);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-pink);
+            color: var(--accent-pink);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            color: var(--accent-pink);
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-huge {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(5rem, 18vw, 14rem);
+            font-weight: 400;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 700px;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* University cards grid */
+        .uni-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .uni-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .uni-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .uni-card.uwa { border-top-color: #003087; }
+        .uni-card.curtin { border-top-color: #E31837; }
+        .uni-card.murdoch { border-top-color: #DC143C; }
+        .uni-card.ecu { border-top-color: #004C93; }
+        .uni-card.notre-dame { border-top-color: #003DA5; }
+
+        .uni-name {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .uni-tag {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .uni-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-indigo);
+        }
+
+        .timeline-month {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            color: var(--accent-pink);
+            min-width: 100px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Info cards for TISC, ATAR etc */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .info-card h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            color: var(--accent-pink);
+            margin-bottom: 1rem;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-card li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-card li:last-child {
+            border-bottom: none;
+        }
+
+        .info-card li::before {
+            content: "→";
+            color: var(--accent-indigo);
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* ATAR examples */
+        .atar-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .atar-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: var(--bg-card);
+            padding: 1.25rem;
+            border-radius: 12px;
+        }
+
+        .atar-score {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--accent-pink);
+            min-width: 80px;
+        }
+
+        .atar-course {
+            flex: 1;
+            font-size: 1.1rem;
+        }
+
+        /* Cost breakdown */
+        .cost-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 800px;
+        }
+
+        .cost-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .cost-amount {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .cost-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* HECS repayment table */
+        .hecs-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 700px;
+        }
+
+        .hecs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hecs-row:last-child {
+            border-bottom: none;
+        }
+
+        .hecs-row.header {
+            font-weight: 600;
+            color: var(--accent-pink);
+        }
+
+        .hecs-income {
+            color: var(--text-secondary);
+        }
+
+        .hecs-rate {
+            color: var(--accent-green);
+            text-align: right;
+        }
+
+        /* Support services */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .support-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .support-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .support-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .support-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Comparison boxes */
+        .comparison-row {
+            display: flex;
+            gap: 2rem;
+            max-width: 1000px;
+        }
+
+        .comparison-card {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .comparison-card h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-indigo);
+        }
+
+        .comparison-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Challenge box */
+        .challenge-box {
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-pink));
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .challenge-box h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .challenge-box ul {
+            list-style: none;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .challenge-box li {
+            padding: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .challenge-box li::before {
+            content: "✓";
+            margin-right: 1rem;
+            color: var(--accent-green);
+        }
+
+        /* Key takeaways */
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+        }
+
+        .takeaway-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .takeaway-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--accent-pink);
+            min-width: 40px;
+        }
+
+        .takeaway-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Living options */
+        .living-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .living-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .living-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .living-cost {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .living-pros {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Pathway options */
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+        }
+
+        .pathway-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .pathway-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pathway-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Reality check items */
+        .reality-list {
+            max-width: 700px;
+            text-align: left;
+        }
+
+        .reality-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .reality-stat {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            color: var(--accent-pink);
+            margin-bottom: 0.5rem;
+        }
+
+        .reality-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #1a0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .uni-grid { grid-template-columns: 1fr; }
+            .info-grid { grid-template-columns: 1fr; }
+            .cost-grid { grid-template-columns: 1fr; }
+            .support-grid { grid-template-columns: 1fr; }
+            .comparison-row { flex-direction: column; }
+            .takeaways-grid { grid-template-columns: 1fr; }
+            .living-grid { grid-template-columns: 1fr; }
+            .pathway-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">The <em>Uni</em> Pathway</h1>
+            <p class="slide-subtitle">Everything Year 12 students need to know about going to university in WA</p>
+            <p class="stat-source">Week 12 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: WA Universities Overview -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">WA's Five Universities</h2>
+            <div class="uni-grid">
+                <div class="uni-card uwa">
+                    <div class="uni-tag">Group of Eight</div>
+                    <div class="uni-name">UWA</div>
+                    <div class="uni-desc">University of Western Australia - Research-intensive, sandstone uni. Strong in medicine, engineering, sciences. Crawley campus near the river.</div>
+                </div>
+                <div class="uni-card curtin">
+                    <div class="uni-tag">Practical Focus</div>
+                    <div class="uni-name">Curtin University</div>
+                    <div class="uni-desc">Practical, industry-connected programs. Strong engineering, business, health sciences. Bentley campus with modern facilities.</div>
+                </div>
+                <div class="uni-card murdoch">
+                    <div class="uni-tag">Personalised</div>
+                    <div class="uni-name">Murdoch University</div>
+                    <div class="uni-desc">Smaller, more personalised. Excellent vet science, environmental studies, nursing. Bush campus in the southern suburbs.</div>
+                </div>
+                <div class="uni-card ecu">
+                    <div class="uni-tag">Creative & Teaching</div>
+                    <div class="uni-name">ECU</div>
+                    <div class="uni-desc">Edith Cowan University - Top for teaching, nursing, creative arts. Multiple campuses across Perth metro and regional WA.</div>
+                </div>
+                <div class="uni-card notre-dame" style="grid-column: span 2;">
+                    <div class="uni-tag">Private, Catholic Heritage</div>
+                    <div class="uni-name">Notre Dame</div>
+                    <div class="uni-desc">Private Catholic university. Small class sizes, personal attention. Strong in health, law, education. Fremantle and Broome campuses.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: How TISC Works -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 3rem; margin-bottom: 2rem;">How TISC Works</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>What is TISC?</h3>
+                    <ul>
+                        <li>Tertiary Institutions Service Centre</li>
+                        <li>You apply through TISC, not directly to unis</li>
+                        <li>One application for all WA unis</li>
+                        <li>Processes your preferences</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>The Process</h3>
+                    <ul>
+                        <li>Select up to 6 course preferences</li>
+                        <li>List them in order of preference</li>
+                        <li>Your top available offer is made</li>
+                        <li>Apply September-December Year 12</li>
+                        <li>Receive offers in January</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">tisc.edu.au - Applications open early September</p>
+        </div>
+
+        <!-- Slide 4: ATAR Explained -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">ATAR Explained</h2>
+            <div style="max-width: 800px; text-align: center; margin-bottom: 2rem;">
+                <div class="stat-huge" style="font-size: 8rem;">90.00</div>
+                <p class="stat-label">ATAR 90 = You're in the top 10% of all Year 12 students</p>
+            </div>
+            <div style="max-width: 800px; background: var(--bg-card); padding: 2rem; border-radius: 16px;">
+                <h3 style="color: var(--accent-pink); margin-bottom: 1rem; text-align: center;">It's a Percentile Rank, Not a Score</h3>
+                <p style="color: var(--text-secondary); line-height: 1.7; text-align: center;">
+                    ATAR = Australian Tertiary Admission Rank. It shows your position relative to other students.
+                    ATAR 75 means you performed better than 75% of the state. It's calculated from your best 4 subjects.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 5: ATAR Examples -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">ATAR Course Requirements</h2>
+            <div class="atar-examples">
+                <div class="atar-row">
+                    <div class="atar-score">99+</div>
+                    <div class="atar-course">Medicine, Dentistry</div>
+                </div>
+                <div class="atar-row">
+                    <div class="atar-score">95+</div>
+                    <div class="atar-course">Law, Pharmacy, Physiotherapy</div>
+                </div>
+                <div class="atar-row">
+                    <div class="atar-score">85+</div>
+                    <div class="atar-course">Engineering, Architecture, Commerce</div>
+                </div>
+                <div class="atar-row">
+                    <div class="atar-score">75+</div>
+                    <div class="atar-course">Nursing, Science, IT</div>
+                </div>
+                <div class="atar-row">
+                    <div class="atar-score">70+</div>
+                    <div class="atar-course">Arts, Social Work, Education</div>
+                </div>
+            </div>
+            <p class="stat-source">These are approximate - cutoffs change yearly based on demand</p>
+        </div>
+
+        <!-- Slide 6: What if ATAR Isn't Enough -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What if My ATAR Isn't Enough?</h2>
+            <div class="pathway-grid">
+                <div class="pathway-card">
+                    <div class="pathway-title">Pathway Programs</div>
+                    <div class="pathway-desc">UniReady (Curtin), UWay (UWA), OnTrack (Murdoch) - Complete a bridging course, then enter your degree.</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-title">TAFE Articulation</div>
+                    <div class="pathway-desc">Complete a TAFE diploma, then transfer into 2nd year of uni degree with credit.</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-title">Alternative Entry</div>
+                    <div class="pathway-desc">Portfolio entry (creative courses), interviews, special consideration for hardship or disadvantage.</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-title">Try Again Next Year</div>
+                    <div class="pathway-desc">Gap year, work experience, re-sit exams. Many students defer and reapply with better results.</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">ATAR is ONE pathway, not the only pathway</p>
+        </div>
+
+        <!-- Slide 7: HECS-HELP Explained -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">HECS-HELP Explained</h2>
+            <div style="max-width: 900px;">
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; margin-bottom: 2rem;">
+                    <h3 style="color: var(--accent-green); font-size: 1.5rem; margin-bottom: 1rem; text-align: center;">It's NOT Like Normal Debt</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        The government pays your fees upfront. You only repay through tax when you earn above $54,435/year.
+                        No minimum monthly payments. No credit checks. No interest - just indexed to inflation.
+                    </p>
+                </div>
+                <div class="info-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="info-card" style="padding: 1.5rem;">
+                        <h3 style="font-size: 1.3rem;">Repayment</h3>
+                        <p style="color: var(--text-secondary);">1-10% of income above $54,435</p>
+                    </div>
+                    <div class="info-card" style="padding: 1.5rem;">
+                        <h3 style="font-size: 1.3rem;">Average Debt</h3>
+                        <p style="color: var(--text-secondary);">$20,000 - $50,000 total</p>
+                    </div>
+                    <div class="info-card" style="padding: 1.5rem;">
+                        <h3 style="font-size: 1.3rem;">Forgiven If...</h3>
+                        <p style="color: var(--text-secondary);">You never earn enough or pass away</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: HECS Repayment Table -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">HECS Repayment Rates</h2>
+            <div class="hecs-table">
+                <div class="hecs-row header">
+                    <div>Annual Income</div>
+                    <div class="hecs-rate">Repayment Rate</div>
+                </div>
+                <div class="hecs-row">
+                    <div class="hecs-income">Below $54,435</div>
+                    <div class="hecs-rate">Nil</div>
+                </div>
+                <div class="hecs-row">
+                    <div class="hecs-income">$54,435 - $62,850</div>
+                    <div class="hecs-rate">1%</div>
+                </div>
+                <div class="hecs-row">
+                    <div class="hecs-income">$62,851 - $66,620</div>
+                    <div class="hecs-rate">2%</div>
+                </div>
+                <div class="hecs-row">
+                    <div class="hecs-income">$66,621 - $70,618</div>
+                    <div class="hecs-rate">2.5%</div>
+                </div>
+                <div class="hecs-row">
+                    <div class="hecs-income">$70,619 - $74,855</div>
+                    <div class="hecs-rate">3%</div>
+                </div>
+                <div class="hecs-row">
+                    <div class="hecs-income">$80,000+</div>
+                    <div class="hecs-rate">4-10%</div>
+                </div>
+            </div>
+            <p class="stat-source">Example: Earning $60,000? You'll repay ~$600/year automatically through tax</p>
+        </div>
+
+        <!-- Slide 9: Course Costs -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Does Uni Actually Cost?</h2>
+            <div class="cost-grid">
+                <div class="cost-card">
+                    <div class="cost-amount">$8-12k</div>
+                    <div class="cost-label">Typical yearly tuition (domestic)</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-amount">$15-20k</div>
+                    <div class="cost-label">Medicine, dentistry, vet (higher band)</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-amount">~$300</div>
+                    <div class="cost-label">Student Services & Amenities Fee/year</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-amount">$500+</div>
+                    <div class="cost-label">Textbooks, equipment, transport</div>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Most domestic students use HECS-HELP and pay nothing upfront</p>
+        </div>
+
+        <!-- Slide 10: What Uni is Actually Like -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Uni is Actually Like</h2>
+            <div class="comparison-row">
+                <div class="comparison-card">
+                    <h3>High School</h3>
+                    <p>📅 30+ contact hours per week</p>
+                    <p>👥 Same 25-30 students all year</p>
+                    <p>📚 Daily homework, regular tests</p>
+                    <p>👨‍🏫 Teachers track your progress</p>
+                    <p>⏰ Structured 8:30am - 3:00pm</p>
+                    <p>✓ You're told what to do</p>
+                </div>
+                <div class="comparison-card">
+                    <h3>University</h3>
+                    <p>📅 12-18 contact hours per week</p>
+                    <p>👥 100+ in lectures, ~20 in tutorials</p>
+                    <p>📚 Large assignments, exams worth 40-60%</p>
+                    <p>👨‍🏫 Nobody checks if you're studying</p>
+                    <p>⏰ You choose your timetable</p>
+                    <p>✓ You manage yourself</p>
+                </div>
+            </div>
+            <p class="stat-source">The shift from structured to self-directed learning is the biggest change</p>
+        </div>
+
+        <!-- Slide 11: Living Arrangements -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Where Will You Live?</h2>
+            <div class="living-grid">
+                <div class="living-card">
+                    <div class="living-title">Live at Home</div>
+                    <div class="living-cost">Cheapest</div>
+                    <div class="living-pros">
+                        Most WA students choose this. Save money, home comforts. Longer commute, less independence.
+                    </div>
+                </div>
+                <div class="living-card">
+                    <div class="living-title">On-Campus College</div>
+                    <div class="living-cost">$15-25k/yr</div>
+                    <div class="living-pros">
+                        Meals included, social, convenient. Expensive, less privacy, can be loud.
+                    </div>
+                </div>
+                <div class="living-card">
+                    <div class="living-title">Share House</div>
+                    <div class="living-cost">$150-250/wk</div>
+                    <div class="living-pros">
+                        Independence, choose housemates. Need to cook, clean, pay bills. Add food, utilities, internet.
+                    </div>
+                </div>
+            </div>
+            <p class="stat-source">Budget for rent + food ($100/wk) + transport + utilities + internet</p>
+        </div>
+
+        <!-- Slide 12: The Reality Check -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Reality Check</h2>
+            <div class="reality-list">
+                <div class="reality-item">
+                    <div class="reality-stat">30% don't finish</div>
+                    <div class="reality-text">Around 30% of students don't complete their degree. It's OK to change direction.</div>
+                </div>
+                <div class="reality-item">
+                    <div class="reality-stat">Changing is common</div>
+                    <div class="reality-text">It's fine to switch courses. Do it early (before 2nd year) to minimize lost time and money.</div>
+                </div>
+                <div class="reality-item">
+                    <div class="reality-stat">Deferring is OK</div>
+                    <div class="reality-text">Many students defer for a year to work, travel, or figure out what they want. You can defer your offer.</div>
+                </div>
+                <div class="reality-item">
+                    <div class="reality-stat">Research job outcomes</div>
+                    <div class="reality-text">Some degrees have limited job prospects. Check graduate employment rates before committing 3-4 years.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Student Support -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Student Support Services</h2>
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">📚</div>
+                    <div class="support-title">Study Skills</div>
+                    <div class="support-desc">Writing workshops, time management, exam prep</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">🧠</div>
+                    <div class="support-title">Counselling</div>
+                    <div class="support-desc">Free mental health support, stress management</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">♿</div>
+                    <div class="support-title">Disability Support</div>
+                    <div class="support-desc">Accommodations, assistive tech, exam adjustments</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">💰</div>
+                    <div class="support-title">Financial Help</div>
+                    <div class="support-desc">Emergency loans, hardship grants, budgeting advice</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">👥</div>
+                    <div class="support-title">Peer Mentoring</div>
+                    <div class="support-desc">Older students help you navigate uni life</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">💼</div>
+                    <div class="support-title">Career Services</div>
+                    <div class="support-desc">Resume help, job boards, interview prep</div>
+                </div>
+            </div>
+            <p class="stat-source">All WA universities offer these services - use them!</p>
+        </div>
+
+        <!-- Slide 14: Working While Studying -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Working While Studying</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>The Balance</h3>
+                    <ul>
+                        <li>Most students work 10-20 hrs/week</li>
+                        <li>More than 20 hrs affects grades</li>
+                        <li>Campus jobs: library, admin, tutoring</li>
+                        <li>Flexible retail/hospitality common</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>Centrelink Support</h3>
+                    <ul>
+                        <li>Youth Allowance (under 25)</li>
+                        <li>Austudy (25+)</li>
+                        <li>Income and asset tested</li>
+                        <li>~$500-700/fortnight if eligible</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">servicesaustralia.gov.au/youth-allowance - Apply early, processing takes weeks</p>
+        </div>
+
+        <!-- Slide 15: Scholarships -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Scholarships</h2>
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">🏆</div>
+                    <div class="support-title">Academic</div>
+                    <div class="support-desc">High ATAR (95+). $2,000-6,000/year. Automatically considered.</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">🤝</div>
+                    <div class="support-title">Equity</div>
+                    <div class="support-desc">Financial hardship, low SES, first in family to attend uni.</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">🌾</div>
+                    <div class="support-title">Regional</div>
+                    <div class="support-desc">For students from rural/regional WA relocating to Perth.</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">🪃</div>
+                    <div class="support-title">Indigenous</div>
+                    <div class="support-desc">Aboriginal and Torres Strait Islander students. Substantial support available.</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">⚽</div>
+                    <div class="support-title">Sport</div>
+                    <div class="support-desc">Elite athletes. Often includes flexible study arrangements.</div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">💼</div>
+                    <div class="support-title">Industry</div>
+                    <div class="support-desc">Sponsored by companies in specific fields (engineering, mining, etc).</div>
+                </div>
+            </div>
+            <p class="stat-source">Apply early! Scholarship applications often close before TISC applications</p>
+        </div>
+
+        <!-- Slide 16: Key Dates Timeline -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key Dates Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-month">August</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Research & Prepare</div>
+                        <div class="timeline-desc">Explore courses, attend uni open days, check ATAR cutoffs</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-month">September</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">TISC Opens</div>
+                        <div class="timeline-desc">Applications open early September. Early closing for some courses (teaching, nursing)</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-month">Late Sept</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Early Round Closes</div>
+                        <div class="timeline-desc">Teaching, nursing, some health courses close for early consideration</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-month">December</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Final Deadline</div>
+                        <div class="timeline-desc">TISC applications close (usually around Christmas)</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-month">January</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Offers Released</div>
+                        <div class="timeline-desc">Main round offers in early January. Accept/decline/defer your offer</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-month">Late Feb</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Semester 1 Starts</div>
+                        <div class="timeline-desc">Orientation week, then classes begin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Your Challenge -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Challenge</h2>
+            <div class="challenge-box">
+                <h3>Research One Course</h3>
+                <ul>
+                    <li>Choose a course you're interested in</li>
+                    <li>Find the ATAR cutoff for that course</li>
+                    <li>Check which uni offers it</li>
+                    <li>Research career outcomes for graduates</li>
+                    <li>Identify if pathway options exist</li>
+                    <li>Check if scholarships are available</li>
+                </ul>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem;">Use tisc.edu.au, uni websites, and qilt.edu.au for graduate outcomes</p>
+        </div>
+
+        <!-- Slide 18: Key Takeaways -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key Takeaways</h2>
+            <div class="takeaways-grid">
+                <div class="takeaway-card">
+                    <div class="takeaway-number">1</div>
+                    <div class="takeaway-text">Apply through TISC (tisc.edu.au) in September-December with up to 6 preferences</div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">2</div>
+                    <div class="takeaway-text">HECS-HELP is not scary debt - you only repay when earning $54,435+</div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">3</div>
+                    <div class="takeaway-text">ATAR alternatives exist: pathway programs, TAFE, portfolio entry, special consideration</div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">4</div>
+                    <div class="takeaway-text">Uni is very different to school: less contact time, more self-direction, larger assessments</div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">5</div>
+                    <div class="takeaway-text">Research career outcomes before committing - not all degrees lead to clear job paths</div>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">6</div>
+                    <div class="takeaway-text">Use support services, apply for scholarships, and it's OK to change your mind</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: End -->
+        <div class="slide gradient-bg">
+            <h1 class="slide-title">Your Education, <em>Your Future</em></h1>
+            <p class="slide-subtitle">The uni pathway is just one of many options. Choose what's right for you.</p>
+            <p class="stat-source" style="margin-top: 3rem;">Questions? Resources: tisc.edu.au • studyassist.gov.au • gooduniversitiesguide.com.au</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 19</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

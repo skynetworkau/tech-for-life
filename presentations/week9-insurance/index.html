@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance & Health // Week 9 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1c1c1c;
+            --accent-red: #ff3b3b;
+            --accent-orange: #ff9500;
+            --accent-green: #00d26a;
+            --accent-blue: #007aff;
+            --accent-purple: #af52de;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        /* Slide container */
+        .slides-container {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            color: var(--accent-blue);
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* Story slides */
+        .story-container {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .story-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .story-quote::before {
+            content: '"';
+            font-size: 8rem;
+            position: absolute;
+            top: -3rem;
+            left: -2rem;
+            color: var(--accent-blue);
+            opacity: 0.3;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        .story-attribution {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .story-attribution strong {
+            color: var(--text-secondary);
+        }
+
+        .story-context {
+            font-size: 1rem;
+            color: var(--accent-orange);
+            margin-top: 0.5rem;
+        }
+
+        /* Content cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .content-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .content-card.green {
+            border-left-color: var(--accent-green);
+        }
+
+        .content-card.red {
+            border-left-color: var(--accent-red);
+        }
+
+        .content-card.orange {
+            border-left-color: var(--accent-orange);
+        }
+
+        .content-card.purple {
+            border-left-color: var(--accent-purple);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* List items */
+        .content-list {
+            list-style: none;
+            text-align: left;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .content-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .list-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .column-text h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .column-text .highlight {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            text-align: left;
+            max-width: 700px;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+        }
+
+        /* Insurance types grid */
+        .insurance-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .insurance-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: left;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .insurance-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+        }
+
+        .insurance-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .insurance-card-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .insurance-card-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .insurance-card-cost {
+            font-size: 0.9rem;
+            color: var(--accent-green);
+            margin-top: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Stat highlight */
+        .stat-huge {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(6rem, 20vw, 15rem);
+            font-weight: 400;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .timeline-label {
+            width: 150px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            flex: 1;
+        }
+
+        /* Fullscreen hint */
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .home-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide {
+                padding: 2rem;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .insurance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark slide variations */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #001a33 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(0, 122, 255, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(175, 82, 222, 0.1) 0%, transparent 50%);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; opacity: 0; }
+        .delay-2 { animation-delay: 0.4s; opacity: 0; }
+        .delay-3 { animation-delay: 0.6s; opacity: 0; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title animate-in">Insurance & <em>Health</em></h1>
+            <p class="slide-subtitle animate-in delay-1">Everything Year 12 students need to know before leaving school</p>
+            <p class="stat-source animate-in delay-2">Week 9 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: Why Insurance Matters - Real Stories -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why Insurance <em>Matters</em></h2>
+            <div class="content-grid">
+                <div class="content-card red">
+                    <div class="card-icon">🚗</div>
+                    <div class="card-title">Car Accident Without Coverage</div>
+                    <div class="card-desc">19-year-old P-plater ran a red light, totalled someone's $35,000 car. Had CTP but no Third Party Property. Now paying $500/month for 7 years.</div>
+                </div>
+                <div class="content-card orange">
+                    <div class="card-icon">📱</div>
+                    <div class="card-title">Phone Stolen, No Insurance</div>
+                    <div class="card-desc">$1,200 iPhone stolen at a party. No contents insurance. Had to buy a budget phone instead and lost all savings for first car.</div>
+                </div>
+                <div class="content-card purple">
+                    <div class="card-icon">🏥</div>
+                    <div class="card-title">Can't Work Due to Injury</div>
+                    <div class="card-desc">Broke wrist skateboarding, casual job at cafe couldn't keep them on. No income protection. Fell behind on rent and had to move back home.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Medicare - What You Get for Free -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Medicare — What You Get <em>Free</em></h2>
+            <ul class="content-list">
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Bulk-billed doctor visits</strong> — Many GPs offer free appointments</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Public hospital treatment</strong> — Emergency care, surgery, overnight stays</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Pathology and X-rays</strong> — Most tests covered when doctor-referred</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>PBS subsidised medications</strong> — Prescriptions often under $30, free for concession card holders</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Get your Medicare card at 15+</strong> — Apply online or at Medicare office, you'll need it for uni, work, and life</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: Medicare - What It Doesn't Cover -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Medicare — What It <em>Doesn't</em> Cover</h2>
+            <ul class="content-list">
+                <li>
+                    <span class="list-icon">❌</span>
+                    <span><strong>Private hospital rooms</strong> — Shared wards only in public hospitals</span>
+                </li>
+                <li>
+                    <span class="list-icon">❌</span>
+                    <span><strong>Dental</strong> — Except emergency dental in public hospitals (extremely limited)</span>
+                </li>
+                <li>
+                    <span class="list-icon">❌</span>
+                    <span><strong>Optical/glasses</strong> — Eye tests and frames not covered</span>
+                </li>
+                <li>
+                    <span class="list-icon">❌</span>
+                    <span><strong>Physiotherapy, chiro, psychology</strong> — Some psychologists bulk-bill under mental health plan, but most allied health costs money</span>
+                </li>
+                <li>
+                    <span class="list-icon">❌</span>
+                    <span><strong>Ambulance in WA</strong> — Not free! Can cost $500-$1000+ per callout</span>
+                </li>
+                <li>
+                    <span class="list-icon">❌</span>
+                    <span><strong>Cosmetic procedures</strong> — Obviously not covered</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Private Health Insurance Explained -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Private Health Insurance</h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h2>Two Types</h2>
+                    <p><span class="highlight">Hospital Cover</span> — Covers private hospital treatment, choice of doctor, private room, faster elective surgery</p>
+                    <p><span class="highlight">Extras Cover</span> — Covers dental, optical, physio, chiro, psychology sessions</p>
+                    <p style="margin-top: 1.5rem;">Most young people start with just <strong>Extras</strong> until they're earning more or need hospital treatment.</p>
+                </div>
+                <div>
+                    <div class="content-card green" style="margin-bottom: 1rem;">
+                        <div class="card-title">Why People Get It</div>
+                        <div class="card-desc">• Choice of specialist<br>• Shorter wait times for surgery<br>• Private hospital room<br>• Extras like dental & optical<br>• Avoid tax surcharge (high earners)</div>
+                    </div>
+                    <div class="content-card blue">
+                        <div class="card-title">Compare Providers</div>
+                        <div class="card-desc">comparethemarket.com.au<br>iSelect.com.au<br>privatehealth.gov.au</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Medicare Levy Surcharge -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Medicare Levy <em>Surcharge</em></h2>
+            <div class="story-container">
+                <div class="stat-huge" style="font-size: 8rem;">$93,000</div>
+                <p class="stat-label">If you earn over this amount and DON'T have private hospital cover, you pay 1-1.5% extra tax</p>
+                <div style="margin-top: 2rem; background: var(--bg-card); padding: 2rem; border-radius: 16px; max-width: 700px;">
+                    <p style="font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary);">
+                        <strong style="color: var(--accent-blue);">Example:</strong> Earning $100,000/year without hospital cover = $1,000-$1,500 extra tax per year.
+                    </p>
+                    <p style="font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary); margin-top: 1rem;">
+                        Basic hospital cover often costs <strong>less</strong> than the surcharge, so it's financially smarter to get covered.
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--accent-orange); margin-top: 1rem;">
+                        Not relevant yet, but will be when you're earning well!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Lifetime Health Cover Loading -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Lifetime Health Cover <em>Loading</em></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-label">Before Age 31</span>
+                    <div class="timeline-content">
+                        <strong>No loading</strong> — Get hospital cover at base price
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">After Age 31</span>
+                    <div class="timeline-content">
+                        <strong>2% loading per year</strong> — Wait until 35? Pay 8% extra. Wait until 40? Pay 18% extra.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">Loading Duration</span>
+                    <div class="timeline-content">
+                        <strong>Stays for 10 years</strong> — You'll pay that extra amount for a full decade
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">The Incentive</span>
+                    <div class="timeline-content">
+                        <strong>Get covered before 31</strong> — Government wants people to join early to balance the system
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: When to Get Private Health -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">When to Get Private Health</h2>
+            <ul class="checklist">
+                <li>
+                    <span class="check-icon">⏰</span>
+                    <span><strong>Before age 31</strong> — Avoid Lifetime Health Cover loading</span>
+                </li>
+                <li>
+                    <span class="check-icon">💰</span>
+                    <span><strong>When earning over $93k</strong> — Avoid Medicare Levy Surcharge</span>
+                </li>
+                <li>
+                    <span class="check-icon">🏥</span>
+                    <span><strong>If you want private hospital choice</strong> — Shorter wait times, choice of doctor</span>
+                </li>
+                <li>
+                    <span class="check-icon">🦷</span>
+                    <span><strong>If you need extras</strong> — Regular dental, optical, physio visits</span>
+                </li>
+                <li>
+                    <span class="check-icon">👍</span>
+                    <span><strong>For most young people:</strong> Just <strong>Extras</strong> is fine until you're earning more or planning surgery</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 9: Car Insurance Types -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Car Insurance <em>Types</em></h2>
+            <div class="insurance-grid">
+                <div class="insurance-card">
+                    <div class="insurance-card-icon">🚑</div>
+                    <div class="insurance-card-name">CTP (Compulsory Third Party)</div>
+                    <div class="insurance-card-desc">Comes with your rego. Covers <strong>injuries to other people</strong> if you cause an accident. Does NOT cover car damage.</div>
+                    <div class="insurance-card-cost">Included in rego</div>
+                </div>
+                <div class="insurance-card">
+                    <div class="insurance-card-icon">🚗</div>
+                    <div class="insurance-card-name">Third Party Property</div>
+                    <div class="insurance-card-desc">Covers <strong>damage you cause to OTHER cars</strong>. Your car is not covered. Minimum recommended for all drivers.</div>
+                    <div class="insurance-card-cost">~$300-600/year</div>
+                </div>
+                <div class="insurance-card">
+                    <div class="insurance-card-icon">🔥</div>
+                    <div class="insurance-card-name">Third Party Fire & Theft</div>
+                    <div class="insurance-card-desc">Covers damage to other cars PLUS if your car is stolen or catches fire.</div>
+                    <div class="insurance-card-cost">~$500-800/year</div>
+                </div>
+                <div class="insurance-card">
+                    <div class="insurance-card-icon">🛡️</div>
+                    <div class="insurance-card-name">Comprehensive</div>
+                    <div class="insurance-card-desc">Covers <strong>everything</strong> including damage to YOUR car, theft, fire, weather damage, and damage you cause to others.</div>
+                    <div class="insurance-card-cost">~$1,500-3,000/year (under 25)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Car Insurance for Young Drivers -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Car Insurance for <em>Young Drivers</em></h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h2>Why It's Expensive</h2>
+                    <p>Premiums are <span class="highlight">HIGH for under-25s</span> because statistics show more accidents in this age group.</p>
+                    <p style="margin-top: 1.5rem;"><strong>Ways to Reduce:</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 0.5rem;">
+                        <li style="margin-bottom: 0.5rem;">• Named driver on parents' policy</li>
+                        <li style="margin-bottom: 0.5rem;">• Build no-claim bonuses</li>
+                        <li style="margin-bottom: 0.5rem;">• Choose higher excess</li>
+                        <li style="margin-bottom: 0.5rem;">• Less powerful car</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="content-card blue" style="margin-bottom: 1rem;">
+                        <div class="card-title">What's an Excess?</div>
+                        <div class="card-desc">The amount <strong>you</strong> pay first when making a claim. Higher excess = lower premium. Typical excess: $500-$1,000.</div>
+                    </div>
+                    <div class="content-card purple">
+                        <div class="card-title">What Affects Premiums</div>
+                        <div class="card-desc">• Age (under 25 = higher)<br>• Car type (sports car = higher)<br>• Suburb (high crime = higher)<br>• Driving history (accidents = higher)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Renters Insurance (Contents Insurance) -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Renters Insurance</h2>
+            <div class="story-container">
+                <p class="slide-subtitle" style="margin-bottom: 2rem;">Your landlord's insurance covers the <strong>building</strong>, NOT your stuff</p>
+                <div class="content-grid" style="margin-top: 2rem;">
+                    <div class="content-card green">
+                        <div class="card-icon">🔥</div>
+                        <div class="card-title">What It Covers</div>
+                        <div class="card-desc">Theft, fire, storm damage, water damage to your belongings — laptop, phone, furniture, clothes, electronics</div>
+                    </div>
+                    <div class="content-card blue">
+                        <div class="card-icon">💵</div>
+                        <div class="card-title">Typical Cost</div>
+                        <div class="card-desc">$15-30/month for basic cover. Worth it if you have valuable items like laptops, phones, or furniture.</div>
+                    </div>
+                    <div class="content-card orange">
+                        <div class="card-icon">📸</div>
+                        <div class="card-title">Smart Tip</div>
+                        <div class="card-desc">Take photos and keep receipts of valuable items. Makes claims much easier if something happens.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Income Protection Insurance -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Income Protection</h2>
+            <div class="two-column">
+                <div class="column-text">
+                    <h2>What It Does</h2>
+                    <p>Pays you <span class="highlight">if you can't work</span> due to illness or injury.</p>
+                    <p>Usually covers <strong>75% of your income</strong> for a set period (3 months to 2 years, depending on policy).</p>
+                    <p style="color: var(--accent-green); margin-top: 1.5rem;">Often <strong>included in your superannuation</strong> — check your super statements!</p>
+                </div>
+                <div>
+                    <div class="content-card purple">
+                        <div class="card-title">When It Matters</div>
+                        <div class="card-desc">More important once you have regular bills to pay — rent, car payments, loans. Less critical when living at home with no major expenses.</div>
+                    </div>
+                    <div class="content-card blue" style="margin-top: 1rem;">
+                        <div class="card-title">Check Your Super</div>
+                        <div class="card-desc">Most super funds include default income protection and life insurance. Log into your super account to see what you already have.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Life Insurance Basics -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Life Insurance</h2>
+            <ul class="content-list">
+                <li>
+                    <span class="list-icon">💰</span>
+                    <span><strong>What it does:</strong> Pays out a lump sum if you die or are diagnosed with a terminal illness</span>
+                </li>
+                <li>
+                    <span class="list-icon">👤</span>
+                    <span><strong>Probably not needed yet</strong> — Unless you have dependents (kids, partner relying on your income)</span>
+                </li>
+                <li>
+                    <span class="list-icon">📊</span>
+                    <span><strong>Default cover in super</strong> — Most super funds include basic life insurance automatically</span>
+                </li>
+                <li>
+                    <span class="list-icon">🏠</span>
+                    <span><strong>Becomes important when:</strong> You have a mortgage, kids, or a partner who relies on your income</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Action:</strong> Review your super statements to see what default life cover you already have</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 14: Ambulance Cover in WA -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Ambulance Cover in <em>WA</em></h2>
+            <div class="story-container">
+                <div class="stat-huge" style="font-size: 8rem;">$500+</div>
+                <p class="stat-label">Cost of a single ambulance callout in Western Australia</p>
+                <div style="margin-top: 2rem; background: var(--bg-card); padding: 2rem; border-radius: 16px; max-width: 700px;">
+                    <p style="font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary);">
+                        Ambulances are <strong style="color: var(--accent-red);">NOT free in WA</strong>. A single trip can cost $500-$1,000+.
+                    </p>
+                    <p style="font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary); margin-top: 1rem;">
+                        <strong style="color: var(--accent-blue);">Options:</strong><br>
+                        • St John Ambulance membership (~$90/year for singles)<br>
+                        • Some private health extras include ambulance<br>
+                        • Pensioners/concession card holders get free cover
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: How to Compare Insurance -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">How to Compare Insurance</h2>
+            <ul class="checklist">
+                <li>
+                    <span class="check-icon">🔍</span>
+                    <span><strong>Use comparison sites</strong> — comparethemarket.com.au, iSelect.com.au, Canstar — but also check providers directly</span>
+                </li>
+                <li>
+                    <span class="check-icon">📄</span>
+                    <span><strong>Read the PDS (Product Disclosure Statement)</strong> — Boring but important. It tells you exactly what's covered.</span>
+                </li>
+                <li>
+                    <span class="check-icon">❌</span>
+                    <span><strong>Check what's EXCLUDED</strong> — Some policies exclude pre-existing conditions, certain activities, or specific items</span>
+                </li>
+                <li>
+                    <span class="check-icon">💵</span>
+                    <span><strong>Higher excess = lower premium</strong> — But make sure you can afford the excess if you need to claim</span>
+                </li>
+                <li>
+                    <span class="check-icon">⚖️</span>
+                    <span><strong>Don't over-insure or under-insure</strong> — Get the right level for your needs, not more, not less</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 16: Your Insurance Checklist -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Your Insurance <em>Checklist</em></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-label">Right Now</span>
+                    <div class="timeline-content">
+                        <strong>Get your Medicare card</strong> — Apply at 15+, essential for life
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">When Driving</span>
+                    <div class="timeline-content">
+                        <strong>At minimum Third Party Property</strong> — Protects you from paying for damage to other cars
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">When Renting</span>
+                    <div class="timeline-content">
+                        <strong>Contents insurance</strong> — $15-30/month for peace of mind
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">Before Age 31</span>
+                    <div class="timeline-content">
+                        <strong>Consider private hospital cover</strong> — Avoid Lifetime Health Cover loading
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-label">Earning $93k+</span>
+                    <div class="timeline-content">
+                        <strong>Definitely get hospital cover</strong> — Avoid Medicare Levy Surcharge
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Key Takeaways -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key <em>Takeaways</em></h2>
+            <ul class="content-list">
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Medicare is great but has gaps</strong> — No dental, optical, physio, or ambulance in WA</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Young = cheap for extras, expensive for car</strong> — Get extras early, comprehensive car later</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Private health: think about it before 31</strong> — Avoid loading and future tax surcharge</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Contents insurance is cheap peace of mind</strong> — Worth it if you have valuable items</span>
+                </li>
+                <li>
+                    <span class="list-icon">✓</span>
+                    <span><strong>Ambulance cover in WA is a must</strong> — Not covered by Medicare, can be very expensive</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 18: End -->
+        <div class="slide gradient-bg">
+            <h1 class="slide-title">Protect <em>Yourself</em></h1>
+            <p class="slide-subtitle">A little insurance today can save you from massive financial stress tomorrow.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 18</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progressBar');
+        const slideCounter = document.getElementById('slideCounter');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>

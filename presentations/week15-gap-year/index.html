@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gap Year & Alternatives // Week 15 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue), var(--accent-cyan));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.8rem;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-top: 0.75rem;
+        }
+
+        .card li {
+            padding: 0.4rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .card li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .column-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .column-content h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .column-content ul {
+            list-style: none;
+        }
+
+        .column-content li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+
+        .column-content li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .info-box h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .info-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .info-box li::before {
+            content: "✓";
+            color: var(--accent-emerald);
+            font-weight: bold;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid var(--accent-violet);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .highlight-box h3 {
+            color: var(--accent-violet);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .highlight-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .highlight-box li::before {
+            content: "→";
+            color: var(--accent-violet);
+            font-weight: bold;
+        }
+
+        /* Background patterns */
+        .slide.gradient-bg {
+            background: linear-gradient(135deg, #0f0a1a 0%, var(--bg-primary) 100%);
+        }
+
+        .slide.pattern-bg {
+            background-image: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
+        /* Budget display */
+        .budget-display {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .budget-display .budget-line {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .budget-display .budget-line strong {
+            color: var(--text-primary);
+        }
+
+        .budget-display .budget-total {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Steps container */
+        .steps-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .step-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .two-column { grid-template-columns: 1fr; gap: 1.5rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <a href="../../index.html" class="home-btn">← Course Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen • Use ← → to navigate</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active pattern-bg">
+            <h1 class="slide-title">Gap Year & <em>Alternatives</em></h1>
+            <p class="slide-subtitle">All the options for Year 12 students who don't want to go straight to uni or TAFE</p>
+            <p class="stat-source">Week 15 • Tech for Life • Year 12</p>
+        </div>
+
+        <!-- Slide 2: What is a Gap Year? -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What is a <em>Gap Year</em>?</h2>
+            <div class="info-box">
+                <h3>Taking a year (or more) before further study</h3>
+                <ul>
+                    <li>Working, travelling, volunteering</li>
+                    <li>NOT wasting time — building experiences</li>
+                    <li>Very common in Australia (30-40% of Year 12s take one)</li>
+                    <li>Can defer uni offer for 1-2 years</li>
+                    <li>Time to figure out what you actually want</li>
+                    <li>Arrive at uni more mature and motivated</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">A gap year is normal. You're not falling behind — you're getting ahead in life experience.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Why Take a Gap Year? -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Why Take a <em>Gap Year</em>?</h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Not Sure What to Study</h3>
+                    <p>Don't rush into a degree you'll regret. Use the year to explore interests and careers.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Burnt Out from School</h3>
+                    <p>13 years of study is exhausting. Take a break before diving into more study.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Want to Save Money First</h3>
+                    <p>Work full-time, save for uni, reduce future debt. Start uni with savings instead of stress.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Travel While Young</h3>
+                    <p>No mortgage, no kids, no major commitments. This is the easiest time to travel.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Gain Work Experience</h3>
+                    <p>Build your resume, learn workplace skills, get references for future applications.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Figure Out What You Want</h3>
+                    <p>Real-world experience helps you discover what you actually enjoy doing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Working First -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Working <em>First</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Why Work Full-Time?</h3>
+                    <ul>
+                        <li>Save money fast (no uni fees yet)</li>
+                        <li>Learn workplace skills and professionalism</li>
+                        <li>Build references and resume</li>
+                        <li>Figure out what you DON'T want to do</li>
+                        <li>Gain independence and confidence</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Common Gap Year Jobs</h3>
+                    <ul>
+                        <li>Retail (Coles, Woolies, clothing stores)</li>
+                        <li>Hospitality (cafes, restaurants, bars)</li>
+                        <li>Admin / reception</li>
+                        <li>Warehouse / logistics</li>
+                        <li>Call centres</li>
+                        <li>Trades assistant (paid to learn)</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Living at home and working full-time, you could save $20k-30k+ in a year</p>
+        </div>
+
+        <!-- Slide 5: Travelling -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Travelling</h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Working Holiday Visa</h3>
+                    <p>417/462 visa for other countries. Work + travel in Canada, UK, Japan, etc. Must be 18-30.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Australia Road Trip</h3>
+                    <p>Australia is massive. Van life, coastal drive, Uluru. Cheaper than flying overseas.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Southeast Asia</h3>
+                    <p>Thailand, Vietnam, Bali. Cheap and close. $2k-3k per month budget (accommodation + food + transport).</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Europe</h3>
+                    <p>Expensive but amazing. $4k-5k per month. Interrail pass for trains. Hostels keep costs down.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Travel Alone or With Friends?</h3>
+                    <p>Solo: more flexible, meet new people. Friends: shared costs, comfort. Both are valid.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Work While Travelling</h3>
+                    <p>Hostel work, farm work (WWOOFing), remote freelancing. Extends travel time.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Volunteering -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Volunteering</h2>
+            <div class="info-box">
+                <h3>Give back and build your resume</h3>
+                <ul>
+                    <li>Conservation Volunteers Australia — environmental projects</li>
+                    <li>Wildlife rescue (RSPCA, wildlife centres)</li>
+                    <li>Community organisations (youth centres, charities)</li>
+                    <li>International volunteering (WWOOFing — work on farms for accommodation)</li>
+                    <li>Looks great on resume and uni applications</li>
+                    <li>Find purpose and meaning while figuring out your path</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">Volunteering shows initiative, empathy, and commitment — all things unis and employers value.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Defence Force Pathways -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Defence Force <em>Pathways</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Gap Year Program</h3>
+                    <p>1 year paid contract. Explore careers in Army, Navy, Air Force. No commitment after. Get paid to try it.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>ADFA</h3>
+                    <p>Australian Defence Force Academy. Degree + career. Paid while studying. Full salary after graduation.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Direct Entry Roles</h3>
+                    <p>Technical roles, logistics, admin. No degree needed. Training provided. Travel opportunities.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Benefits</h3>
+                    <p>Good pay, travel, training, career progression, discipline, fitness, camaraderie.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Considerations</h3>
+                    <p>Commitment required (years, not months). Physical fitness needed. Deployment possible.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>How to Apply</h3>
+                    <p>defencejobs.gov.au — aptitude testing, fitness test, interviews. Process takes months.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: WA Police -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">WA <em>Police</em></h2>
+            <div class="info-box">
+                <h3>Become a police officer straight out of school</h3>
+                <ul>
+                    <li>Must be 18+ (can apply before you turn 18)</li>
+                    <li>No degree required (police academy training provided)</li>
+                    <li>Paid training (28 weeks at WA Police Academy)</li>
+                    <li>Starting salary around $80k+ (increases with rank and years)</li>
+                    <li>Career progression: constable → senior constable → sergeant → inspector</li>
+                    <li>Varied work: traffic, detectives, forensics, community, cybercrime</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">Challenging but rewarding. Make a real difference in your community. Job security and benefits.</p>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Apply at: police.wa.gov.au/Careers</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Mining & Resources -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Mining & <em>Resources</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Entry-Level Roles</h3>
+                    <ul>
+                        <li>Kitchen hand / catering</li>
+                        <li>Cleaner / housekeeping</li>
+                        <li>Trades assistant (no experience needed)</li>
+                        <li>Operations support</li>
+                        <li>Admin / data entry</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>The Reality</h3>
+                    <ul>
+                        <li>FIFO lifestyle (Fly-In Fly-Out, away from home)</li>
+                        <li>Very high wages ($80k-$120k+ entry-level)</li>
+                        <li>Can save a lot quickly</li>
+                        <li>Not for everyone (isolated, tough work)</li>
+                        <li>Common rosters: 2 weeks on, 1 week off</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">WA-specific opportunity — mining is huge here. Good way to save fast for future goals.</p>
+        </div>
+
+        <!-- Slide 10: Other Career Paths -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Other <em>Career Paths</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Real Estate Agent</h3>
+                    <p>No degree required. Get Certificate IV in Real Estate. Commission-based. High earning potential.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Insurance / Banking</h3>
+                    <p>Entry-level roles available. Training provided. Stable career path. Good pay progression.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Travel Agent</h3>
+                    <p>Certificate course. Work with bookings, itineraries, clients. Travel perks and discounts.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Personal Trainer</h3>
+                    <p>Certificate III & IV in Fitness. Work in gyms or start your own business. Flexible hours.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Beautician / Hairdresser</h3>
+                    <p>Apprenticeship or cert course. Build a client base. Can run your own salon eventually.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Photographer / Videographer</h3>
+                    <p>Self-taught or short course. Build portfolio. Weddings, events, real estate, social media.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Deferring Uni -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Deferring <em>Uni</em></h2>
+            <div class="info-box">
+                <h3>Have your cake and eat it too</h3>
+                <ul>
+                    <li>Accept your uni offer through TISC/UAC</li>
+                    <li>Then immediately apply to defer for 1-2 years</li>
+                    <li>Your place is held (no need to reapply)</li>
+                    <li>Work, travel, save money in the meantime</li>
+                    <li>Start uni more mature, motivated, and financially prepared</li>
+                    <li>Check deferral conditions (some courses have restrictions)</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--accent-cyan);">Best of both worlds: guaranteed uni place + gap year experience.</p>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Most courses allow deferral. Medicine, Law, and some competitive courses may not.</p>
+            </div>
+        </div>
+
+        <!-- Slide 12: Career Flexibility -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Career <em>Flexibility</em></h2>
+            <div class="highlight-box">
+                <h3>Your career won't be like your parents' generation</h3>
+                <ul>
+                    <li>You'll have 12+ jobs in your lifetime</li>
+                    <li>5 different careers on average</li>
+                    <li>Unlike parents: one job for life is GONE</li>
+                    <li>Skills transfer between industries</li>
+                    <li>It's OK not to have it all figured out at 18</li>
+                    <li>Career pivots are normal, not failures</li>
+                </ul>
+                <p style="margin-top: 1.5rem; font-weight: 600; color: var(--text-primary);">The pressure to choose the "right" path at 18 is outdated. Your path will evolve as you do.</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Portfolio Careers -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Portfolio <em>Careers</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>What is a Portfolio Career?</h3>
+                    <ul>
+                        <li>Multiple income streams</li>
+                        <li>Day job + side hustle</li>
+                        <li>Freelancing + part-time work</li>
+                        <li>Build skills in different areas</li>
+                        <li>More security through diversity</li>
+                    </ul>
+                </div>
+                <div class="column-content">
+                    <h3>Examples</h3>
+                    <ul>
+                        <li>Barista + photographer on weekends</li>
+                        <li>Retail worker + online tutoring</li>
+                        <li>Gym trainer + social media manager</li>
+                        <li>Admin job + freelance writing</li>
+                        <li>Trades work + property investing</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Remote work opportunities make portfolio careers easier than ever</p>
+        </div>
+
+        <!-- Slide 14: Saving Strategies -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Saving <em>Strategies</em></h2>
+            <div class="two-column">
+                <div class="column-content">
+                    <h3>Smart Saving</h3>
+                    <ul>
+                        <li>Live at home (save on rent if possible)</li>
+                        <li>Avoid lifestyle creep (don't spend just because you earn)</li>
+                        <li>Set a clear savings goal</li>
+                        <li>High-interest savings account (Ubank, ING, etc.)</li>
+                        <li>Automate savings (transfer on payday)</li>
+                    </ul>
+                </div>
+                <div class="budget-display">
+                    <div style="font-weight: 600; color: var(--accent-cyan); margin-bottom: 1rem;">Sample Budget (Full-Time $55k/year)</div>
+                    <div class="budget-line"><span>Monthly after tax:</span><strong>$3,900</strong></div>
+                    <div class="budget-line"><span>Living at home (board):</span><strong>-$600</strong></div>
+                    <div class="budget-line"><span>Car/transport:</span><strong>-$400</strong></div>
+                    <div class="budget-line"><span>Phone/internet:</span><strong>-$80</strong></div>
+                    <div class="budget-line"><span>Food/social:</span><strong>-$600</strong></div>
+                    <div class="budget-line"><span>Entertainment:</span><strong>-$200</strong></div>
+                    <div class="budget-total">Savings: $2,020/month = $24k/year</div>
+                </div>
+            </div>
+            <p class="stat-source">Don't compare to Instagram — focus on your own goals</p>
+        </div>
+
+        <!-- Slide 15: The Gig Economy -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Gig <em>Economy</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>Delivery Services</h3>
+                    <p>Uber Eats, Menulog, DoorDash. Flexible hours. Use your own vehicle. $15-25/hour (varies).</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Rideshare</h3>
+                    <p>Uber, Ola. Need car + full licence. Flexible income. Customer service skills essential.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>Task Platforms</h3>
+                    <p>Airtasker. Handyman tasks, moving help, cleaning. Set your own rates. Build reputation.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Freelancing</h3>
+                    <p>Upwork, Fiverr. Design, writing, coding, admin. Global clients. Build portfolio over time.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>The Pros</h3>
+                    <p>Flexible hours. Be your own boss. Work when you want. Good for side income.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>The Cons</h3>
+                    <p>No job security. No sick leave or super (unless you're ABN registered). Income varies.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Your Challenge -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Your <em>Challenge</em></h2>
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>List 3 Things You Want to Achieve in the Next 2 Years</h4>
+                        <p>Travel somewhere? Save for a car? Learn a skill? Start a side hustle? Be specific.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Research One Alternative Pathway</h4>
+                        <p>Pick one from today: Defence, Police, FIFO mining, travel, volunteering. Look into requirements, pay, lifestyle.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Calculate: How Much Could You Save Working Full-Time for a Year?</h4>
+                        <p>Research entry-level wages in your chosen field. Subtract realistic expenses. What's left?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Key Takeaways -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Key <em>Takeaways</em></h2>
+            <div class="cards-grid">
+                <div class="card" style="border-color: var(--accent-emerald);">
+                    <h3>There's No "Right" Path</h3>
+                    <p>Uni, TAFE, work, travel — all are valid. Your path is yours alone.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <h3>Gap Year ≠ Wasting Time</h3>
+                    <p>Real-world experience, money saved, clarity gained. That's valuable.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <h3>You Can Always Go to Uni Later</h3>
+                    <p>Mature-age students do better. Defer your offer or apply later.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <h3>Career Flexibility is Normal</h3>
+                    <p>12+ jobs, 5 careers. You're not locked in forever.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-amber);">
+                    <h3>Figure It Out As You Go</h3>
+                    <p>No one has it all figured out at 18. Take steps forward, learn, adjust.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent-rose);">
+                    <h3>Your Timeline, Not Theirs</h3>
+                    <p>Don't compare to others. Your journey unfolds at your pace.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: End Slide -->
+        <div class="slide pattern-bg">
+            <h1 class="slide-title">Your Path, Your <em>Pace</em></h1>
+            <p class="slide-subtitle">There's no rush. Take your time. Explore your options. Build your future at a pace that works for you.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 18</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'f' || e.key === 'F') {
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

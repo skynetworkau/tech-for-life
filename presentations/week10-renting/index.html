@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renting & Moving Out - The Real Costs in WA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #2a2a2a;
+            --accent-purple: #a855f7;
+            --accent-blue: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* Slide container */
+        .slide-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            display: none;
+            padding: 80px 100px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Slide counter */
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 40px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+            z-index: 999;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 999;
+        }
+
+        .nav-btn {
+            background: var(--bg-card);
+            border: 1px solid #333;
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-btn:disabled:hover {
+            background: var(--bg-card);
+            border-color: #333;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 72px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent-purple);
+        }
+
+        h4 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--accent-blue);
+        }
+
+        p {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+
+        /* Cards and containers */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* Lists */
+        ul {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        li {
+            font-size: 20px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            padding-left: 32px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-purple);
+            font-weight: 700;
+        }
+
+        /* Price tags */
+        .price {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--accent-purple);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .price-sm {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        /* Stats */
+        .stat-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--accent-purple);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Breakdown table */
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .breakdown-total {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2));
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        /* Comparison boxes */
+        .comparison {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .comparison-box {
+            flex: 1;
+            background: var(--bg-card);
+            border: 2px solid #333;
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+        }
+
+        .comparison-box.winner {
+            border-color: var(--success);
+        }
+
+        .winner-badge {
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: var(--success);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Alert boxes */
+        .alert {
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning);
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .alert h4 {
+            color: var(--warning);
+            margin-bottom: 12px;
+        }
+
+        .alert-info h4 {
+            color: var(--accent-blue);
+        }
+
+        .alert-success h4 {
+            color: var(--success);
+        }
+
+        /* Budget rule visual */
+        .budget-visual {
+            display: flex;
+            height: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .budget-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .budget-needs {
+            background: var(--accent-purple);
+            flex: 50%;
+        }
+
+        .budget-wants {
+            background: var(--accent-blue);
+            flex: 30%;
+        }
+
+        .budget-savings {
+            background: var(--success);
+            flex: 20%;
+        }
+
+        /* Activity section */
+        .activity-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2));
+            border: 2px solid var(--accent-purple);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .slide {
+                padding: 60px 60px;
+            }
+
+            h1 {
+                font-size: 56px;
+            }
+
+            h2 {
+                font-size: 44px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 40px;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+
+            h2 {
+                font-size: 32px;
+            }
+
+            .comparison {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">1 / 12</div>
+
+    <div class="slide-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <h1>Renting & Moving Out</h1>
+                <p class="subtitle">Can you actually afford it?</p>
+                <p style="font-size: 24px; margin-top: 40px;">The real costs of living independently in Western Australia</p>
+                <p style="font-size: 18px; color: var(--text-muted); margin-top: 60px;">Year 12 Digital Technologies - Tech for Life</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: True Cost Overview -->
+        <div class="slide">
+            <h2>The True Cost of Moving Out</h2>
+            <p class="subtitle">It's way more than just rent</p>
+
+            <div class="alert alert-warning">
+                <h4>Reality Check</h4>
+                <p>Most people only think about rent. But that's just the beginning. Moving out requires thousands upfront and hundreds more every week.</p>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="stat-box">
+                    <span class="stat-value">$3,000+</span>
+                    <span class="stat-label">Upfront costs before you move in</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value">$800-1,200</span>
+                    <span class="stat-label">Weekly expenses (living alone)</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value">$45k+</span>
+                    <span class="stat-label">Annual income needed (minimum)</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>What you'll actually need money for</h3>
+                <ul>
+                    <li>Bond (4 weeks rent held by Bond Administrator)</li>
+                    <li>Rent in advance (usually 2 weeks)</li>
+                    <li>Utilities connection fees (power, water, internet)</li>
+                    <li>Furniture and household items (unless fully furnished)</li>
+                    <li>Moving costs (truck hire, helpers)</li>
+                    <li>Ongoing weekly expenses (rent, bills, food, transport)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: Perth Rent Prices 2026 -->
+        <div class="slide">
+            <h2>Perth Rent Prices 2026</h2>
+            <p class="subtitle">The market is expensive right now</p>
+
+            <div class="alert alert-warning">
+                <h4>Housing Crisis Reality</h4>
+                <p>Perth rental market remains tight in 2026. Vacancy rates under 1% mean landlords can charge premium prices. Competition is fierce.</p>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Living Alone</h3>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Studio apartment (CBD/Northbridge)</span>
+                        <span class="breakdown-value">$450-550/wk</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">1-bedroom apartment (Perth metro)</span>
+                        <span class="breakdown-value">$550-650/wk</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">1-bedroom unit (outer suburbs)</span>
+                        <span class="breakdown-value">$480-580/wk</span>
+                    </div>
+                    <div class="breakdown-total">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label"><strong>Median 1-bedroom</strong></span>
+                            <span class="breakdown-value">$575/wk</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Share House Option</h3>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Room in shared house (inner suburbs)</span>
+                        <span class="breakdown-value">$220-280/wk</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Room in shared house (outer suburbs)</span>
+                        <span class="breakdown-value">$180-240/wk</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Room in apartment share (CBD)</span>
+                        <span class="breakdown-value">$250-320/wk</span>
+                    </div>
+                    <div class="breakdown-total">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label"><strong>Median room rate</strong></span>
+                            <span class="breakdown-value">$240/wk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>Popular Student Areas</h4>
+                <p>Near UWA (Crawley, Nedlands): $250-300/wk per room | Near Curtin (Bentley, Victoria Park): $220-270/wk per room | Near Murdoch (Bull Creek, Kardinya): $200-250/wk per room</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Regional WA -->
+        <div class="slide">
+            <h2>Regional WA</h2>
+            <p class="subtitle">Cheaper rent, but jobs matter</p>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Albany (400km south)</h3>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">1-bedroom unit</span>
+                        <span class="breakdown-value">$350-420/wk</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Share house room</span>
+                        <span class="breakdown-value">$150-200/wk</span>
+                    </div>
+                    <p style="margin-top: 16px; color: var(--success);">Pros: Beautiful coast, lower cost of living, tight-knit community</p>
+                    <p style="color: var(--danger);">Cons: Limited job opportunities, less nightlife/entertainment</p>
+                </div>
+
+                <div class="card">
+                    <h3>Bunbury (180km south)</h3>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">1-bedroom unit</span>
+                        <span class="breakdown-value">$380-450/wk</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Share house room</span>
+                        <span class="breakdown-value">$160-220/wk</span>
+                    </div>
+                    <p style="margin-top: 16px; color: var(--success);">Pros: Beach lifestyle, growing city, closer to Perth</p>
+                    <p style="color: var(--danger);">Cons: Fewer job opportunities than Perth, car essential</p>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>The Employment Factor</h4>
+                <p>Regional WA can save you $100-200/week on rent, but you need to secure employment first. Many regional jobs are in mining, agriculture, healthcare, or tourism. Research job availability before committing.</p>
+            </div>
+
+            <div class="card">
+                <h3>Mining Towns (FIFO)</h3>
+                <p>Karratha, Port Hedland, Newman often have mining company-provided accommodation or higher wages ($80k-120k+) that offset high rental costs ($600-900/wk). FIFO (Fly-In-Fly-Out) work means living in Perth but working regional.</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Bond and Upfront Costs -->
+        <div class="slide">
+            <h2>Bond and Upfront Costs</h2>
+            <p class="subtitle">The money you need BEFORE moving in</p>
+
+            <div class="alert alert-warning">
+                <h4>Sticker Shock Warning</h4>
+                <p>You can't just move in with one week's rent. Most landlords require 4 weeks bond + 2 weeks rent in advance. That's 6 weeks total upfront.</p>
+            </div>
+
+            <div class="card">
+                <h3>Example: $550/week apartment</h3>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Bond (4 weeks, held by Bond Administrator WA)</span>
+                    <span class="breakdown-value">$2,200</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Rent in advance (2 weeks)</span>
+                    <span class="breakdown-value">$1,100</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Power connection + deposit</span>
+                    <span class="breakdown-value">$150-300</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Water (if not included)</span>
+                    <span class="breakdown-value">$0-100</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Internet connection + modem</span>
+                    <span class="breakdown-value">$100-200</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Moving truck hire</span>
+                    <span class="breakdown-value">$150-400</span>
+                </div>
+                <div class="breakdown-total">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label"><strong>TOTAL UPFRONT</strong></span>
+                        <span class="breakdown-value" style="font-size: 32px;">$3,700-4,300</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>About the Bond</h4>
+                <p>Your bond is lodged with the Bond Administrator (government agency). The landlord can't just keep it. You get it back at the end if you leave the place clean and undamaged. It usually takes 2-3 weeks to get refunded.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Weekly Expenses Breakdown -->
+        <div class="slide">
+            <h2>Weekly Expenses Breakdown</h2>
+            <p class="subtitle">Where your money actually goes</p>
+
+            <div class="comparison">
+                <div class="comparison-box">
+                    <h3>Living Alone</h3>
+                    <span class="price-sm">$575/wk apartment</span>
+                    <div style="margin-top: 24px;">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Rent</span>
+                            <span class="breakdown-value">$575</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Electricity (avg)</span>
+                            <span class="breakdown-value">$35-50</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Internet</span>
+                            <span class="breakdown-value">$20-25</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Water (if charged)</span>
+                            <span class="breakdown-value">$15-25</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Groceries</span>
+                            <span class="breakdown-value">$120-180</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Transport (fuel/PT)</span>
+                            <span class="breakdown-value">$80-150</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Phone</span>
+                            <span class="breakdown-value">$15-30</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Contents insurance</span>
+                            <span class="breakdown-value">$10-15</span>
+                        </div>
+                        <div class="breakdown-total">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label"><strong>TOTAL/WEEK</strong></span>
+                                <span class="breakdown-value">$870-1,050</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 16px; color: var(--warning);">Need ~$52k annual income after tax</p>
+                </div>
+
+                <div class="comparison-box winner">
+                    <span class="winner-badge">More Affordable</span>
+                    <h3>Share House</h3>
+                    <span class="price-sm">$240/wk room</span>
+                    <div style="margin-top: 24px;">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Rent (your room)</span>
+                            <span class="breakdown-value">$240</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Electricity (split)</span>
+                            <span class="breakdown-value">$15-20</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Internet (split)</span>
+                            <span class="breakdown-value">$8-12</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Water (split)</span>
+                            <span class="breakdown-value">$5-10</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Groceries</span>
+                            <span class="breakdown-value">$100-150</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Transport (fuel/PT)</span>
+                            <span class="breakdown-value">$80-150</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Phone</span>
+                            <span class="breakdown-value">$15-30</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Contents insurance</span>
+                            <span class="breakdown-value">$8-12</span>
+                        </div>
+                        <div class="breakdown-total">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label"><strong>TOTAL/WEEK</strong></span>
+                                <span class="breakdown-value">$471-624</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 16px; color: var(--success);">Need ~$30k annual income after tax</p>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>This doesn't include</h4>
+                <p>Entertainment, eating out, streaming services, gym, car rego/insurance, clothing, medical/dental, saving for emergencies. You need MORE than these minimums.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: 50/30/20 Rule -->
+        <div class="slide">
+            <h2>The 50/30/20 Rule</h2>
+            <p class="subtitle">A simple budgeting framework that actually works</p>
+
+            <div class="budget-visual">
+                <div class="budget-segment budget-needs">50% Needs</div>
+                <div class="budget-segment budget-wants">30% Wants</div>
+                <div class="budget-segment budget-savings">20% Savings</div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                    <h3>50% Needs</h3>
+                    <p style="margin-bottom: 16px;">Essential expenses you can't avoid</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Rent/accommodation</li>
+                        <li>Utilities (power, water)</li>
+                        <li>Groceries</li>
+                        <li>Transport</li>
+                        <li>Phone/internet</li>
+                        <li>Insurance</li>
+                        <li>Minimum debt repayments</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--accent-blue);">
+                    <h3>30% Wants</h3>
+                    <p style="margin-bottom: 16px;">Things that make life enjoyable</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Eating out</li>
+                        <li>Entertainment</li>
+                        <li>Streaming services</li>
+                        <li>Gym membership</li>
+                        <li>Shopping</li>
+                        <li>Hobbies</li>
+                        <li>Socialising</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--success);">
+                    <h3>20% Savings</h3>
+                    <p style="margin-bottom: 16px;">Building your financial future</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Emergency fund (3-6 months expenses)</li>
+                        <li>Superannuation (extra contributions)</li>
+                        <li>House deposit</li>
+                        <li>Investments</li>
+                        <li>Extra debt repayments</li>
+                        <li>Big purchase savings</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Example: $1,000/week after-tax income</h3>
+                <div class="grid grid-3">
+                    <div>
+                        <span class="price-sm">$500/wk</span>
+                        <p>Needs (rent, bills, food, transport)</p>
+                    </div>
+                    <div>
+                        <span class="price-sm">$300/wk</span>
+                        <p>Wants (fun, entertainment, luxuries)</p>
+                    </div>
+                    <div>
+                        <span class="price-sm">$200/wk</span>
+                        <p>Savings (emergency fund, future goals)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <h4>Reality Check</h4>
+                <p>If your "needs" exceed 50% of your income (common when renting in Perth), you need to either increase income or reduce costs. Share housing helps keep needs below 50%.</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Share House vs Alone -->
+        <div class="slide">
+            <h2>Share House vs Living Alone</h2>
+            <p class="subtitle">The maths of splitting costs</p>
+
+            <div class="comparison">
+                <div class="comparison-box">
+                    <h3>Living Alone</h3>
+                    <span class="price">$950/wk</span>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Total weekly costs</p>
+
+                    <h4 style="color: var(--success); margin-top: 24px;">Pros</h4>
+                    <ul>
+                        <li>Complete privacy</li>
+                        <li>Total control of space</li>
+                        <li>No housemate drama</li>
+                        <li>Set your own rules</li>
+                        <li>Quiet when you want it</li>
+                    </ul>
+
+                    <h4 style="color: var(--danger); margin-top: 24px;">Cons</h4>
+                    <ul>
+                        <li>Much more expensive</li>
+                        <li>All bills are your problem</li>
+                        <li>Can be lonely</li>
+                        <li>Harder to save money</li>
+                        <li>Need higher income</li>
+                    </ul>
+
+                    <div class="alert alert-warning" style="margin-top: 24px;">
+                        <p><strong>Income needed:</strong> $52,000+ after tax ($70k+ before tax)</p>
+                    </div>
+                </div>
+
+                <div class="comparison-box winner">
+                    <span class="winner-badge">$25k/year savings</span>
+                    <h3>Share House (3 people)</h3>
+                    <span class="price">$540/wk</span>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Total weekly costs</p>
+
+                    <h4 style="color: var(--success); margin-top: 24px;">Pros</h4>
+                    <ul>
+                        <li>Save $400+/week</li>
+                        <li>Split bills 3 ways</li>
+                        <li>Built-in social life</li>
+                        <li>Share household chores</li>
+                        <li>Learn to compromise</li>
+                    </ul>
+
+                    <h4 style="color: var(--danger); margin-top: 24px;">Cons</h4>
+                    <ul>
+                        <li>Less privacy</li>
+                        <li>Potential housemate conflicts</li>
+                        <li>Shared bathroom/kitchen</li>
+                        <li>Noise from others</li>
+                        <li>Need to be considerate</li>
+                    </ul>
+
+                    <div class="alert alert-success" style="margin-top: 24px;">
+                        <p><strong>Income needed:</strong> $30,000+ after tax ($40k+ before tax)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>The Savings Reality</h3>
+                <p>Living in a share house saves approximately <strong style="color: var(--accent-purple);">$21,000 per year</strong> compared to living alone. That's a house deposit in 3-4 years, or a new car, or a European holiday every year.</p>
+                <p style="margin-top: 16px;">Share housing isn't just for students. Many young professionals choose it to save aggressively for their goals while still living independently.</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: What Landlords Want -->
+        <div class="slide">
+            <h2>What Landlords Want</h2>
+            <p class="subtitle">How to actually get approved for a rental</p>
+
+            <div class="alert alert-warning">
+                <h4>Competitive Market</h4>
+                <p>With vacancy rates under 1% in Perth, landlords can be very selective. You're competing with 20-50+ applicants for every property. You need to stand out.</p>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Essential Documents</h3>
+                    <ul>
+                        <li><strong>Photo ID</strong> - Driver's licence or passport</li>
+                        <li><strong>Proof of income</strong> - Recent payslips (last 3 months) or employment contract</li>
+                        <li><strong>Rental history</strong> - Previous landlord references, rental ledger showing on-time payments</li>
+                        <li><strong>References</strong> - Character references (employer, teacher, coach)</li>
+                        <li><strong>Bank statements</strong> - Show you can afford it (3 months)</li>
+                        <li><strong>Credit check consent</strong> - They'll check your credit score</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>What They're Looking For</h3>
+                    <ul>
+                        <li><strong>Income 3x rent</strong> - $575/wk rent = need $1,725/wk income</li>
+                        <li><strong>Stable employment</strong> - Permanent/ongoing contract preferred</li>
+                        <li><strong>Clean rental history</strong> - No evictions, no damage, no missed rent</li>
+                        <li><strong>Good credit score</strong> - No defaults, bankruptcies, or late payments</li>
+                        <li><strong>Non-smoker</strong> - Most rentals are now smoke-free</li>
+                        <li><strong>No pets</strong> - Unless specified as pet-friendly (rare)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>First-Time Renter Tips</h3>
+                <div class="grid grid-2">
+                    <div>
+                        <h4>If you don't have rental history</h4>
+                        <ul>
+                            <li>Get a guarantor (parent/guardian co-signs)</li>
+                            <li>Offer extra weeks rent in advance</li>
+                            <li>Provide stellar character references</li>
+                            <li>Show strong employment and savings</li>
+                            <li>Consider share houses (easier to get in)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Red Flags to Avoid</h4>
+                        <ul>
+                            <li>Gaps in employment history</li>
+                            <li>Bad credit score</li>
+                            <li>Can't provide references</li>
+                            <li>Income too low for rent</li>
+                            <li>Poor presentation at inspection</li>
+                            <li>Incomplete application</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>The Application Process</h4>
+                <p>1. Attend open inspection | 2. Submit application within 24 hours | 3. Landlord reviews (1-7 days) | 4. If approved, sign lease and pay bond/rent | 5. Move in on agreed date. Speed matters - apply immediately if you like the place.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Your Rights as a Renter -->
+        <div class="slide">
+            <h2>Your Rights as a Renter</h2>
+            <p class="subtitle">Know the law in Western Australia</p>
+
+            <div class="card">
+                <h3>Bond Protection</h3>
+                <ul>
+                    <li>Bond <strong>must</strong> be lodged with Bond Administrator WA within 14 days</li>
+                    <li>Landlord cannot keep your bond without valid reason (damage, unpaid rent, cleaning)</li>
+                    <li>You have the right to be present at final inspection</li>
+                    <li>Disputes go to Magistrates Court if you can't agree</li>
+                    <li>Get a condition report at move-in (document existing damage with photos)</li>
+                </ul>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Landlord Must Provide</h3>
+                    <ul>
+                        <li>Property in clean, working condition</li>
+                        <li>Working locks on doors/windows</li>
+                        <li>Working smoke alarms</li>
+                        <li>Safe electrical and plumbing</li>
+                        <li>24-48 hours notice for inspections</li>
+                        <li>Privacy (can't just walk in)</li>
+                        <li>Timely repairs (safety issues = 24hrs)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>You Must Provide</h3>
+                    <ul>
+                        <li>Rent on time (weekly/fortnightly/monthly)</li>
+                        <li>Keep property reasonably clean</li>
+                        <li>Report damage and needed repairs</li>
+                        <li>Allow inspections (with notice)</li>
+                        <li>No illegal activity on premises</li>
+                        <li>Don't damage property intentionally</li>
+                        <li>Give proper notice when leaving</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Notice Periods (Western Australia)</h3>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Fixed-term lease ending (you leaving)</span>
+                    <span class="breakdown-value">30 days</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Periodic lease (you leaving)</span>
+                    <span class="breakdown-value">21 days</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Landlord ending periodic lease (no reason)</span>
+                    <span class="breakdown-value">60 days</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Landlord ending for breach (e.g., unpaid rent)</span>
+                    <span class="breakdown-value">7 days</span>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>Get Help</h4>
+                <p><strong>Consumer Protection WA:</strong> 1300 304 054 | <strong>Tenancy WA:</strong> Free advice for renters | <strong>Community Legal Centres:</strong> Free legal help if you can't afford a lawyer</p>
+            </div>
+
+            <div class="alert alert-warning">
+                <h4>Common Scams</h4>
+                <p>Never pay bond/rent before seeing the property in person. Never pay via Western Union/Bitcoin/gift cards. Always get receipts. If it seems too good to be true (cheap rent in great area), it's probably a scam.</p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Living at Home Longer -->
+        <div class="slide">
+            <h2>Living at Home Longer</h2>
+            <p class="subtitle">It's not a failure, it's strategic saving</p>
+
+            <div class="alert alert-success">
+                <h4>The Smart Move</h4>
+                <p>More young Australians are living at home into their 20s - not because they're "failures," but because they're financially savvy. It's a legitimate wealth-building strategy.</p>
+            </div>
+
+            <div class="comparison">
+                <div class="comparison-box">
+                    <h3>Moving Out at 18</h3>
+                    <div style="margin-top: 24px;">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Weekly costs (share house)</span>
+                            <span class="breakdown-value">$540</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Annual cost</span>
+                            <span class="breakdown-value">$28,080</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Savings after 5 years</span>
+                            <span class="breakdown-value" style="color: var(--danger);">$5,000</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 24px; color: var(--text-secondary);">Assuming $40k income, minimal savings possible after living expenses.</p>
+                </div>
+
+                <div class="comparison-box winner">
+                    <span class="winner-badge">$70k+ ahead</span>
+                    <h3>Living at Home (paying board)</h3>
+                    <div style="margin-top: 24px;">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Weekly board to parents</span>
+                            <span class="breakdown-value">$150</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Annual cost</span>
+                            <span class="breakdown-value">$7,800</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Savings after 5 years</span>
+                            <span class="breakdown-value" style="color: var(--success);">$75,000+</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 24px; color: var(--success);">That's a house deposit, or a business startup, or financial security.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Make it Work for Everyone</h3>
+                <div class="grid grid-2">
+                    <div>
+                        <h4>Contribute Fairly</h4>
+                        <ul>
+                            <li>Pay board ($100-200/week is reasonable)</li>
+                            <li>Buy your own groceries/toiletries</li>
+                            <li>Do household chores without being asked</li>
+                            <li>Respect house rules and curfews (even if you're 20+)</li>
+                            <li>Keep your space clean</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Build Your Future</h4>
+                        <ul>
+                            <li>Save aggressively (aim for 50%+ of income)</li>
+                            <li>Build your credit score (small credit card, paid in full)</li>
+                            <li>Develop life skills (cooking, budgeting, maintenance)</li>
+                            <li>Set a target goal and timeline</li>
+                            <li>Have an exit plan (don't coast forever)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>When Living at Home Makes Sense</h4>
+                <p>Studying full-time | Saving for house deposit | Starting a business | Paying off debt | Building emergency fund | Career uncertainty | First 1-2 years of entry-level job</p>
+            </div>
+
+            <div class="alert alert-warning">
+                <h4>When It's Time to Move Out</h4>
+                <p>You've hit your savings goal | Family conflict affecting mental health | You need independence for personal growth | Commute is killing you | You're 25+ and coasting | Job opportunity elsewhere</p>
+            </div>
+        </div>
+
+        <!-- Slide 12: Summary + Activity -->
+        <div class="slide">
+            <h2>Summary</h2>
+            <p class="subtitle">The real talk about renting in WA</p>
+
+            <div class="grid grid-2" style="margin-bottom: 32px;">
+                <div class="card">
+                    <h3>Key Takeaways</h3>
+                    <ul>
+                        <li>Moving out costs $3,000+ upfront (bond + rent + connections)</li>
+                        <li>Perth rent: $575/wk alone, $240/wk shared</li>
+                        <li>Need $45k+ income to live alone, $30k+ for share house</li>
+                        <li>Regional WA is cheaper but jobs are limited</li>
+                        <li>Landlords want proof of income, references, rental history</li>
+                        <li>Your bond must be lodged with Bond Administrator</li>
+                        <li>Living at home longer = smart wealth building</li>
+                        <li>Share housing saves $20k+ per year vs living alone</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Action Steps</h3>
+                    <ul>
+                        <li>Calculate your actual income vs expenses</li>
+                        <li>Research real rent prices in your target area</li>
+                        <li>Build an emergency fund (3-6 months expenses)</li>
+                        <li>Start building credit responsibly</li>
+                        <li>Get rental references lined up</li>
+                        <li>Practice budgeting now (50/30/20 rule)</li>
+                        <li>Learn to cook and clean (seriously)</li>
+                        <li>Have honest money conversations with family</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="activity-box">
+                <h3 style="color: white; margin-bottom: 16px;">Class Activity</h3>
+                <h2 style="font-size: 40px; margin-bottom: 24px; color: white;">Budget Reality Calculator</h2>
+                <p style="font-size: 22px; color: white; margin-bottom: 24px;">Use the interactive budget calculator to see if YOU can actually afford to move out right now. Input your real/expected income and see the brutal truth.</p>
+                <a href="https://moneysmart.gov.au/budgeting/budget-planner" target="_blank" class="cta-button">
+                    Open Budget Calculator
+                </a>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-top: 32px;">
+                    Alternative: Search "Perth rental listings" on realestate.com.au and see what you can actually afford with your current/expected income.
+                </p>
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 32px;">
+                <h4>Resources</h4>
+                <p><strong>Consumer Protection WA:</strong> www.commerce.wa.gov.au/consumer-protection | <strong>Bond Administrator:</strong> www.commerce.wa.gov.au/bonds | <strong>MoneySmart:</strong> moneysmart.gov.au | <strong>Tenancy WA:</strong> tenancywa.org.au</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            // Boundary checks
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            // Hide all slides
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            // Show current slide
+            slides[currentSlide].classList.add('active');
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Update slide counter
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            // Scroll to top of slide
+            slides[currentSlide].scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'PageDown':
+                case 'Enter':
+                case ' ':
+                    if (currentSlide < totalSlides - 1) {
+                        changeSlide(1);
+                    }
+                    e.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                case 'PageUp':
+                    if (currentSlide > 0) {
+                        changeSlide(-1);
+                    }
+                    e.preventDefault();
+                    break;
+                case 'Home':
+                    showSlide(0);
+                    e.preventDefault();
+                    break;
+                case 'End':
+                    showSlide(totalSlides - 1);
+                    e.preventDefault();
+                    break;
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                // Swipe left - next slide
+                if (currentSlide < totalSlides - 1) {
+                    changeSlide(1);
+                }
+            }
+            if (touchEndX > touchStartX + 50) {
+                // Swipe right - previous slide
+                if (currentSlide > 0) {
+                    changeSlide(-1);
+                }
+            }
+        }
+
+        // Initialize first slide
+        showSlide(0);
+    </script>
+</body>
+</html>
