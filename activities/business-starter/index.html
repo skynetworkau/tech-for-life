@@ -41,10 +41,16 @@
             padding: 1.5rem;
         }
 
-        .home-link {
+        .nav-links {
             position: fixed;
             top: 1rem;
             left: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .home-link {
             padding: 0.5rem 1rem;
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -52,7 +58,6 @@
             color: var(--text-gray);
             text-decoration: none;
             font-size: 0.85rem;
-            z-index: 100;
             transition: all 0.2s;
         }
 
@@ -962,7 +967,10 @@
     </style>
 </head>
 <body>
-    <a href="../../index.html" class="home-link">← Course Home</a>
+    <div class="nav-links">
+        <a href="../../presentations/week14-business/index.html" class="home-link">← Week 14</a>
+        <a href="../../index.html" class="home-link">Course Home</a>
+    </div>
 
     <div class="container">
         <header class="header">

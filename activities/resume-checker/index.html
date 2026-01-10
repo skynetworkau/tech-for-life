@@ -42,10 +42,16 @@
             font-size: 1.1rem;
         }
 
-        .home-btn {
-            position: absolute;
+        .nav-links {
+            position: fixed;
             top: 20px;
             left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .home-btn {
             background: rgba(0, 212, 255, 0.1);
             border: 2px solid #00d4ff;
             color: #00d4ff;
@@ -507,9 +513,10 @@
     </style>
 </head>
 <body>
-    <a href="../../index.html" class="home-btn">
-        <span>←</span> Back to Home
-    </a>
+    <div class="nav-links">
+        <a href="../../presentations/week11-getting-job/index.html" class="home-btn">← Week 11</a>
+        <a href="../../index.html" class="home-btn">Course Home</a>
+    </div>
 
     <div class="container">
         <header>

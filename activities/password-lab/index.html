@@ -1205,9 +1205,38 @@
                 grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
             }
         }
+
+        .nav-links {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 1001;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            background: var(--panel-bg);
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--matrix-green);
+            color: var(--bg-black);
+        }
     </style>
 </head>
 <body>
+    <div class="nav-links">
+        <a href="../../presentations/week10-passwords/index.html" class="nav-link">← WEEK 5</a>
+        <a href="../../index.html" class="nav-link">COURSE HOME</a>
+    </div>
     <div class="matrix-bg" id="matrixBg"></div>
     <div class="scanlines"></div>
 

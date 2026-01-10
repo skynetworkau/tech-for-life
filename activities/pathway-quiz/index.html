@@ -47,10 +47,16 @@
             position: relative;
         }
 
+        .nav-links {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
         .home-btn {
-            position: absolute;
-            left: 0;
-            top: 30px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-primary);
@@ -572,9 +578,11 @@
     </style>
 </head>
 <body>
+    <div class="nav-links">
+        <a href="../../index.html" class="home-btn">← Course Home</a>
+    </div>
     <div class="container">
         <div class="header">
-            <a href="../../index.html" class="home-btn">← Home</a>
             <h1>Which Pathway Suits You?</h1>
             <p class="subtitle">Discover your ideal post-school direction</p>
         </div>

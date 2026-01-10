@@ -46,10 +46,16 @@
             position: relative;
         }
 
-        .home-button {
-            position: absolute;
-            left: 0;
-            top: 0;
+        .nav-links {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-link {
             background: var(--bg-secondary);
             color: var(--accent-primary);
             text-decoration: none;
@@ -60,7 +66,7 @@
             border: 1px solid var(--bg-tertiary);
         }
 
-        .home-button:hover {
+        .nav-link:hover {
             background: var(--bg-tertiary);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
@@ -611,7 +617,10 @@
                 font-size: 2em;
             }
 
-            .home-button {
+            .nav-links {
+                flex-direction: column;
+            }
+            .nav-link {
                 position: static;
                 display: block;
                 margin-bottom: 20px;
@@ -685,9 +694,12 @@
     </style>
 </head>
 <body>
+    <div class="nav-links">
+        <a href="../../presentations/week7-life-admin/index.html" class="nav-link">← Week 7</a>
+        <a href="../../index.html" class="nav-link">Course Home</a>
+    </div>
     <div class="container">
         <header>
-            <a href="../../index.html" class="home-button">← Home</a>
             <div class="emoji-banner">🎓 📋 💼</div>
             <h1>Life Admin Checklist</h1>
             <p class="subtitle">Level up your adult skills before leaving school</p>
