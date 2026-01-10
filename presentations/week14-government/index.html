@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Jobs & Public Service // Week 14 Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: #27272a;
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-gold: #eab308;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            padding-top: 2rem;
+            padding-bottom: 6rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active { display: flex; opacity: 1; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-emerald), var(--accent-cyan), var(--accent-blue));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .fullscreen-hint {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--text-muted);
+            border-radius: 100px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .home-btn:hover {
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.5rem, 7vw, 4.5rem);
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .card-grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .card-grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--bg-card);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-emerald);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .card-highlight {
+            color: var(--accent-emerald);
+            font-weight: 600;
+        }
+
+        /* Stats */
+        .stat-huge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(4rem, 15vw, 10rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .stat-source {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Benefits List */
+        .benefits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            background: var(--bg-secondary);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-emerald);
+        }
+
+        .benefit-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .benefit-text {
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .benefit-text strong {
+            color: var(--accent-emerald);
+        }
+
+        /* Program Cards */
+        .program-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .program-card:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .program-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .program-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .program-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .program-salary {
+            background: var(--accent-emerald);
+            color: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .timeline-date {
+            background: var(--accent-emerald);
+            color: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: var(--bg-secondary);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+        }
+
+        /* Links */
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .link-card {
+            background: var(--bg-secondary);
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .link-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        .link-icon {
+            font-size: 2rem;
+        }
+
+        .link-text {
+            font-weight: 600;
+        }
+
+        .link-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Comparison Table */
+        .compare-table {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .compare-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border-bottom: 1px solid var(--bg-card);
+        }
+
+        .compare-row:last-child {
+            border-bottom: none;
+        }
+
+        .compare-cell {
+            padding: 1rem 1.25rem;
+            text-align: center;
+        }
+
+        .compare-header {
+            background: var(--bg-card);
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .compare-label {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        /* Pathway Cards */
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .pathway-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .pathway-card:hover {
+            border-color: var(--accent-violet);
+            transform: scale(1.02);
+        }
+
+        .pathway-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pathway-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pathway-age {
+            font-size: 0.85rem;
+            color: var(--accent-amber);
+            margin-bottom: 0.5rem;
+        }
+
+        .pathway-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Video container */
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* AI Future Section */
+        .ai-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 900px;
+        }
+
+        .ai-column h3 {
+            color: var(--accent-emerald);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .ai-column.risk h3 {
+            color: var(--accent-rose);
+        }
+
+        .ai-column ul {
+            list-style: none;
+        }
+
+        .ai-column li {
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .slide { padding: 2rem 1.5rem 5rem; }
+            .card-grid-3, .card-grid-4 { grid-template-columns: 1fr; }
+            .compare-row { grid-template-columns: 1fr; }
+            .ai-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    <a href="../../index.html" class="home-btn">← Home</a>
+    <div class="fullscreen-hint">Press F for fullscreen</div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1 class="slide-title">Government Jobs & <em>Public Service</em></h1>
+            <p class="slide-subtitle">Secure careers, great benefits, and pathways you might not know about</p>
+            <p style="color: var(--accent-emerald); margin-top: 2rem; font-size: 1.1rem;">Week 14 // Denmark Senior High School</p>
+        </div>
+
+        <!-- Slide 2: Why Government? -->
+        <div class="slide">
+            <h2 class="slide-title">Why <em>Government?</em></h2>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <span class="benefit-icon">🛡️</span>
+                    <div class="benefit-text"><strong>Job Security:</strong> Government roles are among the most stable in Australia, even during economic downturns</div>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">💰</span>
+                    <div class="benefit-text"><strong>15.4% Super:</strong> Much higher than the standard 11.5% - that's thousands extra for your retirement</div>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">⚖️</span>
+                    <div class="benefit-text"><strong>Work-Life Balance:</strong> Flex time, generous leave, and actual respect for boundaries</div>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">📈</span>
+                    <div class="benefit-text"><strong>Clear Progression:</strong> Structured pay scales (APS 1-6, EL1, EL2, SES) with transparent promotion paths</div>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🏠</span>
+                    <div class="benefit-text"><strong>Regional Benefits:</strong> Remote area housing, salary sacrifice, relocation packages</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Numbers -->
+        <div class="slide">
+            <div class="stat-huge">15.4%</div>
+            <p class="stat-label">Superannuation contribution rate in public service</p>
+            <p class="stat-source">vs 11.5% standard employer contribution</p>
+            <p style="margin-top: 2rem; color: var(--text-secondary); max-width: 600px; text-align: center;">
+                On a $70,000 salary, that's an extra <strong style="color: var(--accent-emerald);">$2,730 per year</strong> going into your super. Over a 40-year career, with compound interest, that could mean <strong style="color: var(--accent-emerald);">hundreds of thousands more</strong> in retirement.
+            </p>
+        </div>
+
+        <!-- Slide 4: Entry Points -->
+        <div class="slide">
+            <h2 class="slide-title">Entry <em>Points</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Multiple pathways depending on where you're at</p>
+            <div class="pathway-grid">
+                <div class="pathway-card">
+                    <div class="pathway-icon">🎓</div>
+                    <div class="pathway-title">Graduate Programs</div>
+                    <div class="pathway-age">After uni degree</div>
+                    <div class="pathway-desc">12-month structured program with rotations</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-icon">🎒</div>
+                    <div class="pathway-title">School Leaver</div>
+                    <div class="pathway-age">Year 12 leavers</div>
+                    <div class="pathway-desc">Career Starter Program - paid + Certificate IV</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-icon">📚</div>
+                    <div class="pathway-title">Cadetships</div>
+                    <div class="pathway-age">During uni</div>
+                    <div class="pathway-desc">Work while studying, fees often paid</div>
+                </div>
+                <div class="pathway-card">
+                    <div class="pathway-icon">🔄</div>
+                    <div class="pathway-title">Direct Entry</div>
+                    <div class="pathway-age">Any experience</div>
+                    <div class="pathway-desc">Apply directly to advertised roles</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: School Leaver Program -->
+        <div class="slide">
+            <h2 class="slide-title">Straight from <em>Year 12</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Australian Government Career Starter Program</p>
+            <div class="card-grid" style="max-width: 800px;">
+                <div class="card">
+                    <div class="card-icon">💵</div>
+                    <div class="card-title">$54,000+ Salary</div>
+                    <div class="card-text">Full-time permanent role from day one, plus 15.4% super</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📜</div>
+                    <div class="card-title">Free Qualification</div>
+                    <div class="card-text">Earn a Certificate IV in Government or HR while working</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🗓️</div>
+                    <div class="card-title">12-Month Program</div>
+                    <div class="card-text">Structured training, mentorship, and career development</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📍</div>
+                    <div class="card-title">Locations</div>
+                    <div class="card-text">Positions in capital cities across Australia including Perth</div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-amber);">Applications: August each year via apsjobs.gov.au</p>
+        </div>
+
+        <!-- Slide 6: Graduate Programs -->
+        <div class="slide">
+            <h2 class="slide-title"><em>Graduate</em> Programs</h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Finished uni? Here's your fast-track into government</p>
+            <div class="card-grid card-grid-3" style="max-width: 1000px;">
+                <div class="program-card">
+                    <div class="program-logo">🏛️</div>
+                    <div class="program-name">AGGP Generalist</div>
+                    <div class="program-desc">Work across multiple departments</div>
+                    <div class="program-salary">$77,000 - $94,000</div>
+                </div>
+                <div class="program-card">
+                    <div class="program-logo">💻</div>
+                    <div class="program-name">Digital/STEM</div>
+                    <div class="program-desc">Tech roles across government</div>
+                    <div class="program-salary">$77,000 - $94,000</div>
+                </div>
+                <div class="program-card">
+                    <div class="program-logo">🔐</div>
+                    <div class="program-name">Intelligence Stream</div>
+                    <div class="program-desc">National security agencies</div>
+                    <div class="program-salary">$81,000+ start</div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.95rem;">All include 15.4% super • Rotational placements • Guaranteed permanent position</p>
+        </div>
+
+        <!-- Slide 7: Cadetships - Paid to Study -->
+        <div class="slide">
+            <h2 class="slide-title">Get Paid to <em>Study</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Cadetships: Work part-time + have your uni fees paid</p>
+            <div class="card-grid" style="max-width: 900px;">
+                <div class="card">
+                    <div class="card-icon">🎖️</div>
+                    <div class="card-title">Defence STEM Cadetship</div>
+                    <div class="card-text">
+                        <strong style="color: var(--accent-emerald);">Uni fees reimbursed</strong><br>
+                        $3,000 bursary per year<br>
+                        $1,000 for books<br>
+                        60+ paid work days per year<br>
+                        Locations: Perth (Rockingham), + other cities
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🖥️</div>
+                    <div class="card-title">Digital Cadetship</div>
+                    <div class="card-text">
+                        IT, Cyber Security, STEM, Business degrees<br>
+                        Part-time work during semester<br>
+                        Full-time during breaks<br>
+                        Graduate into permanent role
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-cyan);">Apply after first year of uni • defence.gov.au/jobs-careers</p>
+        </div>
+
+        <!-- Slide 8: WA State Government -->
+        <div class="slide">
+            <h2 class="slide-title">WA <em>State</em> Government</h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Don't forget state government opportunities</p>
+            <div class="card-grid" style="max-width: 900px;">
+                <div class="card">
+                    <div class="card-icon">💾</div>
+                    <div class="card-title">Digital Graduate Program</div>
+                    <div class="card-text">Office of Digital Government runs this across 17+ agencies. STEM graduates wanted. Top Graduate Employer award 2024.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🌲</div>
+                    <div class="card-title">DBCA Regional Program</div>
+                    <div class="card-text">2-year program living and working in regional WA. Department of Biodiversity, Conservation and Attractions.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏥</div>
+                    <div class="card-title">Health, Education & More</div>
+                    <div class="card-text">WA Health, Department of Education, Transport, and many more have graduate and entry programs.</div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-emerald);">jobs.wa.gov.au • wa.gov.au/graduate-programs</p>
+        </div>
+
+        <!-- Slide 9: Intelligence & Security -->
+        <div class="slide">
+            <h2 class="slide-title">Intelligence & <em>Security</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">For those who want to protect Australia</p>
+            <div class="card-grid card-grid-3" style="max-width: 1000px;">
+                <div class="card" style="border-color: var(--accent-violet);">
+                    <div class="card-icon">🕵️</div>
+                    <div class="card-title">ASIO</div>
+                    <div class="card-text">
+                        <strong>Australian Security Intelligence Organisation</strong><br><br>
+                        Domestic security & counter-terrorism<br>
+                        Intelligence Development Program<br>
+                        Policy, Governance, Comms streams<br>
+                        <span class="card-highlight">Must be Australian citizen</span>
+                    </div>
+                </div>
+                <div class="card" style="border-color: var(--accent-blue);">
+                    <div class="card-icon">🌏</div>
+                    <div class="card-title">ASIS</div>
+                    <div class="card-text">
+                        <strong>Australian Secret Intelligence Service</strong><br><br>
+                        Foreign intelligence gathering<br>
+                        ACTIVATE Graduate Program<br>
+                        Analysts, Technologists, Legal/Finance<br>
+                        <span class="card-highlight">$90,000+ starting salary</span>
+                    </div>
+                </div>
+                <div class="card" style="border-color: var(--accent-cyan);">
+                    <div class="card-icon">📡</div>
+                    <div class="card-title">ASD</div>
+                    <div class="card-text">
+                        <strong>Australian Signals Directorate</strong><br><br>
+                        Cyber security & signals intelligence<br>
+                        Graduate Development Program<br>
+                        Tech-focused roles<br>
+                        <span class="card-highlight">Canberra-based mainly</span>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">Security clearance takes 12-24 months • Don't tell anyone you've applied • intelligence.gov.au</p>
+        </div>
+
+        <!-- Slide 10: Australian Federal Police -->
+        <div class="slide">
+            <h2 class="slide-title">Australian Federal <em>Police</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">More than just police work - cybercrime, fraud, forensics, international</p>
+            <div class="card-grid" style="max-width: 900px;">
+                <div class="card">
+                    <div class="card-icon">🎓</div>
+                    <div class="card-title">AFP Graduate Program</div>
+                    <div class="card-text">
+                        12-month program for uni grads<br>
+                        Rotations across different areas<br>
+                        <strong style="color: var(--accent-emerald);">Guaranteed permanent position</strong><br>
+                        Areas: Cybercrime, Fraud, Forensics, Intel
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👮</div>
+                    <div class="card-title">AFP Recruit</div>
+                    <div class="card-text">
+                        Become a sworn Federal Agent<br>
+                        Different to state police<br>
+                        National & international operations<br>
+                        Anti-terrorism, organised crime, airports
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-amber);">2,000+ applications per year - very competitive • careers.afp.gov.au</p>
+        </div>
+
+        <!-- Slide 11: WA Police -->
+        <div class="slide">
+            <h2 class="slide-title">WA <em>Police</em> Force</h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Serve your local community</p>
+            <div class="card-grid" style="max-width: 900px;">
+                <div class="card">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Requirements</div>
+                    <div class="card-text">
+                        • 17.5 years to apply, 18 to start<br>
+                        • Manual or Auto C-class licence<br>
+                        • Australian citizen or permanent resident<br>
+                        • Pass fitness test (beep test level 10.1)<br>
+                        • No serious criminal history
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏫</div>
+                    <div class="card-title">Training</div>
+                    <div class="card-text">
+                        <strong style="color: var(--accent-cyan);">28 weeks at WA Police Academy</strong><br>
+                        Joondalup location (near train station)<br>
+                        Paid training from day one<br>
+                        Graduate as Probationary Constable
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 1.5rem; color: var(--text-secondary);">Alternative: ECU Associate Degree in Criminology & Justice (2 years) + 6-month practicum</p>
+            <p style="margin-top: 1rem; color: var(--accent-emerald);">letsjoinforces.wa.gov.au</p>
+        </div>
+
+        <!-- Slide 12: Australian Defence Force -->
+        <div class="slide">
+            <h2 class="slide-title">Australian <em>Defence</em> Force</h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Multiple pathways - not just combat roles</p>
+            <div class="pathway-grid">
+                <div class="pathway-card" style="border-color: var(--accent-amber);">
+                    <div class="pathway-icon">⏱️</div>
+                    <div class="pathway-title">Gap Year</div>
+                    <div class="pathway-age">Ages 17-24</div>
+                    <div class="pathway-desc">12-month paid experience with no long-term commitment. 20+ roles available.</div>
+                </div>
+                <div class="pathway-card" style="border-color: var(--accent-blue);">
+                    <div class="pathway-icon">🎓</div>
+                    <div class="pathway-title">ADFA</div>
+                    <div class="pathway-age">After Year 12</div>
+                    <div class="pathway-desc">Free UNSW degree + paid salary + military training. Graduate as Officer.</div>
+                </div>
+                <div class="pathway-card" style="border-color: var(--accent-violet);">
+                    <div class="pathway-icon">📚</div>
+                    <div class="pathway-title">Uni Sponsorship</div>
+                    <div class="pathway-age">Current uni students</div>
+                    <div class="pathway-desc">Defence pays remaining fees + salary while you finish your degree.</div>
+                </div>
+                <div class="pathway-card" style="border-color: var(--accent-emerald);">
+                    <div class="pathway-icon">🔧</div>
+                    <div class="pathway-title">Trade Training</div>
+                    <div class="pathway-age">Any age</div>
+                    <div class="pathway-desc">Learn a trade (mechanic, electrician, etc.) while getting paid + job security.</div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-cyan);">adfcareers.gov.au • Talk to a Defence recruiter</p>
+        </div>
+
+        <!-- Slide 13: Teaching -->
+        <div class="slide">
+            <h2 class="slide-title">Become a <em>Teacher</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">High demand, great benefits, make a real difference</p>
+            <div class="card-grid" style="max-width: 900px;">
+                <div class="card">
+                    <div class="card-icon">🎓</div>
+                    <div class="card-title">Traditional Pathway</div>
+                    <div class="card-text">
+                        Bachelor of Education (4 years)<br>
+                        OR Bachelor degree + Master of Teaching (5-6 years)<br>
+                        Available at UWA, Curtin, Murdoch, ECU
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">Fast-Track: Teach for Australia</div>
+                    <div class="card-text">
+                        Already have a degree? Get into classroom in weeks<br>
+                        Intensive training + Master's while teaching<br>
+                        Paid teaching position from the start
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💰</div>
+                    <div class="card-title">Scholarships Available</div>
+                    <div class="card-text">
+                        <strong style="color: var(--accent-emerald);">Up to $40,000</strong> for teaching degrees<br>
+                        Bob Hawke Aboriginal Teacher Scholarships<br>
+                        Regional & remote incentives
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-amber);">High demand subjects: Maths, Science, Tech, Languages</p>
+        </div>
+
+        <!-- Slide 14: AI & The Future -->
+        <div class="slide">
+            <h2 class="slide-title">AI & The <em>Future</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">Why public service might be the smart long-term play</p>
+            <div class="ai-grid">
+                <div class="ai-column">
+                    <h3>🛡️ Why Government is Safer</h3>
+                    <ul>
+                        <li>Complex human judgment roles</li>
+                        <li>Policy & democratic accountability</li>
+                        <li>Face-to-face citizen services</li>
+                        <li>Security clearance requirements</li>
+                        <li>Union protections & job security</li>
+                        <li>New AI oversight roles emerging</li>
+                    </ul>
+                </div>
+                <div class="ai-column risk">
+                    <h3>⚠️ Roles at Higher Risk</h3>
+                    <ul>
+                        <li>Data entry & processing</li>
+                        <li>Basic admin tasks</li>
+                        <li>Routine financial processing</li>
+                        <li>Standard report generation</li>
+                        <li>Simple customer queries</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--text-secondary); max-width: 700px; text-align: center; font-size: 0.95rem;">
+                Prediction: By 2030, <strong style="color: var(--accent-emerald);">50% of routine paperwork</strong> will be automated, but this creates <strong style="color: var(--accent-cyan);">new roles</strong> in AI oversight, data quality, and human-AI collaboration.
+            </p>
+        </div>
+
+        <!-- Slide 15: Key Dates -->
+        <div class="slide">
+            <h2 class="slide-title">Key <em>Dates</em></h2>
+            <p class="slide-subtitle" style="margin-bottom: 2rem;">When to apply for 2027 intakes</p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Feb-Mar</div>
+                    <div class="timeline-content">Federal Graduate Programs (AGGP) applications open</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Mar-May</div>
+                    <div class="timeline-content">Intelligence agencies (ASIO, ASIS, ASD) applications</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Apr-Aug</div>
+                    <div class="timeline-content">WA State Government graduate programs</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Aug</div>
+                    <div class="timeline-content">School Leaver Program (Career Starter) applications</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Ongoing</div>
+                    <div class="timeline-content">ADF, Police, Cadetships - check individual deadlines</div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--accent-amber);">Set calendar reminders NOW for early 2026!</p>
+        </div>
+
+        <!-- Slide 16: Resources -->
+        <div class="slide">
+            <h2 class="slide-title"><em>Resources</em></h2>
+            <div class="link-grid">
+                <a href="https://www.apsjobs.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">🏛️</span>
+                    <div>
+                        <div class="link-text">APS Jobs</div>
+                        <div class="link-sub">All federal government jobs</div>
+                    </div>
+                </a>
+                <a href="https://jobs.wa.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">🌾</span>
+                    <div>
+                        <div class="link-text">WA Government Jobs</div>
+                        <div class="link-sub">State government roles</div>
+                    </div>
+                </a>
+                <a href="https://www.intelligence.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">🔐</span>
+                    <div>
+                        <div class="link-text">Intelligence Community</div>
+                        <div class="link-sub">ASIO, ASIS, ASD careers</div>
+                    </div>
+                </a>
+                <a href="https://www.adfcareers.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">🎖️</span>
+                    <div>
+                        <div class="link-text">ADF Careers</div>
+                        <div class="link-sub">Defence Force options</div>
+                    </div>
+                </a>
+                <a href="https://careers.afp.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">👮</span>
+                    <div>
+                        <div class="link-text">AFP Careers</div>
+                        <div class="link-sub">Federal Police</div>
+                    </div>
+                </a>
+                <a href="https://letsjoinforces.wa.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">🚔</span>
+                    <div>
+                        <div class="link-text">WA Police</div>
+                        <div class="link-sub">State police recruitment</div>
+                    </div>
+                </a>
+                <a href="https://www.defence.gov.au/jobs-careers/student-pathways/stem-cadetship" target="_blank" class="link-card">
+                    <span class="link-icon">📚</span>
+                    <div>
+                        <div class="link-text">Defence Cadetships</div>
+                        <div class="link-sub">Get paid while studying</div>
+                    </div>
+                </a>
+                <a href="https://www.bethatteacher.gov.au" target="_blank" class="link-card">
+                    <span class="link-icon">🍎</span>
+                    <div>
+                        <div class="link-text">Be That Teacher</div>
+                        <div class="link-sub">Teaching pathways</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Slide 17: Comparison -->
+        <div class="slide">
+            <h2 class="slide-title">Quick <em>Comparison</em></h2>
+            <div class="compare-table">
+                <div class="compare-row">
+                    <div class="compare-cell compare-header">Pathway</div>
+                    <div class="compare-cell compare-header">Starting Salary</div>
+                    <div class="compare-cell compare-header">Entry Requirement</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">School Leaver Program</div>
+                    <div class="compare-cell">$54,000+</div>
+                    <div class="compare-cell">Year 12</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">WA Police Recruit</div>
+                    <div class="compare-cell">$72,000+</div>
+                    <div class="compare-cell">18+, fit, licence</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">ADF Gap Year</div>
+                    <div class="compare-cell">$55,000+</div>
+                    <div class="compare-cell">17-24, Year 12</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Graduate Program</div>
+                    <div class="compare-cell">$77,000-94,000</div>
+                    <div class="compare-cell">Bachelor degree</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Intelligence Grad</div>
+                    <div class="compare-cell">$81,000-90,000</div>
+                    <div class="compare-cell">Degree + clearance</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">ADFA Officer</div>
+                    <div class="compare-cell">$50,000 (while studying)</div>
+                    <div class="compare-cell">Year 12 + selection</div>
+                </div>
+            </div>
+            <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">All include 15.4% super (higher than private sector)</p>
+        </div>
+
+        <!-- Slide 18: End -->
+        <div class="slide">
+            <h1 class="slide-title">Serve <em>Australia</em></h1>
+            <p class="slide-subtitle">Stable careers, real impact, pathways for everyone</p>
+            <p style="margin-top: 3rem; color: var(--text-muted);">Government isn't boring - it's where the big decisions happen.</p>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 18</div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'f' || e.key === 'F') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+
+        // Touch support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+        });
+    </script>
+</body>
+</html>
