@@ -465,6 +465,72 @@
                               radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
         }
 
+        /* Video container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Robot cards */
+        .robot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .robot-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .robot-card:hover {
+            transform: translateY(-5px);
+            border-left-color: var(--accent-violet);
+        }
+
+        .robot-card h4 {
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        .robot-card .robot-company {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .robot-card .robot-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .robot-card .robot-price {
+            margin-top: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-emerald);
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .slide { padding: 2rem; }
@@ -496,27 +562,297 @@
             <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">The Robot Revolution is <em>NOW</em></h2>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">📦</div>
-                    <div class="stat-number">750,000+</div>
-                    <div class="stat-label">Robots in Amazon warehouses worldwide</div>
+                    <div class="stat-icon">🏭</div>
+                    <div class="stat-number">30,000+</div>
+                    <div class="stat-label">Atlas robots to be produced yearly at Hyundai's new factory</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">🤖</div>
-                    <div class="stat-number">Tesla Optimus</div>
-                    <div class="stat-label">Humanoid robot already working in factories</div>
+                    <div class="stat-icon">🚗</div>
+                    <div class="stat-number">30,000 BMWs</div>
+                    <div class="stat-label">Built with help from Figure robots in 2025</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">🚛</div>
-                    <div class="stat-number">Autonomous</div>
-                    <div class="stat-label">Self-driving trucks on highways in USA & Australia</div>
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-number">$13,500</div>
+                    <div class="stat-label">Cost of a Unitree G1 humanoid robot today</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">🛴</div>
-                    <div class="stat-number">Delivery Bots</div>
-                    <div class="stat-label">Robot deliveries on sidewalks and campuses</div>
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-number">$20,000</div>
+                    <div class="stat-label">Tesla's target price for Optimus Gen 3</div>
                 </div>
             </div>
-            <p class="stat-source">This isn't science fiction. It's happening right now.</p>
+            <p class="stat-source">CES 2026: Humanoid robots dominated the show • This is happening NOW</p>
+        </div>
+
+        <!-- Slide 2.5: Watch - CES 2026 Atlas Demo -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Watch: <em>Atlas at CES 2026</em></h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/sd8ivhpjI6g" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="stat-source" style="margin-top: 1.5rem;">Boston Dynamics • First public Atlas demo • January 2026</p>
+        </div>
+
+        <!-- Slide: Meet the Robots (Visual) -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Meet the <em>Robots</em></h2>
+            <div class="robot-grid" style="grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🤖</div>
+                    <h4 style="margin-bottom: 0.25rem;">Atlas</h4>
+                    <div class="robot-company">Boston Dynamics</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Blue humanoid, glowing ring-light face, 360° rotating joints</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚡</div>
+                    <h4 style="margin-bottom: 0.25rem;">Optimus</h4>
+                    <div class="robot-company">Tesla</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">White/black, human-sized, sleek Tesla design language</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏃</div>
+                    <h4 style="margin-bottom: 0.25rem;">G1</h4>
+                    <div class="robot-company">Unitree</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Compact 1.3m, black, backflips and martial arts</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔧</div>
+                    <h4 style="margin-bottom: 0.25rem;">Figure 02</h4>
+                    <div class="robot-company">Figure AI</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Black/grey, industrial design, built 30,000 BMWs</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🦵</div>
+                    <h4 style="margin-bottom: 0.25rem;">Digit</h4>
+                    <div class="robot-company">Agility Robotics</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Ostrich-like legs, no head, warehouse specialist</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏠</div>
+                    <h4 style="margin-bottom: 0.25rem;">NEO</h4>
+                    <div class="robot-company">1X Technologies</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Friendly home robot, first $499/month subscription</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🐕</div>
+                    <h4 style="margin-bottom: 0.25rem;">Spot</h4>
+                    <div class="robot-company">Boston Dynamics</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Yellow robot dog, inspections, site monitoring</div>
+                </div>
+                <div class="robot-card" style="text-align: center; padding: 1.2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏥</div>
+                    <h4 style="margin-bottom: 0.25rem;">Da Vinci</h4>
+                    <div class="robot-company">Intuitive Surgical</div>
+                    <div class="robot-desc" style="font-size: 0.8rem;">Surgical robot, 4 arms, 12 million surgeries</div>
+                </div>
+            </div>
+            <p class="stat-source">Search these robots on YouTube to see them in action</p>
+        </div>
+
+        <!-- Slide 2.6: Humanoid Robots at CES 2026 -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;"><em>Humanoid Robots</em> at CES 2026</h2>
+            <div class="robot-grid">
+                <div class="robot-card">
+                    <h4>Boston Dynamics Atlas</h4>
+                    <div class="robot-company">USA (Hyundai-owned)</div>
+                    <div class="robot-desc">56 degrees of freedom, 360° rotating joints, 50kg lifting capacity. Now in production.</div>
+                </div>
+                <div class="robot-card">
+                    <h4>Figure 03</h4>
+                    <div class="robot-company">USA (California)</div>
+                    <div class="robot-desc">Next-gen after Figure 02 built 30,000 BMWs. Ready for scaled deployment.</div>
+                </div>
+                <div class="robot-card">
+                    <h4>Tesla Optimus Gen 3</h4>
+                    <div class="robot-company">USA (Tesla)</div>
+                    <div class="robot-desc">Target: 1 million units/year. Household tasks, factory work. Reveal Feb 2026.</div>
+                    <div class="robot-price">Target: ~$20,000</div>
+                </div>
+                <div class="robot-card">
+                    <h4>Unitree G1</h4>
+                    <div class="robot-company">China</div>
+                    <div class="robot-desc">Backflips, martial arts, dancing. Performed live at Wang Leehom concert Dec 2025.</div>
+                    <div class="robot-price">From $13,500</div>
+                </div>
+                <div class="robot-card">
+                    <h4>EngineAI T800</h4>
+                    <div class="robot-company">China</div>
+                    <div class="robot-desc">1.73m tall, 450 Nm torque, NVIDIA Jetson Thor. Shipping mid-2026.</div>
+                    <div class="robot-price">From $25,000</div>
+                </div>
+                <div class="robot-card">
+                    <h4>NEURA 4NE1</h4>
+                    <div class="robot-company">Germany</div>
+                    <div class="robot-desc">Powered by NVIDIA GR00T. Humanoid + quadruped versions available.</div>
+                </div>
+            </div>
+            <p class="stat-source">21 of 38 humanoid robot exhibitors at CES 2026 were Chinese companies</p>
+        </div>
+
+        <!-- Slide 2.7: Real Robots, Real Work -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Real Robots, <em>Real Work</em></h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div class="content-box">
+                    <h3>Figure 02 at BMW (2025)</h3>
+                    <ul>
+                        <li>11-month deployment at BMW Spartanburg</li>
+                        <li>10-hour shifts, Monday to Friday</li>
+                        <li>90,000+ sheet metal parts loaded</li>
+                        <li>30,000+ BMW X3s produced</li>
+                        <li>84-second cycle time, 5mm precision</li>
+                        <li>>99% success rate per shift</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>What This Means</h3>
+                    <ul>
+                        <li>Humanoid robots are no longer demos</li>
+                        <li>They work real shifts in real factories</li>
+                        <li>They're getting faster and cheaper</li>
+                        <li>Your future workplace will have them</li>
+                        <li>New jobs: robot operators, maintenance</li>
+                        <li>The transition is happening NOW</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source">Figure AI • 11-month deployment results • November 2025</p>
+        </div>
+
+        <!-- Slide: Famous Quotes -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What the <em>Experts</em> Are Saying</h2>
+            <div class="skills-list" style="gap: 1.5rem;">
+                <div class="skill-item" style="border-left-color: var(--accent-violet);">
+                    <div class="skill-icon">🚀</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Elon Musk, CEO Tesla</div>
+                        <div class="skill-desc" style="font-style: italic;">"By 2040 there will be more humanoid robots than people. The biggest product ever — bigger than cellphones or anything else."</div>
+                    </div>
+                </div>
+                <div class="skill-item" style="border-left-color: var(--accent-cyan);">
+                    <div class="skill-icon">🎮</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Jensen Huang, CEO NVIDIA</div>
+                        <div class="skill-desc" style="font-style: italic;">"Robots with human-level capabilities will arrive this year [2026]. Humanoid robotics is going to be one of the largest industries ever."</div>
+                    </div>
+                </div>
+                <div class="skill-item" style="border-left-color: var(--accent-amber);">
+                    <div class="skill-icon">🏠</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Peter Diamandis, Futurist</div>
+                        <div class="skill-desc" style="font-style: italic;">"We'll see humanoid robots in homes by the end of 2026. Half of the $110 trillion global GDP is labour — that's the potential robot market."</div>
+                    </div>
+                </div>
+                <div class="skill-item" style="border-left-color: var(--accent-rose);">
+                    <div class="skill-icon">🔧</div>
+                    <div class="skill-content">
+                        <div class="skill-name">Brett Adcock, CEO Figure AI</div>
+                        <div class="skill-desc" style="font-style: italic;">"In 2026, humanoids will work autonomously and perform unsupervised, multi-day tasks in homes they've never seen before."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide: What Robots Will Do FOR You -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">What Robots Will Do <em>For You</em></h2>
+            <div class="two-column" style="max-width: 1000px;">
+                <div class="content-box">
+                    <h3 style="color: var(--accent-emerald);">At Work</h3>
+                    <ul>
+                        <li>Handle dangerous and repetitive tasks</li>
+                        <li>Work 24/7 shifts you don't want</li>
+                        <li>Lift heavy loads (no back injuries)</li>
+                        <li>Increase your productivity 3-5x</li>
+                        <li>Free you for creative and human work</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3 style="color: var(--accent-violet);">At Home</h3>
+                    <ul>
+                        <li>Cooking, cleaning, laundry</li>
+                        <li>Elderly care and assistance</li>
+                        <li>Security and monitoring</li>
+                        <li>Deliveries and errands</li>
+                        <li>Personal assistant tasks</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="stat-source" style="margin-top: 2rem; font-size: 1.1rem; color: var(--text-secondary);">
+                Elon Musk: <em>"My prediction is that work will be optional."</em>
+            </p>
+        </div>
+
+        <!-- Slide: Robots in YOUR Future Career -->
+        <div class="slide">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Robots in <em>Your Future Career</em></h2>
+            <div class="industry-grid">
+                <div class="industry-card" style="border-color: var(--accent-amber);">
+                    <div class="industry-icon">⛏️</div>
+                    <div class="industry-title">Mining (WA!)</div>
+                    <div class="industry-desc">130+ autonomous trucks in the Pilbara. Rio Tinto's 1,500km robot train network. Zero haul truck injuries since 2008.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-cyan);">
+                    <div class="industry-icon">🏥</div>
+                    <div class="industry-title">Healthcare</div>
+                    <div class="industry-desc">8,000+ Da Vinci surgical robots worldwide. AI nursing bots reduce workload 30%. 12 million surgeries completed.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-violet);">
+                    <div class="industry-icon">🏗️</div>
+                    <div class="industry-title">Construction</div>
+                    <div class="industry-desc">Bricklaying robots: 500 blocks/hour vs 50 human. Drones survey 120 acres/hour. 3D printing entire buildings.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-emerald);">
+                    <div class="industry-icon">📦</div>
+                    <div class="industry-title">Warehouses</div>
+                    <div class="industry-desc">Digit robots at Amazon moving 100,000+ totes. GXO and Spanx using humanoids. 24/7 operations.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-rose);">
+                    <div class="industry-icon">🍽️</div>
+                    <div class="industry-title">Hospitality</div>
+                    <div class="industry-desc">Robot waiters in 25,000+ restaurants. AI baristas making coffee. Hotels cutting costs 30-40%.</div>
+                </div>
+                <div class="industry-card" style="border-color: var(--accent-blue);">
+                    <div class="industry-icon">🌾</div>
+                    <div class="industry-title">Agriculture</div>
+                    <div class="industry-desc">Autonomous tractors. Crop-picking robots. Drone monitoring. Precision weeding with AI vision.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide: WA Mining Robots -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Right Here in <em>WA</em></h2>
+            <div class="aussie-card" style="max-width: 900px;">
+                <div class="aussie-icon">🇦🇺</div>
+                <div class="aussie-title">The Pilbara: World's Most Automated Mines</div>
+                <div class="aussie-content">
+                    <div class="stats-grid" style="margin-top: 1.5rem;">
+                        <div class="stat-card" style="padding: 1.5rem;">
+                            <div class="stat-number" style="font-size: 2rem;">130+</div>
+                            <div class="stat-label">Autonomous trucks at Rio Tinto</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1.5rem;">
+                            <div class="stat-number" style="font-size: 2rem;">1,500km</div>
+                            <div class="stat-label">Robot train network</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1.5rem;">
+                            <div class="stat-number" style="font-size: 2rem;">0</div>
+                            <div class="stat-label">Haul truck injuries since 2008</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1.5rem;">
+                            <div class="stat-number" style="font-size: 2rem;">20%</div>
+                            <div class="stat-label">Cost reduction achieved</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1.5rem; font-size: 1rem; color: var(--text-muted);">
+                        Rio Tinto's Gudai-Darri is the world's most technologically advanced mine. BHP has 41+ autonomous trucks at South Flank. These jobs exist NOW in WA.
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Slide 3: Jobs Being Disrupted -->
@@ -1012,7 +1348,36 @@
             </div>
         </div>
 
-        <!-- Slide 18: End Slide -->
+        <!-- Slide: Week 2 Activity -->
+        <div class="slide pattern-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Week 2 <em>Activity</em></h2>
+            <a href="../../activities/fact-or-cap/index.html" target="_blank" style="text-decoration: none; color: inherit; max-width: 500px; display: block;">
+                <div class="content-box" style="text-align: center; padding: 3rem 2rem; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;">
+                    <div style="font-size: 4rem; margin-bottom: 1.5rem;">🧢</div>
+                    <h3 style="color: var(--accent-violet); font-size: 1.8rem; margin-bottom: 1rem;">Fact or Cap?</h3>
+                    <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                        AI predictions about robots and jobs — can you separate real stats from total rubbish? Test your critical thinking!
+                    </p>
+                    <div style="padding: 0.75rem 2rem; background: var(--accent-violet); border-radius: 50px; display: inline-block; font-weight: 600; font-size: 1rem;">PLAY NOW →</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Slide: Next Week Teaser -->
+        <div class="slide gradient-bg">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Next Week: <em>AI Risks & Ethics</em></h2>
+            <div class="content-box" style="max-width: 700px; text-align: center; padding: 2.5rem;">
+                <div style="font-size: 1.2rem; color: var(--text-secondary); line-height: 1.8;">
+                    <p style="margin-bottom: 1rem;">🎭 Deepfakes and misinformation</p>
+                    <p style="margin-bottom: 1rem;">🧠 AI hallucinations and errors</p>
+                    <p style="margin-bottom: 1rem;">📚 Academic integrity in the AI age</p>
+                    <p style="margin-bottom: 1rem;">🏢 Workplace AI policies</p>
+                </div>
+            </div>
+            <p class="stat-source">Week 3 • The dark side of AI</p>
+        </div>
+
+        <!-- End Slide -->
         <div class="slide">
             <h1 class="slide-title">Your Career, <em>Your Terms</em></h1>
             <p class="slide-subtitle">The future of work is flexible, exciting, and full of possibilities. Are you ready?</p>
