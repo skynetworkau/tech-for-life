@@ -520,6 +520,145 @@
             object-fit: contain;
         }
 
+        /* Updated Tools Grid with Tooltips */
+        .tools-grid-v2 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .tools-grid-v2 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tool-card-v2 {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 3px solid;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tool-card-v2:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .tool-card-v2:hover .tool-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .tool-card-v2:nth-child(1) { border-color: #10b981; }
+        .tool-card-v2:nth-child(2) { border-color: #f97316; }
+        .tool-card-v2:nth-child(3) { border-color: #3b82f6; }
+        .tool-card-v2:nth-child(4) { border-color: #8b5cf6; }
+        .tool-card-v2:nth-child(5) { border-color: #06b6d4; }
+        .tool-card-v2:nth-child(6) { border-color: #ec4899; }
+        .tool-card-v2:nth-child(7) { border-color: #f59e0b; }
+        .tool-card-v2:nth-child(8) { border-color: #14b8a6; }
+
+        .tool-logo-v2 {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 0.75rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            padding: 6px;
+        }
+
+        .tool-logo-v2 img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .tool-name-v2 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-usecase {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        .tool-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1a1a24;
+            border: 1px solid var(--accent-violet);
+            border-radius: 10px;
+            padding: 1rem;
+            width: 250px;
+            text-align: left;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .tool-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--accent-violet);
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .tooltip-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .tooltip-usecases {
+            font-size: 0.75rem;
+            color: var(--accent-emerald);
+        }
+
+        .tooltip-usecases strong {
+            color: var(--text-muted);
+        }
+
+        /* Category Label */
+        .tools-category {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-label {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent-violet);
+            font-weight: 500;
+            margin: 0 0.5rem;
+        }
+
         /* Video Container */
         .video-container {
             position: relative;
@@ -644,80 +783,115 @@
 
         <!-- Slide 5: AI Tools You Use -->
         <div class="slide pattern-bg">
-            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">AI Tools You <em>Actually</em> Use</h2>
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-logo">
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 1.5rem;">AI Tools You'll <em>Actually</em> Use</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">Hover for use cases • These are the tools professionals use daily</p>
+            <div class="tools-grid-v2">
+                <!-- Perplexity -->
+                <div class="tool-card-v2" onclick="window.open('https://perplexity.ai', '_blank')">
+                    <div class="tool-logo-v2">
+                        <img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="Perplexity">
+                    </div>
+                    <div class="tool-name-v2">Perplexity</div>
+                    <div class="tool-usecase">Research & Citations</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">🔍 Perplexity AI</div>
+                        <div class="tooltip-desc">AI-powered search that gives you answers WITH sources. Like Google but actually answers your question and shows where it got the info.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Research assignments, fact-checking, finding sources, staying current on news</div>
+                    </div>
+                </div>
+                <!-- ChatGPT -->
+                <div class="tool-card-v2" onclick="window.open('https://chat.openai.com', '_blank')">
+                    <div class="tool-logo-v2">
                         <img src="https://www.google.com/s2/favicons?domain=chat.openai.com&sz=64" alt="ChatGPT">
                     </div>
-                    <div class="tool-name">ChatGPT</div>
-                    <div class="tool-type">OpenAI • Chat & writing</div>
+                    <div class="tool-name-v2">ChatGPT</div>
+                    <div class="tool-usecase">Writing & Ideas</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">💬 ChatGPT</div>
+                        <div class="tooltip-desc">The most popular AI chatbot. Great for brainstorming, explaining concepts, drafting emails, and general assistance.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Essay outlines, explaining concepts, drafting cover letters, brainstorming ideas</div>
+                    </div>
                 </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
+                <!-- Claude -->
+                <div class="tool-card-v2" onclick="window.open('https://claude.ai', '_blank')">
+                    <div class="tool-logo-v2">
                         <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude">
                     </div>
-                    <div class="tool-name">Claude</div>
-                    <div class="tool-type">Anthropic • Analysis & code</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
-                        <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini">
+                    <div class="tool-name-v2">Claude</div>
+                    <div class="tool-usecase">Long Documents & Code</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">🧠 Claude</div>
+                        <div class="tooltip-desc">Excellent at analysing long documents, coding, and detailed explanations. Can read entire PDFs and textbooks.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Analysing readings, coding help, detailed feedback on writing, complex explanations</div>
                     </div>
-                    <div class="tool-name">Gemini</div>
-                    <div class="tool-type">Google • Search & multimodal</div>
                 </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
+                <!-- NotebookLM -->
+                <div class="tool-card-v2" onclick="window.open('https://notebooklm.google.com', '_blank')">
+                    <div class="tool-logo-v2">
                         <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&sz=64" alt="NotebookLM">
                     </div>
-                    <div class="tool-name">NotebookLM</div>
-                    <div class="tool-type">Google • AI study assistant</div>
+                    <div class="tool-name-v2">NotebookLM</div>
+                    <div class="tool-usecase">Study & Revision</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">📚 NotebookLM</div>
+                        <div class="tooltip-desc">Upload your notes/textbooks and it creates study guides, summaries, and even AI podcasts explaining the content!</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Exam revision, turning notes into podcasts, understanding complex texts, study summaries</div>
+                    </div>
                 </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
+                <!-- Canva AI -->
+                <div class="tool-card-v2" onclick="window.open('https://canva.com', '_blank')">
+                    <div class="tool-logo-v2">
+                        <img src="https://www.google.com/s2/favicons?domain=canva.com&sz=64" alt="Canva">
+                    </div>
+                    <div class="tool-name-v2">Canva AI</div>
+                    <div class="tool-usecase">Design & Presentations</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">🎨 Canva AI</div>
+                        <div class="tooltip-desc">Design tool with AI features for creating presentations, social media posts, resumes, and marketing materials.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Presentations, resumes, social media content, posters, business cards</div>
+                    </div>
+                </div>
+                <!-- CapCut -->
+                <div class="tool-card-v2" onclick="window.open('https://capcut.com', '_blank')">
+                    <div class="tool-logo-v2">
+                        <img src="https://www.google.com/s2/favicons?domain=capcut.com&sz=64" alt="CapCut">
+                    </div>
+                    <div class="tool-name-v2">CapCut</div>
+                    <div class="tool-usecase">Video Editing</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">🎬 CapCut</div>
+                        <div class="tooltip-desc">Free video editor with AI auto-captions, background removal, and effects. Used by every content creator.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> TikTok/Reels, school video projects, adding captions, content creation</div>
+                    </div>
+                </div>
+                <!-- Grammarly -->
+                <div class="tool-card-v2" onclick="window.open('https://grammarly.com', '_blank')">
+                    <div class="tool-logo-v2">
+                        <img src="https://www.google.com/s2/favicons?domain=grammarly.com&sz=64" alt="Grammarly">
+                    </div>
+                    <div class="tool-name-v2">Grammarly</div>
+                    <div class="tool-usecase">Writing & Editing</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">✍️ Grammarly</div>
+                        <div class="tooltip-desc">Real-time grammar, spelling, and style checker that works across all websites and apps. Essential for professional writing.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Essays, emails, job applications, any professional writing</div>
+                    </div>
+                </div>
+                <!-- Midjourney/DALL-E -->
+                <div class="tool-card-v2" onclick="window.open('https://ideogram.ai', '_blank')">
+                    <div class="tool-logo-v2">
                         <img src="https://www.google.com/s2/favicons?domain=ideogram.ai&sz=64" alt="Ideogram">
                     </div>
-                    <div class="tool-name">Ideogram</div>
-                    <div class="tool-type">AI image generation</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
-                        <img src="https://www.google.com/s2/favicons?domain=midjourney.com&sz=64" alt="Midjourney">
+                    <div class="tool-name-v2">Ideogram</div>
+                    <div class="tool-usecase">Image Generation</div>
+                    <div class="tool-tooltip">
+                        <div class="tooltip-title">🖼️ Ideogram</div>
+                        <div class="tooltip-desc">Free AI image generator that's great with text in images. Create posters, logos, artwork from text descriptions.</div>
+                        <div class="tooltip-usecases"><strong>Use for:</strong> Creating visuals for projects, posters, social media graphics, concept art</div>
                     </div>
-                    <div class="tool-name">Midjourney</div>
-                    <div class="tool-type">Image generation</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
-                        <img src="https://www.google.com/s2/favicons?domain=canva.com&sz=64" alt="Canva AI">
-                    </div>
-                    <div class="tool-name">Canva AI</div>
-                    <div class="tool-type">Design & image tools</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
-                        <img src="https://www.google.com/s2/favicons?domain=recraft.ai&sz=64" alt="Recraft">
-                    </div>
-                    <div class="tool-name">Recraft</div>
-                    <div class="tool-type">AI design tool</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
-                        <img src="https://www.google.com/s2/favicons?domain=teacherscreen.com.au&sz=64" alt="TeacherScreen">
-                    </div>
-                    <div class="tool-name">TeacherScreen</div>
-                    <div class="tool-type">Australian AI teaching</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-logo">
-                        <img src="https://www.google.com/s2/favicons?domain=replicate.com&sz=64" alt="Replicate">
-                    </div>
-                    <div class="tool-name">Replicate</div>
-                    <div class="tool-type">AI model hosting</div>
                 </div>
             </div>
-            <p class="stat-source">Over 85% of Australian students have used generative AI tools for schoolwork (2026 Monash University Study)</p>
+            <p class="stat-source" style="margin-top: 1.5rem;">Click any tool to try it • <a href="../../resources/ai-tools/index.html" style="color: var(--accent-cyan);">See full AI Tools Directory →</a></p>
         </div>
 
         <!-- Slide 6: How AI Works - Simple -->
@@ -747,11 +921,11 @@
 
         <!-- Slide 6.5: Video - How AI Works -->
         <div class="slide">
-            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Watch: <em>How AI Learns</em></h2>
+            <h2 class="slide-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Watch: <em>What is Machine Learning?</em></h2>
             <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/aircAruvnKk" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/9gGnTQTYNaE" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
-            <p class="stat-source" style="margin-top: 1.5rem;">But what IS a neural network? • 3Blue1Brown • 19 minutes</p>
+            <p class="stat-source" style="margin-top: 1.5rem;">What is Machine Learning? • IBM Technology • 5 minutes</p>
         </div>
 
         <!-- Slide 7: Real Example -->
